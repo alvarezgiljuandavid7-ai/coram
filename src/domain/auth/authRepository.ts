@@ -28,6 +28,19 @@ interface ProfileRow {
   role: 'admin' | 'premium' | 'member' | null;
 }
 
+const configuredPublicAppUrl = (import.meta.env.VITE_CORAM_PUBLIC_URL as string | undefined)?.trim();
+
+export function buildAuthRedirectUrl(
+  path: string,
+  currentOrigin = window.location.origin,
+  configuredOrigin = configuredPublicAppUrl,
+): string {
+  const origin = (configuredOrigin || currentOrigin).replace(/\/+$/, '');
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  return `${origin}${normalizedPath}`;
+}
+
 function normalizeRole(role: string | null | undefined): 'admin' | 'premium' | 'member' {
   return role === 'admin' || role === 'premium' || role === 'member' ? role : 'member';
 }
@@ -80,7 +93,7 @@ export async function signInWithGoogle(): Promise<void> {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/app`,
+      redirectTo: buildAuthRedirectUrl('/app'),
       skipBrowserRedirect: true,
     },
   });
@@ -97,7 +110,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
     throw new Error('Supabase no está configurado.');
   }
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
   if (error) throw error;
 }
 
@@ -107,13 +120,13 @@ export async function signUpWithEmail(email: string, password: string, fullName:
   }
 
   const { error } = await supabase.auth.signUp({
-    email,
+    email: email.trim(),
     password,
     options: {
       data: {
         full_name: fullName,
       },
-      emailRedirectTo: `${window.location.origin}/app`,
+      emailRedirectTo: buildAuthRedirectUrl('/app'),
     },
   });
 
@@ -125,8 +138,8 @@ export async function sendPasswordReset(email: string): Promise<void> {
     throw new Error('Supabase no está configurado.');
   }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/login`,
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: buildAuthRedirectUrl('/login'),
   });
 
   if (error) throw error;

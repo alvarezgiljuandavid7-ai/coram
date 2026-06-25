@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   signInWithOAuth: vi.fn(),
+  signInWithPassword: vi.fn(),
   assign: vi.fn(),
 }));
 
@@ -9,13 +10,15 @@ vi.mock('../../shared/supabase/client', () => ({
   supabase: {
     auth: {
       signInWithOAuth: mocks.signInWithOAuth,
+      signInWithPassword: mocks.signInWithPassword,
     },
   },
 }));
 
-describe('signInWithGoogle', () => {
+describe('authRepository', () => {
   beforeEach(() => {
     mocks.signInWithOAuth.mockReset();
+    mocks.signInWithPassword.mockReset();
     mocks.assign.mockReset();
     Object.defineProperty(globalThis, 'window', {
       configurable: true,
@@ -46,5 +49,22 @@ describe('signInWithGoogle', () => {
       },
     });
     expect(mocks.assign).toHaveBeenCalledWith('https://accounts.google.com/o/oauth2/v2/auth?client_id=coram');
+  });
+
+  it('builds auth redirect URLs from a configured public app URL', async () => {
+    const { buildAuthRedirectUrl } = await import('./authRepository');
+
+    expect(buildAuthRedirectUrl('/app', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe(
+      'https://coram-two.vercel.app/app',
+    );
+  });
+
+  it('trims email before password sign in', async () => {
+    mocks.signInWithPassword.mockResolvedValue({ error: null });
+    const { signInWithEmail } = await import('./authRepository');
+
+    await signInWithEmail('  admin@example.com  ', 'password');
+
+    expect(mocks.signInWithPassword).toHaveBeenCalledWith({ email: 'admin@example.com', password: 'password' });
   });
 });
