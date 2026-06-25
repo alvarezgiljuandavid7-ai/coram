@@ -39,6 +39,7 @@ Required production environment variables:
 ```text
 VITE_SUPABASE_URL
 VITE_SUPABASE_PUBLISHABLE_KEY
+VITE_CORAM_PUBLIC_URL
 ```
 
 ## Current Capabilities
