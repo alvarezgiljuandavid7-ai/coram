@@ -114,6 +114,18 @@ export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
       </div>
 
       <div className="space-y-2">
+        {!auth.recoveryMode && mode !== 'reset' && (
+          <button
+            type="button"
+            disabled={working}
+            onClick={() => void startGoogleSignIn()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 disabled:cursor-wait disabled:text-slate-400"
+          >
+            {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5 text-[#C29031]" />}
+            <span>Continuar con Google</span>
+          </button>
+        )}
+
         {mode === 'signup' && !auth.recoveryMode && (
           <input
             value={fullName}
@@ -161,18 +173,8 @@ export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white hover:bg-slate-900 disabled:cursor-wait disabled:bg-slate-400"
           >
             {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
-            <span>{auth.recoveryMode ? 'Actualizar' : mode === 'reset' ? 'Enviar' : 'Entrar'}</span>
+            <span>{auth.recoveryMode ? 'Actualizar' : mode === 'reset' ? 'Enviar' : mode === 'signup' ? 'Crear cuenta' : 'Entrar'}</span>
           </button>
-          {!auth.recoveryMode && mode === 'signin' && (
-            <button
-              type="button"
-              disabled={working}
-              onClick={() => void startGoogleSignIn()}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100"
-            >
-              Google
-            </button>
-          )}
         </div>
 
         {!auth.recoveryMode && (

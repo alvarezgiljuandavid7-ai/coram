@@ -22,8 +22,8 @@ export function LoginPage() {
             Entra a CorAM con tu cuenta real.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600">
-            Usa correo y contrasena o Google. El rol se valida desde Supabase para separar usuarios normales y
-            administradores.
+            Usa Google para entrar al instante o correo y contrasena cuando el correo de confirmacion este disponible.
+            El rol se valida desde Supabase para separar usuarios normales y administradores.
           </p>
         </div>
         <div className="border-t border-slate-200 bg-slate-50 p-5 md:border-l md:border-t-0">
