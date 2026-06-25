@@ -8,6 +8,18 @@ describe('humanizeAuthError', () => {
     );
   });
 
+  it('explains email send rate limits in Spanish', () => {
+    expect(humanizeAuthError(new Error('email rate limit exceeded'))).toBe(
+      'Supabase alcanzo el limite temporal de correos. Intenta registrarte mas tarde o entra con Google.',
+    );
+  });
+
+  it('explains invalid email addresses in Spanish', () => {
+    expect(humanizeAuthError(new Error('Email address "test@example.com" is invalid'))).toBe(
+      'Ese correo no parece valido para Supabase. Usa un correo real o continua con Google.',
+    );
+  });
+
   it('keeps useful unknown provider messages when no known mapping exists', () => {
     expect(humanizeAuthError(new Error('Something unexpected'))).toBe('Something unexpected');
   });
