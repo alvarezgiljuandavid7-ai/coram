@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { AlertCircle, Check, KeyRound, Loader2, LogOut, Mail, ShieldCheck } from 'lucide-react';
 import type { CoramAuthState } from '../app/useSupabaseAuth';
+import { humanizeAuthError } from '../domain/auth/authErrors';
 
 interface AuthPanelProps {
   auth: CoramAuthState;
@@ -39,7 +40,7 @@ export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
         setMessage('Te enviamos un enlace para recuperar tu contraseña.');
       }
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo completar la acción.');
+      setError(humanizeAuthError(caughtError));
     } finally {
       setWorking(false);
     }
@@ -53,7 +54,7 @@ export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
     try {
       await auth.signInWithGoogle();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo iniciar sesión con Google.');
+      setError(humanizeAuthError(caughtError));
     } finally {
       setWorking(false);
     }
