@@ -44,7 +44,7 @@ https://coram-nhnb5zpmb-alvarezgiljuandavid7-ais-projects.vercel.app
 GitHub auto-deploy status:
 
 ```text
-Pending: authorize/connect the Vercel GitHub App for alvarezgiljuandavid7-ai/coram.
+Connected: alvarezgiljuandavid7-ai/coram is linked to the Vercel coram project.
 ```
 
 ## Vercel project settings
