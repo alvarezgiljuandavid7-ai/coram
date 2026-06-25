@@ -15,6 +15,26 @@ Reasons:
 - Simple environment variable management.
 - SPA fallback can be configured with `vercel.json`.
 
+## Current Vercel deployment
+
+Project:
+
+```text
+alvarezgiljuandavid7-ais-projects/coram
+```
+
+Production URL:
+
+```text
+https://coram-two.vercel.app
+```
+
+Latest deployment checked during setup:
+
+```text
+https://coram-nhnb5zpmb-alvarezgiljuandavid7-ais-projects.vercel.app
+```
+
 ## Vercel project settings
 
 If the GitHub repository contains the full `open desing` workspace, set:
@@ -53,11 +73,11 @@ Do not add any Supabase `service_role` or secret key to Vercel for the browser a
 After Vercel creates the production URL, update Supabase Dashboard > Authentication > URL Configuration:
 
 ```text
-Site URL: https://<coram-production-domain>
+Site URL: https://coram-two.vercel.app
 Redirect URLs:
   http://localhost:3000/**
   http://127.0.0.1:3000/**
-  https://<coram-production-domain>/**
+  https://coram-two.vercel.app/**
   https://*.vercel.app/**
 ```
 
@@ -65,7 +85,7 @@ If Google login is enabled, also update the Google OAuth app:
 
 ```text
 Authorized JavaScript origins:
-  https://<coram-production-domain>
+  https://coram-two.vercel.app
 
 Authorized redirect URIs:
   https://qbjcqnhgijsotmdzccmi.supabase.co/auth/v1/callback
