@@ -17,6 +17,12 @@ Reasons:
 
 ## Current Vercel deployment
 
+GitHub repository:
+
+```text
+https://github.com/alvarezgiljuandavid7-ai/coram
+```
+
 Project:
 
 ```text
@@ -33,6 +39,12 @@ Latest deployment checked during setup:
 
 ```text
 https://coram-nhnb5zpmb-alvarezgiljuandavid7-ais-projects.vercel.app
+```
+
+GitHub auto-deploy status:
+
+```text
+Pending: authorize/connect the Vercel GitHub App for alvarezgiljuandavid7-ai/coram.
 ```
 
 ## Vercel project settings
