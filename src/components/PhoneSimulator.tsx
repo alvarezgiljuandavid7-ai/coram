@@ -230,6 +230,27 @@ interface PhoneSimulatorProps {
   setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
   mentorships: MentorshipSession[];
   monetizationSettings?: { id: string; name: string; isPremium: boolean; price: string }[];
+  immersive?: boolean;
+}
+
+export function getPhoneSimulatorLayout(immersive: boolean) {
+  if (immersive) {
+    return {
+      rootClassName:
+        'relative flex h-[100dvh] w-full flex-col overflow-hidden bg-slate-950',
+      screenClassName:
+        'h-full w-full overflow-hidden relative flex flex-col transition-colors duration-300',
+      showDeviceChrome: false,
+    };
+  }
+
+  return {
+    rootClassName:
+      'relative w-full max-w-[370px] h-[720px] mx-auto bg-slate-950 rounded-[48px] shadow-2xl p-3 border-4 border-slate-900 overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-indigo-950/20',
+    screenClassName:
+      'w-full h-full rounded-[36px] overflow-hidden relative flex flex-col transition-colors duration-300',
+    showDeviceChrome: true,
+  };
 }
 
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
@@ -240,8 +261,11 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   profile,
   setProfile,
   mentorships,
-  monetizationSettings = []
+  monetizationSettings = [],
+  immersive = false
 }) => {
+  const layout = getPhoneSimulatorLayout(immersive);
+
   // Mobile navigation state
   const [currentScreen, setCurrentScreen] = useState<string>('splash');
   const [selectedCorario, setSelectedCorario] = useState<Corario | null>(null);
@@ -1167,32 +1191,36 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   );
 
   return (
-    <div id="coram-smartphone-simulator" className="relative w-full max-w-[370px] h-[720px] mx-auto bg-slate-950 rounded-[48px] shadow-2xl p-3 border-4 border-slate-900 overflow-hidden flex flex-col group transition-all duration-300 hover:shadow-indigo-950/20">
+    <div id="coram-smartphone-simulator" className={layout.rootClassName}>
       
       {/* Notch / Speaker bar */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-32 h-4 bg-slate-900 rounded-full z-30 flex items-center justify-center space-x-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-slate-850"></div>
-        <div className="w-12 h-1 bg-slate-850 rounded-full"></div>
-        <div className="w-2 h-2 rounded-full bg-indigo-900/55 border border-indigo-900"></div>
-      </div>
+      {layout.showDeviceChrome && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-32 h-4 bg-slate-900 rounded-full z-30 flex items-center justify-center space-x-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-slate-850"></div>
+          <div className="w-12 h-1 bg-slate-850 rounded-full"></div>
+          <div className="w-2 h-2 rounded-full bg-indigo-900/55 border border-indigo-900"></div>
+        </div>
+      )}
 
       {/* Screen area container */}
-      <div className={`w-full h-full rounded-[36px] overflow-hidden relative flex flex-col transition-colors duration-300 ${
+      <div className={`${layout.screenClassName} ${
         isDarkMode ? 'dark-theme-simulator bg-slate-900' : 'bg-[#FAF9F6]'
       }`}>
         
         {/* Phone mock status bar */}
-        <div className={`w-full h-7 backdrop-blur-xs flex items-center justify-between px-6 text-[11px] font-mono font-medium z-20 shrink-0 select-none pt-1 transition-colors ${
-          isDarkMode ? 'bg-slate-800/70 text-slate-100 border-b border-slate-700/40' : 'bg-white/70 text-slate-800'
-        }`}>
-          <span>09:41 AM</span>
-          <div className="flex items-center space-x-1.5">
-            <span>5G</span>
-            <div className="w-5 h-2.5 border border-slate-700 rounded-sm p-[1px] flex items-center">
-              <div className="h-full w-4 bg-slate-800 rounded-2xs"></div>
+        {layout.showDeviceChrome && (
+          <div className={`w-full h-7 backdrop-blur-xs flex items-center justify-between px-6 text-[11px] font-mono font-medium z-20 shrink-0 select-none pt-1 transition-colors ${
+            isDarkMode ? 'bg-slate-800/70 text-slate-100 border-b border-slate-700/40' : 'bg-white/70 text-slate-800'
+          }`}>
+            <span>09:41 AM</span>
+            <div className="flex items-center space-x-1.5">
+              <span>5G</span>
+              <div className="w-5 h-2.5 border border-slate-700 rounded-sm p-[1px] flex items-center">
+                <div className="h-full w-4 bg-slate-800 rounded-2xs"></div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Global Toaster message */}
         <AnimatePresence>

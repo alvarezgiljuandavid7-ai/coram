@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   BookMarked,
   FolderOpen,
@@ -27,12 +27,18 @@ const appNav = [
   { to: '/app/perfil', label: 'Perfil', icon: UserRound },
 ];
 
+export function isImmersiveAppRoute(pathname: string): boolean {
+  return pathname === '/app' || pathname === '/app/';
+}
+
 export function AppLayout() {
   const { auth } = useCoramApp();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const immersiveAppRoute = isImmersiveAppRoute(location.pathname);
 
   return (
-    <div className="min-h-screen bg-[oklch(98%_0.006_90)] text-slate-900">
+    <div className={`min-h-screen bg-[oklch(98%_0.006_90)] text-slate-900 ${immersiveAppRoute ? 'max-md:bg-slate-950' : ''}`}>
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-200 bg-[oklch(99%_0.004_90)] px-4 py-5 shadow-xl shadow-slate-950/5 transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
@@ -88,7 +94,7 @@ export function AppLayout() {
       {open && <button type="button" aria-label="Cerrar menu" className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden" onClick={() => setOpen(false)} />}
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-4 py-3 backdrop-blur md:px-6">
+        <header className={`${immersiveAppRoute ? 'hidden md:block' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-4 py-3 backdrop-blur md:px-6`}>
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -107,10 +113,12 @@ export function AppLayout() {
           </div>
         </header>
 
-        <main className="px-4 py-5 md:px-6 md:py-7">
+        <main className={immersiveAppRoute ? 'p-0 md:px-6 md:py-7' : 'px-4 py-5 md:px-6 md:py-7'}>
           <Outlet />
         </main>
-        <LegalFooter />
+        <div className={immersiveAppRoute ? 'hidden md:block' : ''}>
+          <LegalFooter />
+        </div>
       </div>
       <CookieConsent />
     </div>

@@ -7,9 +7,24 @@ import { useCoramApp } from '../../app/CoramAppContext';
 export function AppHomePage() {
   const { state, hymns, hymnsLoading, monetizationSettings, mentorships } = useCoramApp();
   const { corarios, courses, resources, sponsors, profile, setProfile } = state;
+  const simulatorProps = {
+    corarios,
+    courses,
+    resources,
+    sponsors,
+    profile,
+    setProfile,
+    mentorships,
+    monetizationSettings,
+  };
 
   return (
-    <section className="grid min-h-[calc(100vh-120px)] gap-6 xl:grid-cols-[360px_1fr]">
+    <>
+      <section className="md:hidden">
+        <PhoneSimulator {...simulatorProps} immersive />
+      </section>
+
+      <section className="hidden min-h-[calc(100vh-120px)] gap-6 md:grid xl:grid-cols-[360px_1fr]">
       <aside className="space-y-4">
         <div className="rounded-3xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm">
           <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">CorAM App</p>
@@ -32,18 +47,10 @@ export function AppHomePage() {
       </aside>
 
       <div className="flex items-start justify-center rounded-3xl border border-slate-200 bg-[oklch(99%_0.004_90)] px-3 py-6 shadow-sm md:px-6">
-        <PhoneSimulator
-          corarios={corarios}
-          courses={courses}
-          resources={resources}
-          sponsors={sponsors}
-          profile={profile}
-          setProfile={setProfile}
-          mentorships={mentorships}
-          monetizationSettings={monetizationSettings}
-        />
+        <PhoneSimulator {...simulatorProps} />
       </div>
-    </section>
+      </section>
+    </>
   );
 }
 
