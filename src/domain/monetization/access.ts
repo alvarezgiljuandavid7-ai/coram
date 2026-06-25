@@ -12,10 +12,14 @@ export function isSectionLocked(
   settings: MonetizationToolSetting[],
   profile: UserProfile,
 ): boolean {
-  const setting = findSectionSetting(sectionId, settings);
-  return Boolean(setting?.isPremium && !profile.isPremium);
+  void sectionId;
+  void settings;
+  void profile;
+  return false;
 }
 
 export function getSectionPrice(sectionId: string, settings: MonetizationToolSetting[]): string {
-  return findSectionSetting(sectionId, settings)?.price ?? '$0.00';
+  void sectionId;
+  void settings;
+  return 'Gratuito';
 }

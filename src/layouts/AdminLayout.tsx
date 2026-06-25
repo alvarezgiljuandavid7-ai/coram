@@ -12,7 +12,7 @@ const adminNav = [
   { to: '/admin/corarios', label: 'Corarios', icon: Music2 },
   { to: '/admin/himnos', label: 'Himnos', icon: BookMarked },
   { to: '/admin/recursos', label: 'Recursos', icon: FolderOpen },
-  { to: '/admin/media', label: 'Media', icon: Images },
+  { to: '/admin/media', label: 'Campañas', icon: Images },
   { to: '/admin/usuarios', label: 'Usuarios', icon: UsersRound },
 ];
 

@@ -1,4 +1,4 @@
-import { Lock, PlayCircle, Star } from 'lucide-react';
+import { PlayCircle, Star } from 'lucide-react';
 import { useState } from 'react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import type { Course } from '../../types';
@@ -36,7 +36,7 @@ export function AcademiaPage() {
                   {course.rating}
                 </span>
                 <span>{course.duration}</span>
-                <span>{course.isPremium ? course.price || 'Premium' : 'Gratis'}</span>
+                <span>Gratis</span>
               </div>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setSelected(course)} className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-xs font-black text-[#0B2545]">
@@ -62,7 +62,6 @@ export function AcademiaPage() {
                   <p className="truncate text-sm font-black text-[#0B2545]">{lesson.title}</p>
                   <p className="text-xs font-semibold text-slate-500">{lesson.duration}</p>
                 </div>
-                {!lesson.isPreview && <Lock className="h-4 w-4 text-slate-400" />}
               </div>
             ))}
           </div>

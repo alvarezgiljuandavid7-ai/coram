@@ -1,11 +1,12 @@
 import { BookOpen, GraduationCap, Music2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { ElementType } from 'react';
 import { PhoneSimulator } from '../../components/PhoneSimulator';
 import { useCoramApp } from '../../app/CoramAppContext';
 
 export function AppHomePage() {
-  const { state, hymns, hymnsLoading, monetizationSettings, mentorships } = useCoramApp();
+  const { state, auth, hymns, hymnsLoading, monetizationSettings, mentorships } = useCoramApp();
+  const navigate = useNavigate();
   const { corarios, courses, resources, sponsors, profile, setProfile } = state;
   const simulatorProps = {
     corarios,
@@ -16,6 +17,9 @@ export function AppHomePage() {
     setProfile,
     mentorships,
     monetizationSettings,
+    onSignOut: auth.signOut,
+    isAdmin: auth.isAdmin,
+    onOpenAdmin: () => navigate('/admin'),
   };
 
   return (

@@ -22,19 +22,19 @@ describe('access', () => {
     expect(isSectionLocked('corarios', settings, freeProfile)).toBe(false);
   });
 
-  it('locks premium sections for free users', () => {
-    expect(isSectionLocked('courses', settings, freeProfile)).toBe(true);
+  it('keeps previously premium sections unlocked during the free launch', () => {
+    expect(isSectionLocked('courses', settings, freeProfile)).toBe(false);
   });
 
-  it('unlocks premium sections for premium users', () => {
+  it('keeps sections unlocked for every user role', () => {
     expect(isSectionLocked('courses', settings, { ...freeProfile, isPremium: true })).toBe(false);
   });
 
-  it('returns configured section price', () => {
-    expect(getSectionPrice('courses', settings)).toBe('$19.99');
+  it('returns free pricing during the launch period', () => {
+    expect(getSectionPrice('courses', settings)).toBe('Gratuito');
   });
 
   it('uses fallback price for unknown sections', () => {
-    expect(getSectionPrice('missing', settings)).toBe('$0.00');
+    expect(getSectionPrice('missing', settings)).toBe('Gratuito');
   });
 });

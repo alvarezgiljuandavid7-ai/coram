@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Heart, Lock, Search } from 'lucide-react';
+import { Heart, Search } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import type { Corario } from '../../types';
 
@@ -51,7 +51,6 @@ export function CorariosPage() {
                   <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">{corario.category}</p>
                   <h3 className="mt-1 text-base font-black leading-snug text-[#0B2545]">{corario.title}</h3>
                 </div>
-                {corario.isPremium && <Lock className="h-4 w-4 text-[#B5811F]" />}
               </div>
               <p className="mt-3 line-clamp-3 text-xs leading-6 text-slate-600">{corario.lyrics.replace(/\s+/g, ' ')}</p>
               <div className="mt-4 flex items-center justify-between text-xs font-bold text-slate-500">

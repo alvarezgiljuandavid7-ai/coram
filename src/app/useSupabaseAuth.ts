@@ -5,7 +5,7 @@ import {
   sendPasswordReset,
   signInWithEmail,
   signInWithGoogle,
-  signOut,
+  signOut as signOutFromSupabase,
   signUpWithEmail,
   updateCurrentPassword,
   type CoramAuthProfile,
@@ -44,6 +44,18 @@ export function useSupabaseAuth(): CoramAuthState {
     setLoading(false);
   }, []);
 
+  const handleSignOut = useCallback(async () => {
+    try {
+      await signOutFromSupabase();
+    } finally {
+      setRecoveryMode(false);
+      setUser(null);
+      setProfile(null);
+      setRole('guest');
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     refresh();
 
@@ -70,6 +82,6 @@ export function useSupabaseAuth(): CoramAuthState {
     signUpWithEmail,
     sendPasswordReset,
     updateCurrentPassword,
-    signOut,
+    signOut: handleSignOut,
   };
 }

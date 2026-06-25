@@ -1,4 +1,4 @@
-import { Download, Lock } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import { PageHeading } from './AcademiaPage';
 
@@ -16,7 +16,7 @@ export function RecursosPage() {
                 <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">{resource.category}</p>
                 <h3 className="mt-1 text-lg font-black text-[#0B2545]">{resource.title}</h3>
               </div>
-              {resource.isPremium ? <Lock className="h-5 w-5 text-[#B5811F]" /> : <Download className="h-5 w-5 text-emerald-600" />}
+              <Download className="h-5 w-5 text-emerald-600" />
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-600">{resource.description}</p>
             <div className="mt-5 flex items-center justify-between text-xs font-bold text-slate-500">

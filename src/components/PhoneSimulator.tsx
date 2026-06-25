@@ -6,7 +6,9 @@ import {
   getSectionPrice as getConfiguredSectionPrice,
   isSectionLocked as isConfiguredSectionLocked,
 } from '../domain/monetization/access';
-import { setPremiumStatus, toggleCourseEnrollment, toggleFavoriteCorario } from '../domain/profile/profileActions';
+import { toggleCourseEnrollment, toggleFavoriteCorario } from '../domain/profile/profileActions';
+import { createReusableAudioContext, getBrowserAudioContextClass } from '../domain/audio/reusableAudioContext';
+import { getHeldPitchState } from '../domain/audio/pitchHold';
 import type { Hymn } from '../domain/hymns/types';
 import {
   useAcademiaModule,
@@ -231,6 +233,9 @@ interface PhoneSimulatorProps {
   mentorships: MentorshipSession[];
   monetizationSettings?: { id: string; name: string; isPremium: boolean; price: string }[];
   immersive?: boolean;
+  onSignOut?: () => Promise<void> | void;
+  isAdmin?: boolean;
+  onOpenAdmin?: () => void;
 }
 
 export function getPhoneSimulatorLayout(immersive: boolean) {
@@ -253,6 +258,14 @@ export function getPhoneSimulatorLayout(immersive: boolean) {
   };
 }
 
+export function getInitialPhoneScreen(): string {
+  return 'home';
+}
+
+export function getAdminShortcutLabel(isAdmin: boolean): string | null {
+  return isAdmin ? 'Panel administrador' : null;
+}
+
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   corarios,
   courses,
@@ -262,12 +275,15 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   setProfile,
   mentorships,
   monetizationSettings = [],
-  immersive = false
+  immersive = false,
+  onSignOut,
+  isAdmin = false,
+  onOpenAdmin,
 }) => {
   const layout = getPhoneSimulatorLayout(immersive);
 
   // Mobile navigation state
-  const [currentScreen, setCurrentScreen] = useState<string>('splash');
+  const [currentScreen, setCurrentScreen] = useState<string>(getInitialPhoneScreen);
   const [selectedCorario, setSelectedCorario] = useState<Corario | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [onboardingIndex, setOnboardingIndex] = useState<number>(0);
@@ -400,6 +416,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   const micStreamRef = useRef<MediaStream | null>(null);
   const tunerAudioContextRef = useRef<AudioContext | null>(null);
   const tunerAnimationFrameIdRef = useRef<number | null>(null);
+  const pianoAudioRef = useRef(createReusableAudioContext(getBrowserAudioContextClass()));
+  const lastDetectedPitchRef = useRef<{ note: string | null; frequency: number | null; detectedAt: number }>({
+    note: null,
+    frequency: null,
+    detectedAt: 0,
+  });
 
   const beatRef = useRef<number>(1);
   beatRef.current = currentBeat;
@@ -546,7 +568,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
 
     let currentStep = 0;
     
-    const playNextStep = () => {
+    const playNextStep = async () => {
       if (currentStep >= scaleNotes.length) {
         setScalePlaying(false);
         setActiveScaleStep(-1);
@@ -557,8 +579,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
       const noteName = scaleNotes[currentStep];
       
       try {
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-        const audioCtx = new AudioContextClass();
+        const audioCtx = await pianoAudioRef.current.get();
         const now = audioCtx.currentTime;
 
         const masterGain = audioCtx.createGain();
@@ -612,10 +633,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
         osc1.stop(now + 0.5);
         osc2.stop(now + 0.5);
         
-        setTimeout(() => {
-          audioCtx.close().catch(() => {});
-        }, 700);
-
       } catch (err) {
         console.warn('Vocal warmup play error:', err);
       }
@@ -689,10 +706,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   };
 
   // Real Acoustic Piano Single Note Synthesis: replicates physical piano string decay, overtones and a wooden hammer click
-  const playPianoSingleNote = (noteName: string) => {
+  const playPianoSingleNote = async (noteName: string) => {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioContextClass();
+      const audioCtx = await pianoAudioRef.current.get();
       const now = audioCtx.currentTime;
 
       // Master gain
@@ -752,10 +768,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   };
 
   // Real Acoustic Piano Chord Synthesis: replicates physical piano string layers, hammer strikes, and natural sustain decay
-  const playChordRef = (root: string, type: 'mayor' | 'menor', voiceType: 'grave' | 'aguda') => {
+  const playChordRef = async (root: string, type: 'mayor' | 'menor', voiceType: 'grave' | 'aguda') => {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioContextClass();
+      const audioCtx = await pianoAudioRef.current.get();
       const now = audioCtx.currentTime;
 
       // Master gain
@@ -956,8 +971,15 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
           const midi = Math.round(noteNum) + 57; // A3 MIDI is 57
           const noteIdx = (midi % 12 + 12) % 12;
           const detectedVal = noteNames[noteIdx];
+          const roundedFreq = Math.round(freq * 10) / 10;
 
-          setTunerDetectedFreq(Math.round(freq * 10) / 10);
+          lastDetectedPitchRef.current = {
+            note: detectedVal,
+            frequency: roundedFreq,
+            detectedAt: performance.now(),
+          };
+
+          setTunerDetectedFreq(roundedFreq);
           setTunerDetectedNote(detectedVal);
 
           // Standard reference frequency for selected target note
@@ -1000,9 +1022,21 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
             }
           }
         } else {
-          setTunerDetectedFreq(null);
-          setTunerDetectedNote(null);
-          setTunerMatchScore('idle');
+          const heldPitch = getHeldPitchState({
+            detectedNote: null,
+            detectedFrequency: null,
+            previousNote: lastDetectedPitchRef.current.note,
+            previousFrequency: lastDetectedPitchRef.current.frequency,
+            lastDetectedAt: lastDetectedPitchRef.current.detectedAt,
+            now: performance.now(),
+            holdMs: 700,
+          });
+
+          setTunerDetectedFreq(heldPitch.frequency);
+          setTunerDetectedNote(heldPitch.note);
+          if (!heldPitch.held) {
+            setTunerMatchScore('idle');
+          }
         }
 
         tunerAnimationFrameIdRef.current = requestAnimationFrame(updatePitch);
@@ -1079,10 +1113,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
       tunerAudioContextRef.current.close().catch(() => {});
       tunerAudioContextRef.current = null;
     }
+    pianoAudioRef.current.dispose().catch(() => {});
     setTunerActive(false);
     setTunerDetectedFreq(null);
     setTunerDetectedNote(null);
     setTunerMatchScore('idle');
+    lastDetectedPitchRef.current = { note: null, frequency: null, detectedAt: 0 };
   };
 
   // Close recording streaming automatically if they switch away or log out
@@ -1117,13 +1153,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
     showToast('\u00a1Inscripci\u00f3n completada con \u00e9xito!');
   };
 
-  // Helper: check premium resource restriction
+  // Helper: download resources during the free launch
   const handleResourceClick = (res: Resource) => {
-    if (res.isPremium && !profile.isPremium) {
-      handleOpenCheckout('resources', `Recurso: ${res.title}`);
-    } else {
-      showToast(`Descargando ${res.title}... ¡Guardado en tu dispositivo!`);
-    }
+    showToast(`Descargando ${res.title}... ¡Guardado en tu dispositivo!`);
   };
 
   // Header Component for inside screens
@@ -1170,22 +1202,10 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
         )}
       </div>
       <div className="flex items-center space-x-1">
-        {profile.isPremium ? (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 flex items-center space-x-1">
-            <Sparkles className="w-2.5 h-2.5 fill-current" />
-            <span>PREMIUM</span>
-          </span>
-        ) : (
-          <button 
-            id="btn-nav-premium"
-            onClick={() => {
-              handleOpenCheckout('membership', 'Acceso Total Premium');
-            }}
-            className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#0B2545] text-white hover:bg-slate-800 transition-colors"
-          >
-            PRO
-          </button>
-        )}
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center space-x-1">
+          <Sparkles className="w-2.5 h-2.5 fill-current" />
+          <span>GRATIS</span>
+        </span>
       </div>
     </div>
   );
@@ -1237,7 +1257,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Premium Upgrade Modal Layer */}
+        {/* Access information layer */}
         <AnimatePresence>
           {showPaywall && (
             <motion.div 
@@ -1262,9 +1282,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   <Award className="w-7 h-7 text-[#D4AF37]" />
                 </div>
 
-                <h3 className="font-sans font-extrabold text-slate-900 text-lg text-center tracking-tight">Únete a CorAM Premium</h3>
+                <h3 className="font-sans font-extrabold text-slate-900 text-lg text-center tracking-tight">Contenido disponible</h3>
                 <p className="text-center text-xs text-slate-500 max-w-[280px] mx-auto mt-1 mb-4 leading-normal">
-                  Necesitas Premium para: <span className="font-semibold text-indigo-950">{paywallReason || 'Acceso Completo'}</span>.
+                  Esta sección está habilitada para todos: <span className="font-semibold text-indigo-950">{paywallReason || 'Acceso completo'}</span>.
                 </p>
 
                 {/* Benefits checklist */}
@@ -1282,30 +1302,17 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   ))}
                 </div>
 
-                {/* Pricing / Plan choices */}
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="border border-gray-100 p-2.5 rounded-xl text-center bg-gray-50/50">
-                    <span className="font-bold text-slate-900 text-sm">$5.99 <span className="text-[9px] text-slate-500 font-normal">/mes</span></span>
-                    <span className="block text-[8px] text-blue-900 font-semibold uppercase tracking-wider mt-0.5">Mensual</span>
-                  </div>
-                  <div className="border-2 border-[#D4AF37] p-2.5 rounded-xl text-center bg-[#D4AF37]/5 relative">
-                    <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 px-1.5 py-px text-[7px] bg-[#D4AF37] text-white rounded-full font-bold">MEJOR VALOR</span>
-                    <span className="font-bold text-slate-900 text-sm">$49.99 <span className="text-[9px] text-slate-500 font-normal">/año</span></span>
-                    <span className="block text-[8px] text-amber-950 font-semibold uppercase tracking-wider mt-0.5">Ahorra 30%</span>
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <button 
                     id="btn-paywall-upgrade-now"
                     onClick={() => {
                       setShowPaywall(false);
-                      handleOpenCheckout('membership', 'Acceso Total Premium');
+                      setShowPaywall(false);
                     }}
                     className="w-full bg-[#0B2545] hover:bg-slate-900 text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center space-x-1.5 transition-colors shadow-sm"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>Hacerme Premium Ahora</span>
+                    <span>Continuar</span>
                   </button>
                   <button 
                     id="btn-paywall-close"
@@ -1332,7 +1339,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-[#0A0B11] flex flex-col items-center justify-center px-6"
             >
-              {/* Premium Luxury Logo */}
+              {/* Luxury logo */}
               <motion.div 
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -1398,7 +1405,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     </div>
                     <h3 className="font-sans font-black text-slate-900 text-xl tracking-tight leading-tight">Aprende con cursos y mentorías</h3>
                     <p className="text-xs text-slate-500 leading-normal">
-                      Formación musical Premium y mentorías privadas con Angie MZ diseñadas para elevar la excelencia en tu altar.
+                      Formación musical y mentorías privadas con Angie MZ diseñadas para elevar la excelencia en tu altar.
                     </p>
                   </motion.div>
                 )}
@@ -1456,7 +1463,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
               <div className="mt-4 flex flex-col items-center justify-center">
                 <CoramLogo variant="icon" size={110} />
                 <h4 className="font-serif text-[#C29031] text-2xl font-bold tracking-tight leading-none mt-2">CorAM</h4>
-                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">ACCESO PREMIUM DEL MINISTRO</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">ACCESO GRATUITO DEL MINISTRO</p>
               </div>
 
               {/* Social authentication widgets */}
@@ -1472,19 +1479,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 >
                   <span className="text-red-500 font-bold">G</span>
                   <span>Continuar con Google</span>
-                </button>
-                
-                <button 
-                  id="btn-login-apple"
-                  onClick={() => {
-                    setProfile({ ...profile, name: 'Juan Gil (M3)', isPremium: false });
-                    showToast('Ingreso local completado. Premium depende de Supabase/Stripe.');
-                    setCurrentScreen('home');
-                  }}
-                  className="w-full bg-slate-900 hover:bg-black text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs flex items-center justify-center space-x-3 transition-colors"
-                >
-                  <span className="font-bold">ï£¿</span>
-                  <span>Continuar con Apple</span>
                 </button>
               </div>
 
@@ -1559,7 +1553,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 <div className="flex items-center space-x-2">
                   <div className="text-right">
                     <span id="user-display-name" className="text-[10px] font-bold text-slate-800 block line-clamp-1 max-w-[80px]">{profile.name}</span>
-                    <span className="text-[8px] bg-slate-100 text-slate-500 rounded-full px-1.5 py-0.2">{profile.isPremium ? 'Premium ⭐' : 'Gratis'}</span>
+                    <span className="text-[8px] bg-slate-100 text-slate-500 rounded-full px-1.5 py-0.2">Gratis</span>
                   </div>
                   <img 
                     src={profile.avatarUrl} 
@@ -1649,7 +1643,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   </div>
                 </div>
 
-                {/* Section: Premium Vocal Ear Tuner Banner */}
+                {/* Section: Vocal Ear Tuner Banner */}
                 <div className="bg-gradient-to-r from-sky-500/5 via-indigo-500/10 to-white p-3.5 rounded-2xl border border-indigo-100/60 shadow-3xs flex items-center justify-between text-left relative overflow-hidden group">
                   <div className="flex items-center space-x-3 max-w-[72%]">
                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#0B2545] to-[#1e3450] text-[#D4AF37] shrink-0 shadow-xs">
@@ -1712,9 +1706,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                             >
                               {cor.title}
                             </motion.span>
-                            {cor.isPremium && (
-                              <span className="text-[8px] bg-[#D4AF37]/10 text-[#D4AF37] px-1 rounded-sm border border-[#D4AF37]/30 italic font-semibold">Premium</span>
-                            )}
                           </div>
                           <motion.span 
                             layoutId={`corario-meta-${cor.id}`}
@@ -1736,25 +1727,20 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   </div>
                 </div>
 
-                {/* Section: Premium Membership CTA */}
-                {!profile.isPremium && (
-                  <div className="bg-gradient-to-br from-[#D4AF37]/10 via-amber-50 to-orange-50/50 p-3.5 rounded-xl border border-[#D4AF37]/35 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-black text-[#D4AF37]">PAQUETE DE EXCELENCIA</span>
-                      <h6 className="font-sans font-bold text-slate-800 text-xs mt-0.5">Accede al Cancionero Impreso de Angie MZ</h6>
-                      <p className="text-[9px] text-slate-500 max-w-[190px]">Descarga PDFs, cifrados profesionales y material avanzado.</p>
-                    </div>
-                    <button 
-                      id="btn-home-go-premium"
-                      onClick={() => {
-                        handleOpenCheckout('membership', 'Acceso Total Premium');
-                      }}
-                      className="px-3 py-1.5 bg-[#0B2545] hover:bg-slate-900 text-white rounded-lg text-[9px] font-black"
-                    >
-                      SER PREMIUM
-                    </button>
+                <div className="bg-gradient-to-br from-[#D4AF37]/10 via-amber-50 to-orange-50/50 p-3.5 rounded-xl border border-[#D4AF37]/35 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black text-[#D4AF37]">PAQUETE DE EXCELENCIA</span>
+                    <h6 className="font-sans font-bold text-slate-800 text-xs mt-0.5">Cancionero y materiales de Angie MZ</h6>
+                    <p className="text-[9px] text-slate-500 max-w-[190px]">Descarga PDFs, cifrados profesionales y material avanzado.</p>
                   </div>
-                )}
+                  <button 
+                    id="btn-home-open-resources"
+                    onClick={() => setCurrentScreen('recursos')}
+                    className="px-3 py-1.5 bg-[#0B2545] hover:bg-slate-900 text-white rounded-lg text-[9px] font-black"
+                  >
+                    ABRIR
+                  </button>
+                </div>
 
                 {/* Section: Cursos Destacados */}
                 <div>
@@ -1908,9 +1894,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                           >
                             {cor.title}
                           </motion.h6>
-                          {cor.isPremium && (
-                            <span className="text-[8px] bg-[#D4AF37]/10 text-[#D4AF37] px-1 rounded-sm border border-[#D4AF37]/30 font-semibold italic">PRO</span>
-                          )}
                         </div>
                         <motion.p 
                           layoutId={`corario-meta-${cor.id}`}
@@ -1988,7 +1971,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 </div>
               </div>
 
-              {/* INTEGRATED PREMIUM METRONOME WIDGET */}
+              {/* Integrated metronome widget */}
               <div className="bg-slate-50 border-b border-slate-200/60 p-3 px-4 space-y-2 text-left">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-1.5">
@@ -2137,20 +2120,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 <button 
                   id="btn-detail-download-pdf"
                   onClick={() => {
-                    if (selectedCorario.isPremium && !profile.isPremium) {
-                      handleOpenCheckout('corarios', `Descargar: ${selectedCorario.title}`);
-                    } else {
-                      showToast('Descargando archivo PDF listo para imprimir...');
-                    }
+                    showToast('Descargando archivo PDF listo para imprimir...');
                   }}
                   className="flex-1 py-2 rounded-xl text-xs font-bold bg-[#0B2545] hover:bg-slate-900 text-white flex items-center justify-center space-x-1.5 transition-colors shadow-2xs"
                 >
-                  {selectedCorario.isPremium && !profile.isPremium ? (
-                    <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  ) : (
-                    <Download className="w-3.5 h-3.5" />
-                  )}
-                  <span>PDF PRO</span>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PDF</span>
                 </button>
               </div>
             </motion.div>
@@ -2193,8 +2168,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                             referrerPolicy="no-referrer"
                             className="w-full h-24 object-cover"
                           />
-                          <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[8px] font-bold text-white shadow-sm ${course.isPremium ? 'bg-amber-600' : 'bg-green-600'}`}>
-                            {course.isPremium ? 'Premium' : 'Gratuito'}
+                          <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[8px] font-bold text-white shadow-sm bg-green-600">
+                            Gratuito
                           </span>
                         </div>
                         <div className="p-3 space-y-1 text-left">
@@ -2254,7 +2229,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                       <div className="flex items-center justify-between relative z-10 text-[10px]">
                         <div className="flex items-center space-x-1.5">
                           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                          <span className="text-[#D4AF37] font-black uppercase tracking-widest font-mono">REPRODUCTOR DE ACADEMIA PRO</span>
+                          <span className="text-[#D4AF37] font-black uppercase tracking-widest font-mono">REPRODUCTOR DE ACADEMIA</span>
                         </div>
                         <button 
                           onClick={() => {
@@ -2461,7 +2436,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Contenido / Sílabo</span>
                     <div className="space-y-1.5">
                       {selectedCourse.syllabus.map((lesson, idx) => {
-                        const showLock = selectedCourse.isPremium && !profile.isPremium && !lesson.isPreview;
+                        const showLock = false;
                         const isCurrentlyPlaying = activeLessonId === lesson.id;
                         return (
                           <div 
@@ -2512,31 +2487,18 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
 
               {/* Course Action Bottom Trigger */}
               <div className="bg-white border-t border-gray-100 p-3 flex">
-                {selectedCourse.isPremium && !profile.isPremium ? (
-                  <button 
-                    id="btn-course-upgrade"
-                    onClick={() => {
-                      handleOpenCheckout('courses', `Curso: ${selectedCourse.title}`);
-                    }}
-                    className="w-full bg-gradient-to-r from-amber-600 to-[#0B2545] hover:to-slate-900 text-white text-xs font-bold py-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center space-x-2"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>Únete a Premium para Acceder</span>
-                  </button>
-                ) : (
-                  <button 
-                    id="btn-course-enroll"
-                    onClick={() => toggleEnroll(selectedCourse.id)}
-                    disabled={profile.enrolledCourses.includes(selectedCourse.id)}
-                    className={`w-full text-xs font-bold py-3.5 rounded-xl transition-all shadow-sm ${
-                      profile.enrolledCourses.includes(selectedCourse.id)
-                        ? 'bg-green-50 text-green-700 border border-green-200 pointer-events-none'
-                        : 'bg-[#0B2545] hover:bg-slate-900 text-white'
-                    }`}
-                  >
-                    {profile.enrolledCourses.includes(selectedCourse.id) ? 'Ya estás Inscrito ✓' : 'Inscribirme Ahora'}
-                  </button>
-                )}
+                <button 
+                  id="btn-course-enroll"
+                  onClick={() => toggleEnroll(selectedCourse.id)}
+                  disabled={profile.enrolledCourses.includes(selectedCourse.id)}
+                  className={`w-full text-xs font-bold py-3.5 rounded-xl transition-all shadow-sm ${
+                    profile.enrolledCourses.includes(selectedCourse.id)
+                      ? 'bg-green-50 text-green-700 border border-green-200 pointer-events-none'
+                      : 'bg-[#0B2545] hover:bg-slate-900 text-white'
+                  }`}
+                >
+                  {profile.enrolledCourses.includes(selectedCourse.id) ? 'Ya estás Inscrito ✓' : 'Inscribirme Ahora'}
+                </button>
               </div>
             </motion.div>
           )}
@@ -2638,17 +2600,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                         <button 
                           id={`btn-resource-download-${res.id}`}
                           onClick={() => handleResourceClick(res)}
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all shrink-0 ${
-                            res.isPremium && !profile.isPremium 
-                              ? 'bg-amber-100 text-[#D4AF37] border-amber-300 hover:bg-amber-150' 
-                              : 'bg-slate-50 hover:bg-slate-150 text-slate-700 border-slate-200'
-                          }`}
+                          className="w-9 h-9 rounded-xl flex items-center justify-center border transition-all shrink-0 bg-slate-50 hover:bg-slate-150 text-slate-700 border-slate-200"
                         >
-                          {res.isPremium && !profile.isPremium ? (
-                            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          ) : (
-                            <Download className="w-4 h-4" />
-                          )}
+                          <Download className="w-4 h-4" />
                         </button>
                       </div>
                     );
@@ -2666,12 +2620,12 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
               animate={{ opacity: 1 }}
               className="flex-1 flex flex-col bg-slate-50 text-left animate-fade-in font-sans"
             >
-              {/* Premium Top Navigation Bar */}
+              {/* Top navigation bar */}
               <InnerHeader title="Afinador de Piano Vocal" showBack={true} backTo="home" />
 
               <div className="p-4 space-y-4 flex-1 overflow-y-auto">
                 
-                {/* Visual Header / Premium Overview Card */}
+                {/* Visual header card */}
                 <div className="bg-gradient-to-br from-[#0B2545] via-[#10315c] to-slate-900 text-white p-4 rounded-2xl border border-slate-800 shadow-md relative overflow-hidden">
                   <div className="absolute top-3 right-3 text-[#D4AF37]/35 animate-pulse">
                     <Zap className="w-4 h-4 text-amber-400" />
@@ -2849,7 +2803,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   </div>
                 </div>
 
-                {/* --- PREMIUM COMPREHENSIVE VOCAL PERFORMANCE GAUGE (No SVG circles) --- */}
+                {/* Vocal performance gauge */}
                 <div className="bg-slate-950 text-slate-100 p-4 rounded-2xl border border-slate-900 shadow-xl relative overflow-hidden">
                   
                   {/* Ambient background matrix mesh */}
@@ -3782,11 +3736,21 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     </div>
 
                     <div className="pt-1.5 border-t border-slate-200/50 flex space-x-2">
+                      {getAdminShortcutLabel(isAdmin) && (
+                        <button 
+                          id="btn-profile-open-admin"
+                          onClick={() => onOpenAdmin?.()}
+                          className="w-full bg-[#0B2545] hover:bg-slate-900 text-white text-[10px] py-1.5 rounded-lg flex items-center justify-center space-x-1 font-bold"
+                        >
+                          <Smartphone className="w-3 h-3" />
+                          <span>{getAdminShortcutLabel(isAdmin)}</span>
+                        </button>
+                      )}
                       <button 
                         id="btn-developer-logout"
                         onClick={() => {
-                          setCurrentScreen('login');
-                          showToast('Sesión de prueba cerrada.');
+                          void onSignOut?.();
+                          showToast('Sesión cerrada.');
                         }}
                         className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-[10px] py-1.5 rounded-lg flex items-center justify-center space-x-1 font-bold"
                       >
@@ -3850,7 +3814,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
           </div>
         )}
 
-        {/* --- DYNAMIC SHOPPING CART & CHECKOUT PAYWALL MODAL --- */}
+        {/* --- CONTENT ACCESS CONFIRMATION MODAL --- */}
         {showCartCheckout && (
           <div id="cart-checkout-overlay" className="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-4 z-50 font-sans">
             <div id="cart-checkout-modal" className="bg-white w-full max-w-[310px] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85%] border border-slate-100 relative">
@@ -3860,8 +3824,8 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 <div className="flex items-center space-x-2">
                   <DollarSign className="w-4 h-4 text-amber-500 shrink-0" />
                   <div>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37] block">Pasarela CorAM</span>
-                    <h4 className="text-[11px] font-black leading-none">Carrito de Pago Seguro</h4>
+                    <span className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37] block">CorAM</span>
+                    <h4 className="text-[11px] font-black leading-none">Confirmación de acceso</h4>
                   </div>
                 </div>
                 <button 
@@ -3882,7 +3846,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     <h5 className="font-extrabold text-xs text-slate-800 tracking-tight leading-normal mt-0.5">{checkoutItemName}</h5>
                     
                     <div className="flex items-center justify-between border-t border-slate-200/50 mt-2.5 pt-2 font-mono">
-                      <span className="text-[9.5px] font-bold text-slate-500">Monto Final:</span>
+                      <span className="text-[9.5px] font-bold text-slate-500">Estado:</span>
                       <span className="text-sm font-black text-[#0B2545] bg-[#0B2545]/5 px-2 py-0.5 rounded-md">
                         {checkoutItemPrice}
                       </span>
@@ -3891,11 +3855,9 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
 
                   {/* Payment Methods tabs selector */}
                   <div>
-                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">Elegir Medio de Pago:</span>
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">Elegir medio de contacto:</span>
                     <div className="grid grid-cols-3 gap-1.5">
                       {[
-                        { id: 'card', label: 'Tarjeta' },
-                        { id: 'paypal', label: 'PayPal' },
                         { id: 'whatsapp', label: 'WhatsApp' }
                       ].map(method => (
                         <button
@@ -3913,83 +3875,11 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     </div>
                   </div>
 
-                  {/* Dynamic subform depending on mode */}
-                  {paymentMethod === 'card' && (
-                    <div className="space-y-2.5 text-[10.5px]">
-                      <div>
-                        <label className="text-[8px] font-black text-slate-500 uppercase block mb-0.5">Número de Tarjeta</label>
-                        <input
-                          type="text"
-                          required
-                          value={cardNumber}
-                          maxLength={19}
-                          onChange={(e) => {
-                            // Automatically insert dashes for format
-                            const v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                            const matches = v.match(/\d{4,16}/g);
-                            const match = matches && matches[0] || '';
-                            const parts = [];
-                            for (let i=0, len=match.length; i<len; i+=4) {
-                              parts.push(match.substring(i, i+4));
-                            }
-                            if (parts.length > 0) {
-                              setCardNumber(parts.join(' '));
-                            } else {
-                              setCardNumber(v);
-                            }
-                          }}
-                          placeholder="4152 7485 9621 3548"
-                          className="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg focus:outline-hidden font-mono font-bold"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="text-[8px] font-black text-slate-500 uppercase block mb-0.5">Vencimiento</label>
-                          <input
-                            type="text"
-                            maxLength={5}
-                            placeholder="12/29"
-                            className="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg focus:outline-hidden text-center font-mono font-bold"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[8px] font-black text-slate-500 uppercase block mb-0.5">CVV (Código)</label>
-                          <input
-                            type="password"
-                            maxLength={3}
-                            placeholder="***"
-                            className="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg focus:outline-hidden text-center font-mono font-bold"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[8px] font-black text-slate-500 uppercase block mb-0.5">Titular de la Cuenta</label>
-                        <input
-                          type="text"
-                          required
-                          value={cardName}
-                          onChange={(e) => setCardName(e.target.value)}
-                          placeholder="e.g. Pastor David"
-                          className="w-full bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg focus:outline-hidden font-bold"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'paypal' && (
-                    <div className="bg-[#003087]/5 border border-[#003087]/15 p-3 rounded-xl space-y-2 text-center">
-                      <span className="text-xl font-black text-[#003087] block italic">PayPal</span>
-                      <p className="text-[9.5px] text-slate-600 leading-normal">
-                        Simula un pago rápido de ofrenda ministerial a través de tu billetera digital segura PayPal.
-                      </p>
-                    </div>
-                  )}
-
                   {paymentMethod === 'whatsapp' && (
                     <div className="bg-emerald-500/5 border border-emerald-500/20 p-3 rounded-xl space-y-2 text-center">
                       <span className="text-xs font-black text-emerald-800 block">💬 Consultar por WhatsApp</span>
                       <p className="text-[9.5px] text-slate-600 leading-normal">
-                        ¿Prefieres pagar por transferencia bancaria directa o efectivo? Presiona el botón de consulta a continuación para enviarle un mensaje predeterminado a <strong>Angie MZ</strong>.
+                        ¿Prefieres coordinar directamente? Presiona el botón de consulta a continuación para enviarle un mensaje predeterminado a <strong>Angie MZ</strong>.
                       </p>
                     </div>
                   )}
@@ -4013,7 +3903,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                       <button
                         onClick={() => {
                           if (paymentMethod === 'card' && (!cardNumber || !cardName)) {
-                            showToast('Por favor completa los datos de tu tarjeta.');
+                            showToast('Por favor completa los datos requeridos.');
                             return;
                           }
                           handleUnavailablePayment();
@@ -4027,7 +3917,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                             <span>Procesando...</span>
                           </>
                         ) : (
-                          <span>Procesar Ofrenda de Pago</span>
+                          <span>Continuar</span>
                         )}
                       </button>
                     )}
@@ -4041,10 +3931,10 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     <Check className="w-6 h-6 stroke-2" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-sm text-slate-900">¡Ofrenda Aprobada!</h4>
+                    <h4 className="font-extrabold text-sm text-slate-900">Acceso disponible</h4>
                     <span className="text-[10px] font-mono text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md mt-1 inline-block">ID TRANS: #TX2026-CORAM</span>
                     <p className="text-[10px] text-slate-500 leading-relaxed mt-2">
-                      ¡Tu cuenta ha sido ascendida a **CorAM Premium**! Ahora tienes acceso irrestricto a todas las herramientas del cancionero, cursos y mentorías. ¡Adora con alegría!
+                      Tu cuenta ya tiene acceso a las herramientas del cancionero, cursos y mentorías. ¡Adora con alegría!
                     </p>
                   </div>
                   <button

@@ -74,7 +74,7 @@ export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
       <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
         <div className="text-right leading-tight">
           <span className="block text-[10px] font-black uppercase tracking-wider text-[#0B2545]">
-          {auth.isAdmin ? 'Administrador' : auth.role === 'premium' ? 'Premium' : 'Miembro'}
+          {auth.isAdmin ? 'Administrador' : 'Miembro'}
           </span>
           <span className="block max-w-[180px] truncate text-[11px] font-semibold text-slate-500">
             {auth.profile?.email ?? auth.user.email}

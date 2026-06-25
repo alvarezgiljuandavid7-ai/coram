@@ -17,4 +17,11 @@ describe('createInitialCoramState', () => {
       revenueThisMonth: 0,
     });
   });
+
+  it('starts every app section as free during the public launch', () => {
+    const state = createInitialCoramState({ useDemoContent: false });
+
+    expect(state.monetizationSettings.every((setting) => !setting.isPremium)).toBe(true);
+    expect(state.monetizationSettings.every((setting) => setting.price === 'Gratuito')).toBe(true);
+  });
 });

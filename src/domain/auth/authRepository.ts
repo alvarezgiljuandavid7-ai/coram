@@ -156,6 +156,6 @@ export async function updateCurrentPassword(password: string): Promise<void> {
 
 export async function signOut(): Promise<void> {
   if (!supabase) return;
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: 'local' });
   if (error) throw error;
 }

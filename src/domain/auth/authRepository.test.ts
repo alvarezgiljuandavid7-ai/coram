@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   signInWithOAuth: vi.fn(),
   signInWithPassword: vi.fn(),
+  signOut: vi.fn(),
   assign: vi.fn(),
 }));
 
@@ -11,6 +12,7 @@ vi.mock('../../shared/supabase/client', () => ({
     auth: {
       signInWithOAuth: mocks.signInWithOAuth,
       signInWithPassword: mocks.signInWithPassword,
+      signOut: mocks.signOut,
     },
   },
 }));
@@ -19,6 +21,7 @@ describe('authRepository', () => {
   beforeEach(() => {
     mocks.signInWithOAuth.mockReset();
     mocks.signInWithPassword.mockReset();
+    mocks.signOut.mockReset();
     mocks.assign.mockReset();
     Object.defineProperty(globalThis, 'window', {
       configurable: true,
@@ -66,5 +69,14 @@ describe('authRepository', () => {
     await signInWithEmail('  admin@example.com  ', 'password');
 
     expect(mocks.signInWithPassword).toHaveBeenCalledWith({ email: 'admin@example.com', password: 'password' });
+  });
+
+  it('signs out only the current browser session', async () => {
+    mocks.signOut.mockResolvedValue({ error: null });
+    const { signOut } = await import('./authRepository');
+
+    await signOut();
+
+    expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' });
   });
 });
