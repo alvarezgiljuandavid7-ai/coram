@@ -49,6 +49,9 @@ describe('authRepository', () => {
       options: {
         redirectTo: 'http://localhost:3000/app',
         skipBrowserRedirect: true,
+        queryParams: {
+          prompt: 'select_account',
+        },
       },
     });
     expect(mocks.assign).toHaveBeenCalledWith('https://accounts.google.com/o/oauth2/v2/auth?client_id=coram');
@@ -71,12 +74,12 @@ describe('authRepository', () => {
     expect(mocks.signInWithPassword).toHaveBeenCalledWith({ email: 'admin@example.com', password: 'password' });
   });
 
-  it('signs out only the current browser session', async () => {
+  it('signs out all Supabase sessions for a clean account switch', async () => {
     mocks.signOut.mockResolvedValue({ error: null });
     const { signOut } = await import('./authRepository');
 
     await signOut();
 
-    expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' });
+    expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'global' });
   });
 });

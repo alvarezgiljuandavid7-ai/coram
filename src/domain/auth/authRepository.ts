@@ -95,6 +95,9 @@ export async function signInWithGoogle(): Promise<void> {
     options: {
       redirectTo: buildAuthRedirectUrl('/app'),
       skipBrowserRedirect: true,
+      queryParams: {
+        prompt: 'select_account',
+      },
     },
   });
 
@@ -156,6 +159,6 @@ export async function updateCurrentPassword(password: string): Promise<void> {
 
 export async function signOut(): Promise<void> {
   if (!supabase) return;
-  const { error } = await supabase.auth.signOut({ scope: 'local' });
+  const { error } = await supabase.auth.signOut({ scope: 'global' });
   if (error) throw error;
 }
