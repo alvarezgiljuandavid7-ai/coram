@@ -94,7 +94,7 @@ export function AppLayout() {
       {open && <button type="button" aria-label="Cerrar menu" className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden" onClick={() => setOpen(false)} />}
 
       <div className="lg:pl-72">
-        <header className={`${immersiveAppRoute ? 'hidden md:block' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-4 py-3 backdrop-blur md:px-6`}>
+        <header className={`${immersiveAppRoute ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-4 py-3 backdrop-blur md:px-6`}>
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -113,10 +113,10 @@ export function AppLayout() {
           </div>
         </header>
 
-        <main className={immersiveAppRoute ? 'p-0 md:px-6 md:py-7' : 'px-4 py-5 md:px-6 md:py-7'}>
+        <main className={immersiveAppRoute ? 'p-0' : 'px-4 py-5 md:px-6 md:py-7'}>
           <Outlet />
         </main>
-        <div className={immersiveAppRoute ? 'hidden md:block' : ''}>
+        <div className={immersiveAppRoute ? 'hidden' : ''}>
           <LegalFooter />
         </div>
       </div>

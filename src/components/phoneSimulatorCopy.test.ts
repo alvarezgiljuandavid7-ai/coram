@@ -10,8 +10,8 @@ describe('PhoneSimulator launch copy', () => {
     expect(getInitialPhoneScreen()).toBe('home');
   });
 
-  it('shows an admin shortcut only for administrators', () => {
-    expect(getAdminShortcutLabel(true)).toBe('Panel administrador');
+  it('keeps administrator access out of the member app shell', () => {
+    expect(getAdminShortcutLabel(true)).toBeNull();
     expect(getAdminShortcutLabel(false)).toBeNull();
   });
 

@@ -9,6 +9,7 @@ import {
 import { toggleCourseEnrollment, toggleFavoriteCorario } from '../domain/profile/profileActions';
 import { createReusableAudioContext, getBrowserAudioContextClass } from '../domain/audio/reusableAudioContext';
 import { getHeldPitchState } from '../domain/audio/pitchHold';
+import { getTunerMatchScore } from '../domain/audio/tunerMatch';
 import type { Hymn } from '../domain/hymns/types';
 import {
   useAcademiaModule,
@@ -37,7 +38,6 @@ import {
   FileText, 
   Sliders, 
   CheckCircle2, 
-  Smartphone,
   Sparkles,
   Lock,
   LogOut,
@@ -263,7 +263,8 @@ export function getInitialPhoneScreen(): string {
 }
 
 export function getAdminShortcutLabel(isAdmin: boolean): string | null {
-  return isAdmin ? 'Panel administrador' : null;
+  void isAdmin;
+  return null;
 }
 
 export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
@@ -277,8 +278,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   monetizationSettings = [],
   immersive = false,
   onSignOut,
-  isAdmin = false,
-  onOpenAdmin,
 }) => {
   const layout = getPhoneSimulatorLayout(immersive);
 
@@ -1001,26 +1000,13 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
           const centsDiff = Math.round(1200 * Math.log2(freq / bestTargetFreq));
           setTunerDeviation(centsDiff);
 
-          // Evaluation compared strictly to selected target note
-          if (detectedVal === tunerSelectedChordRef.current) {
-            if (Math.abs(centsDiff) <= 18) {
-              setTunerMatchScore('perfect'); // GREEN
-            } else {
-              setTunerMatchScore('near');    // BLUE
-            }
-          } else {
-            // Check if 1 semitone off
-            const targetIdx = noteNames.indexOf(tunerSelectedChordRef.current);
-            const semitoneDist = Math.min(
-              Math.abs(noteIdx - targetIdx),
-              12 - Math.abs(noteIdx - targetIdx)
-            );
-            if (semitoneDist === 1) {
-              setTunerMatchScore('near');    // BLUE
-            } else {
-              setTunerMatchScore('none');    // RED
-            }
-          }
+          setTunerMatchScore(
+            getTunerMatchScore({
+              detectedNote: detectedVal,
+              targetNote: tunerSelectedChordRef.current,
+              centsDiff,
+            }),
+          );
         } else {
           const heldPitch = getHeldPitchState({
             detectedNote: null,
@@ -1029,7 +1015,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
             previousFrequency: lastDetectedPitchRef.current.frequency,
             lastDetectedAt: lastDetectedPitchRef.current.detectedAt,
             now: performance.now(),
-            holdMs: 700,
+            holdMs: 1800,
           });
 
           setTunerDetectedFreq(heldPitch.frequency);
@@ -1074,26 +1060,13 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
     }
     setTunerDeviation(centsDiff);
 
-    if (note === tunerSelectedChordRef.current) {
-      if (Math.abs(centsDiff) <= 18) {
-        setTunerMatchScore('perfect'); // GREEN
-      } else {
-        setTunerMatchScore('near');    // BLUE
-      }
-    } else {
-      const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-      const noteIdx = noteNames.indexOf(note);
-      const targetIdx = noteNames.indexOf(tunerSelectedChordRef.current);
-      const semitoneDist = Math.min(
-        Math.abs(noteIdx - targetIdx),
-        12 - Math.abs(noteIdx - targetIdx)
-      );
-      if (semitoneDist === 1) {
-        setTunerMatchScore('near');    // BLUE
-      } else {
-        setTunerMatchScore('none');    // RED
-      }
-    }
+    setTunerMatchScore(
+      getTunerMatchScore({
+        detectedNote: note,
+        targetNote: tunerSelectedChordRef.current,
+        centsDiff,
+      }),
+    );
 
     showToast(`Simulando voz: ${NOTE_SPANISH[note] || note}`);
   };
@@ -3017,7 +2990,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 {/* Practical Guideline Tip Box */}
                 <div className="bg-amber-500/5 rounded-xl border border-amber-500/10 p-3 text-left space-y-1">
                   <span className="text-[10px] font-black text-slate-900 block">💡 Consejos para la Afinación Concreta:</span>
-                  <p className="text-[9.5px] text-slate-550 leading-relaxed font-medium">
+                  <p className="text-[9.5px] text-slate-600 leading-relaxed font-medium">
                     1. Toca la tecla del piano de referencia para grabar o memorizar en tu oído la tónica correcta.
                     <br />
                     2. Activa tu micrófono y canta de manera estable a la misma altura.
@@ -3736,16 +3709,6 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                     </div>
 
                     <div className="pt-1.5 border-t border-slate-200/50 flex space-x-2">
-                      {getAdminShortcutLabel(isAdmin) && (
-                        <button 
-                          id="btn-profile-open-admin"
-                          onClick={() => onOpenAdmin?.()}
-                          className="w-full bg-[#0B2545] hover:bg-slate-900 text-white text-[10px] py-1.5 rounded-lg flex items-center justify-center space-x-1 font-bold"
-                        >
-                          <Smartphone className="w-3 h-3" />
-                          <span>{getAdminShortcutLabel(isAdmin)}</span>
-                        </button>
-                      )}
                       <button 
                         id="btn-developer-logout"
                         onClick={() => {

@@ -11,6 +11,7 @@ import {
   type CoramAuthProfile,
 } from '../domain/auth/authRepository';
 import type { User } from '@supabase/supabase-js';
+import { isAllowedAdmin } from '../domain/auth/adminAccess';
 
 export interface CoramAuthState {
   loading: boolean;
@@ -75,7 +76,7 @@ export function useSupabaseAuth(): CoramAuthState {
     user,
     profile,
     role,
-    isAdmin: role === 'admin',
+    isAdmin: isAllowedAdmin(profile, user),
     refresh,
     signInWithGoogle,
     signInWithEmail,

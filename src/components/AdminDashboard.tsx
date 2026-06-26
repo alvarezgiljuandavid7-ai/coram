@@ -114,7 +114,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [courseFormTitle, setCourseFormTitle] = useState<string>('');
   const [courseFormInstructor, setCourseFormInstructor] = useState<string>('Angie MZ');
   const [courseFormDuration, setCourseFormDuration] = useState<string>('12 Clases • 8 horas');
-  const [courseFormIsPremium, setCourseFormIsPremium] = useState<boolean>(false);
   const [courseFormDescription, setCourseFormDescription] = useState<string>('');
   const [courseFormImageUrl, setCourseFormImageUrl] = useState<string>('');
   const [courseFormPrice, setCourseFormPrice] = useState<string>('');
@@ -207,11 +206,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setCourseFormTitle(course.title);
       setCourseFormInstructor(course.instructor);
       setCourseFormDuration(course.duration);
-      setCourseFormIsPremium(course.isPremium);
       setCourseFormDescription(course.description);
       setCourseFormImageUrl(course.imageUrl);
-      setCourseFormPrice(course.price || '');
-      setCourseFormOffer(course.offer || '');
+      setCourseFormPrice('');
+      setCourseFormOffer('');
       setCourseFormVideoUrl(course.videoUrl || '');
       // convert syllabus to newline-separated text
       const syllabusStr = course.syllabus
@@ -223,11 +221,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setCourseFormTitle('');
       setCourseFormInstructor('Angie MZ');
       setCourseFormDuration('12 Clases • 8 horas');
-      setCourseFormIsPremium(false);
       setCourseFormDescription('');
       setCourseFormImageUrl('https://images.unsplash.com/photo-1516280440614-37939bbacd6a?q=80&w=600&auto=format&fit=crop');
-      setCourseFormPrice('$24.99');
-      setCourseFormOffer('20% Descuento Especial');
+      setCourseFormPrice('');
+      setCourseFormOffer('');
       setCourseFormVideoUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
       setCourseFormSyllabusTxt('Clase 1: Introducción a la Técnica Vocal (40m)\nClase 2: Ejercicios Diarios de Respiración (35m)\nClase 3: Postura y Presencia en el Altar (30m)\nClase 4: El Flujo Espiritual de la Adoración (50m)');
     }
@@ -261,7 +258,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             title: courseFormTitle,
             instructor: courseFormInstructor,
             duration: courseFormDuration,
-            isPremium: courseFormIsPremium,
+            isPremium: false,
             description: courseFormDescription,
             imageUrl: courseFormImageUrl,
             price: courseFormPrice || undefined,
@@ -278,7 +275,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         title: courseFormTitle,
         instructor: courseFormInstructor,
         duration: courseFormDuration,
-        isPremium: courseFormIsPremium,
+        isPremium: false,
         description: courseFormDescription,
         rating: 4.9,
         imageUrl: courseFormImageUrl || 'https://images.unsplash.com/photo-1516280440614-37939bbacd6a?q=80&w=600&auto=format&fit=crop',
@@ -341,7 +338,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         file,
         bucketId: 'course-videos',
         assetType: 'video',
-        visibility: courseFormIsPremium ? 'premium' : 'private',
+        visibility: 'private',
         linkedEntityType: 'course',
         linkedEntityId: editingCourse?.id,
       });
@@ -1378,7 +1375,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* INLINE COURSE MODAL */}
       {showCourseModal && (
         <div id="course-modal-overlay" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div id="course-modal" className="bg-white p-6 rounded-2xl w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
+          <div id="course-modal" className="bg-white p-6 rounded-2xl w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4 text-slate-900">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <h3 className="font-sans font-black text-slate-900 text-md">
                 {editingCourse ? 'Editar Curso Académico' : 'Publicar Nuevo Curso'}
@@ -1394,72 +1391,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <form onSubmit={handleSaveCourse} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-505 block mb-1 uppercase tracking-wider">Título del Curso</label>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">Título del Curso</label>
                   <input 
                     type="text" 
                     required
                     value={courseFormTitle}
                     onChange={(e) => setCourseFormTitle(e.target.value)}
                     placeholder="e.g. Técnica Vocal Avanzada"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205 focus:outline-hidden"
+                    className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-505 block mb-1 uppercase tracking-wider">Instructor</label>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">Instructor</label>
                   <input 
                     type="text" 
                     required
                     value={courseFormInstructor}
                     onChange={(e) => setCourseFormInstructor(e.target.value)}
                     placeholder="e.g. Angie MZ"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205 focus:outline-hidden"
+                    className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-505 block mb-1 uppercase tracking-wider">Duración / Clases</label>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">Duración / Clases</label>
                   <input 
                     type="text" 
                     required
                     value={courseFormDuration}
                     onChange={(e) => setCourseFormDuration(e.target.value)}
                     placeholder="e.g. 12 Clases • 8 horas"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">Precio de Venta</label>
-                  <input 
-                    type="text" 
-                    value={courseFormPrice}
-                    onChange={(e) => setCourseFormPrice(e.target.value)}
-                    placeholder="e.g. $19.99"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">Oferta / Descuento</label>
-                  <input 
-                    type="text" 
-                    value={courseFormOffer}
-                    onChange={(e) => setCourseFormOffer(e.target.value)}
-                    placeholder="e.g. 20% OFF"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
+                    className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">Portada del curso</label>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">Portada del curso</label>
                   <input 
                     type="text" 
                     value={courseFormImageUrl}
                     onChange={(e) => setCourseFormImageUrl(e.target.value)}
                     placeholder="URL o archivo subido a Supabase"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
+                    className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                   />
                   <label className={`mt-2 flex items-center justify-center gap-2 rounded-lg border border-slate-205 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all ${
                     courseImageUploading ? 'cursor-wait text-slate-400' : 'cursor-pointer text-[#0B2545] hover:bg-slate-50'
@@ -1476,13 +1453,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </label>
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">URL del Video de Introducción</label>
+                  <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">URL del Video de Introducción</label>
                   <input 
                     type="text" 
                     value={courseFormVideoUrl}
                     onChange={(e) => setCourseFormVideoUrl(e.target.value)}
                     placeholder="YouTube, Vimeo o archivo privado de Supabase"
-                    className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
+                    className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                   />
                   <label className={`mt-2 flex items-center justify-center gap-2 rounded-lg border border-slate-205 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all ${
                     courseVideoUploading ? 'cursor-wait text-slate-400' : 'cursor-pointer text-[#0B2545] hover:bg-slate-50'
@@ -1508,19 +1485,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
 
               <div>
-                <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">Descripción del Curso</label>
+                <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">Descripción del Curso</label>
                 <textarea 
                   required
                   rows={3}
                   value={courseFormDescription}
                   onChange={(e) => setCourseFormDescription(e.target.value)}
                   placeholder="Escribe un resumen atractivo de lo que aprenderán..."
-                  className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205"
+                  className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                 ></textarea>
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-slate-550 block mb-1 uppercase tracking-wider">
+                <label className="text-[10px] font-bold text-slate-700 block mb-1 uppercase tracking-wider">
                   Plan de Estudio (Una lección por línea, formato: Título de Clase (Duración))
                 </label>
                 <textarea 
@@ -1528,21 +1505,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   value={courseFormSyllabusTxt}
                   onChange={(e) => setCourseFormSyllabusTxt(e.target.value)}
                   placeholder="Clase 1: Introducción Teórica (30m)&#13;Clase 2: Ejercicio Respiratorio (45m)"
-                  className="w-full bg-slate-50 text-xs px-3 py-2 rounded-lg border border-slate-205 font-mono"
+                  className="w-full bg-white text-xs text-slate-900 placeholder:text-slate-400 px-3 py-2 rounded-lg border border-slate-300 font-mono focus:border-[#0B2545] focus:outline-hidden focus:ring-1 focus:ring-[#0B2545]"
                 ></textarea>
               </div>
 
-              <div className="flex justify-between items-center pt-2">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={courseFormIsPremium}
-                    onChange={(e) => setCourseFormIsPremium(e.target.checked)}
-                    className="rounded text-[#0B2545] focus:ring-[#0B2545]"
-                  />
-                  <span className="font-extrabold text-slate-700">Restringir a Miembros Premium lock</span>
-                </label>
-
+              <div className="flex justify-end items-center pt-2">
                 <div className="flex space-x-2">
                   <button 
                     type="button" 

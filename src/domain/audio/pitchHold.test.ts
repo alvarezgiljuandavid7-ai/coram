@@ -10,8 +10,8 @@ describe('getHeldPitchState', () => {
         previousNote: 'F',
         previousFrequency: 349.2,
         lastDetectedAt: 1000,
-        now: 1450,
-        holdMs: 700,
+        now: 2450,
+        holdMs: 1800,
       }),
     ).toEqual({ note: 'F', frequency: 349.2, held: true });
   });
@@ -24,8 +24,8 @@ describe('getHeldPitchState', () => {
         previousNote: 'F',
         previousFrequency: 349.2,
         lastDetectedAt: 1000,
-        now: 1800,
-        holdMs: 700,
+        now: 2900,
+        holdMs: 1800,
       }),
     ).toEqual({ note: null, frequency: null, held: false });
   });
