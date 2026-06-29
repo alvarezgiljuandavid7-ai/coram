@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Menu,
   Music2,
-  Sparkles,
   UserRound,
   X,
 } from 'lucide-react';
@@ -17,8 +16,7 @@ import { CoramLogo } from '../components/CoramLogo';
 import { LegalFooter } from '../components/LegalFooter';
 import { useCoramApp } from '../app/CoramAppContext';
 
-const appNav = [
-  { to: '/app', label: 'Aplicacion', icon: Sparkles, end: true },
+export const appNav = [
   { to: '/app/inicio', label: 'Inicio', icon: LayoutDashboard },
   { to: '/app/corarios', label: 'Corarios', icon: Music2 },
   { to: '/app/himnario', label: 'Himnario', icon: BookMarked },
@@ -28,7 +26,8 @@ const appNav = [
 ];
 
 export function isImmersiveAppRoute(pathname: string): boolean {
-  return pathname === '/app' || pathname === '/app/';
+  void pathname;
+  return false;
 }
 
 export function AppLayout() {
@@ -64,7 +63,7 @@ export function AppLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.end}
+                end={item.to === '/app/inicio'}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
@@ -81,14 +80,6 @@ export function AppLayout() {
           })}
         </nav>
 
-        {auth.isAdmin && (
-          <NavLink
-            to="/admin"
-            className="mt-8 block rounded-2xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 p-4 text-sm font-black text-[#0B2545]"
-          >
-            Ir al panel administrador
-          </NavLink>
-        )}
       </aside>
 
       {open && <button type="button" aria-label="Cerrar menu" className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden" onClick={() => setOpen(false)} />}

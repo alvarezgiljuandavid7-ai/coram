@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { PublicLayout } from '../layouts/PublicLayout';
+import { AuthLayout } from '../layouts/AuthLayout';
 import { AppLayout } from '../layouts/AppLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
 import { AdminRoute } from './AdminRoute';
@@ -8,6 +10,9 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { RouteAnalytics } from './RouteAnalytics';
 
 const LoginPage = lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
+const LandingPage = lazy(() => import('../pages/public/LandingPage').then((m) => ({ default: m.LandingPage })));
 const AppHomePage = lazy(() => import('../pages/app/AppHomePage').then((m) => ({ default: m.AppHomePage })));
 const AppInicioPage = lazy(() => import('../pages/app/AppInicioPage').then((m) => ({ default: m.AppInicioPage })));
 const CorariosPage = lazy(() => import('../pages/app/CorariosPage').then((m) => ({ default: m.CorariosPage })));
@@ -19,9 +24,9 @@ const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'
 const AdminCoursesPage = lazy(() => import('../pages/admin/AdminCoursesPage').then((m) => ({ default: m.AdminCoursesPage })));
 const AdminCorariosPage = lazy(() => import('../pages/admin/AdminCorariosPage').then((m) => ({ default: m.AdminCorariosPage })));
 const AdminHymnsPage = lazy(() => import('../pages/admin/AdminHymnsPage').then((m) => ({ default: m.AdminHymnsPage })));
-const AdminMediaPage = lazy(() => import('../pages/admin/AdminMediaPage').then((m) => ({ default: m.AdminMediaPage })));
 const AdminResourcesPage = lazy(() => import('../pages/admin/AdminResourcesPage').then((m) => ({ default: m.AdminResourcesPage })));
 const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
 const LegalPage = lazy(() => import('../pages/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
 
 function RouteFallback() {
@@ -38,11 +43,23 @@ export function AppRouter() {
       <RouteAnalytics />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/legal/privacidad" element={<LegalPage type="privacidad" />} />
-          <Route path="/legal/terminos" element={<LegalPage type="terminos" />} />
-          <Route path="/legal/cookies" element={<LegalPage type="cookies" />} />
-          <Route path="/legal/reembolsos" element={<LegalPage type="reembolsos" />} />
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="legal/privacidad" element={<LegalPage type="privacidad" />} />
+            <Route path="legal/terminos" element={<LegalPage type="terminos" />} />
+            <Route path="legal/cookies" element={<LegalPage type="cookies" />} />
+            <Route path="legal/reembolsos" element={<LegalPage type="reembolsos" />} />
+          </Route>
+
+          <Route path="/login" element={<AuthLayout />}>
+            <Route index element={<LoginPage />} />
+          </Route>
+          <Route path="/register" element={<AuthLayout />}>
+            <Route index element={<RegisterPage />} />
+          </Route>
+          <Route path="/forgot-password" element={<AuthLayout />}>
+            <Route index element={<ForgotPasswordPage />} />
+          </Route>
 
           <Route element={<ProtectedRoute />}>
             <Route path="/app" element={<AppLayout />}>
@@ -65,12 +82,11 @@ export function AppRouter() {
               <Route path="himnos" element={<AdminHymnsPage />} />
               <Route path="recursos" element={<AdminResourcesPage />} />
               <Route path="usuarios" element={<AdminUsersPage />} />
-              <Route path="media" element={<AdminMediaPage />} />
+              <Route path="configuracion" element={<AdminSettingsPage />} />
             </Route>
           </Route>
 
-          <Route path="/" element={<Navigate to="/app" replace />} />
-          <Route path="*" element={<Navigate to="/app" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

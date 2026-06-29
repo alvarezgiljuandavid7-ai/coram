@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookMarked, FolderOpen, GraduationCap, Images, LayoutDashboard, Menu, Music2, UsersRound, X } from 'lucide-react';
+import { BookMarked, FolderOpen, GraduationCap, LayoutDashboard, Menu, Music2, Settings, UsersRound, X } from 'lucide-react';
 import { AuthPanel } from '../components/AuthPanel';
 import { CoramLogo } from '../components/CoramLogo';
 import { LegalFooter } from '../components/LegalFooter';
 import { useCoramApp } from '../app/CoramAppContext';
 
-const adminNav = [
+export const adminNav = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/cursos', label: 'Cursos', icon: GraduationCap },
   { to: '/admin/corarios', label: 'Corarios', icon: Music2 },
   { to: '/admin/himnos', label: 'Himnos', icon: BookMarked },
   { to: '/admin/recursos', label: 'Recursos', icon: FolderOpen },
-  { to: '/admin/media', label: 'Campañas', icon: Images },
   { to: '/admin/usuarios', label: 'Usuarios', icon: UsersRound },
+  { to: '/admin/configuracion', label: 'Configuracion', icon: Settings },
 ];
 
 export function AdminLayout() {

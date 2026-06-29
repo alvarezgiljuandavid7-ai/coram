@@ -6,12 +6,13 @@ import { humanizeAuthError } from '../domain/auth/authErrors';
 interface AuthPanelProps {
   auth: CoramAuthState;
   compact?: boolean;
+  initialMode?: AuthMode;
 }
 
 type AuthMode = 'signin' | 'signup' | 'reset';
 
-export function AuthPanel({ auth, compact = false }: AuthPanelProps) {
-  const [mode, setMode] = useState<AuthMode>('signin');
+export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: AuthPanelProps) {
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
