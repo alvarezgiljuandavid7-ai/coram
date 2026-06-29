@@ -37,6 +37,7 @@ describe('experience separation', () => {
     expect(appLayout).toContain("label: 'Himnario'");
     expect(appLayout).toContain("label: 'Academia'");
     expect(appLayout).toContain("label: 'Recursos'");
+    expect(appLayout).toContain("label: 'Herramientas'");
     expect(appLayout).toContain("label: 'Perfil'");
     expect(appLayout).not.toContain("label: 'Aplicacion'");
     expect(appLayout).not.toContain('Ir al panel administrador');
@@ -67,5 +68,27 @@ describe('experience separation', () => {
   it('keeps admin resources and hymns on dedicated pages instead of unrelated dashboard tabs', () => {
     expect(source('src/pages/admin/AdminResourcesPage.tsx')).not.toContain('monetize');
     expect(source('src/pages/admin/AdminHymnsPage.tsx')).not.toContain('corarios');
+  });
+
+  it('mounts vocal tools as normal user app routes', () => {
+    const router = source('src/routes/AppRouter.tsx');
+
+    expect(router).toContain('path="herramientas" element={<HerramientasPage />}');
+    expect(router).toContain('path="herramientas/afinador" element={<AfinadorPage />}');
+    expect(router).toContain('path="herramientas/piano" element={<PianoPage />}');
+    expect(router).toContain('path="herramientas/calentamiento" element={<CalentamientoPage />}');
+  });
+
+  it('reuses the existing vocal tools engine without exposing the old phone home in tool routes', () => {
+    const toolsShell = source('src/pages/app/tools/VocalToolsShell.tsx');
+    const phoneSimulator = source('src/components/PhoneSimulator.tsx');
+
+    expect(toolsShell).toContain('PhoneSimulator');
+    expect(toolsShell).toContain('initialScreen');
+    expect(toolsShell).toContain('toolOnly');
+    expect(phoneSimulator).toContain('initialScreen = getInitialPhoneScreen()');
+    expect(phoneSimulator).toContain('toolOnly = false');
+    expect(phoneSimulator).toContain('setCurrentScreen(toolOnly ? initialScreen : backTo)');
+    expect(phoneSimulator).toContain('Antes de activar el afinador, tu navegador te pedira permiso para usar el microfono.');
   });
 });

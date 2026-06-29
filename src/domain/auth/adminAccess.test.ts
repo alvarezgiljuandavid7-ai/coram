@@ -13,15 +13,16 @@ const baseProfile: CoramAuthProfile = {
 };
 
 describe('isAllowedAdmin', () => {
-  it('allows only the configured admin email with admin role', () => {
-    expect(isAllowedAdmin(baseProfile, null)).toBe(true);
+  it('allows any profile with the admin role from Supabase', () => {
+    expect(isAllowedAdmin(baseProfile)).toBe(true);
+    expect(isAllowedAdmin({ ...baseProfile, email: 'admin-real@example.com' })).toBe(true);
   });
 
   it('rejects member users even if they open the admin URL', () => {
-    expect(isAllowedAdmin({ ...baseProfile, role: 'member' }, null)).toBe(false);
+    expect(isAllowedAdmin({ ...baseProfile, role: 'member' })).toBe(false);
   });
 
-  it('rejects admin role on a non-admin email', () => {
-    expect(isAllowedAdmin({ ...baseProfile, email: 'usuario@example.com' }, null)).toBe(false);
+  it('rejects premium users even if their email is in the previous fallback list', () => {
+    expect(isAllowedAdmin({ ...baseProfile, role: 'premium' })).toBe(false);
   });
 });

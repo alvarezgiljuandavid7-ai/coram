@@ -20,6 +20,10 @@ const HimnarioPage = lazy(() => import('../pages/app/HimnarioPage').then((m) => 
 const AcademiaPage = lazy(() => import('../pages/app/AcademiaPage').then((m) => ({ default: m.AcademiaPage })));
 const RecursosPage = lazy(() => import('../pages/app/RecursosPage').then((m) => ({ default: m.RecursosPage })));
 const ProfilePage = lazy(() => import('../pages/app/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
+const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
+const PianoPage = lazy(() => import('../pages/app/tools/PianoPage').then((m) => ({ default: m.PianoPage })));
+const CalentamientoPage = lazy(() => import('../pages/app/tools/CalentamientoPage').then((m) => ({ default: m.CalentamientoPage })));
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })));
 const AdminCoursesPage = lazy(() => import('../pages/admin/AdminCoursesPage').then((m) => ({ default: m.AdminCoursesPage })));
 const AdminCorariosPage = lazy(() => import('../pages/admin/AdminCorariosPage').then((m) => ({ default: m.AdminCorariosPage })));
@@ -69,6 +73,10 @@ export function AppRouter() {
               <Route path="himnario" element={<HimnarioPage />} />
               <Route path="academia" element={<AcademiaPage />} />
               <Route path="recursos" element={<RecursosPage />} />
+              <Route path="herramientas" element={<HerramientasPage />} />
+              <Route path="herramientas/afinador" element={<AfinadorPage />} />
+              <Route path="herramientas/piano" element={<PianoPage />} />
+              <Route path="herramientas/calentamiento" element={<CalentamientoPage />} />
               <Route path="perfil" element={<ProfilePage />} />
             </Route>
           </Route>

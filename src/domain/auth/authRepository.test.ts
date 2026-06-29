@@ -47,7 +47,7 @@ describe('authRepository', () => {
     expect(mocks.signInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: {
-        redirectTo: 'http://localhost:3000/app',
+        redirectTo: 'http://localhost:3000/login',
         skipBrowserRedirect: true,
         queryParams: {
           prompt: 'select_account',
@@ -60,8 +60,8 @@ describe('authRepository', () => {
   it('builds auth redirect URLs from a configured public app URL', async () => {
     const { buildAuthRedirectUrl } = await import('./authRepository');
 
-    expect(buildAuthRedirectUrl('/app', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe(
-      'https://coram-two.vercel.app/app',
+    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe(
+      'https://coram-two.vercel.app/login',
     );
   });
 

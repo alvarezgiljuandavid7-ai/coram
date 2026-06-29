@@ -93,7 +93,7 @@ export async function signInWithGoogle(): Promise<void> {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: buildAuthRedirectUrl('/app'),
+      redirectTo: buildAuthRedirectUrl('/login'),
       skipBrowserRedirect: true,
       queryParams: {
         prompt: 'select_account',
@@ -129,7 +129,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
       data: {
         full_name: fullName,
       },
-      emailRedirectTo: buildAuthRedirectUrl('/app'),
+      emailRedirectTo: buildAuthRedirectUrl('/login'),
     },
   });
 

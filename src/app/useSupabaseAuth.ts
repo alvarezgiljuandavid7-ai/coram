@@ -76,7 +76,7 @@ export function useSupabaseAuth(): CoramAuthState {
     user,
     profile,
     role,
-    isAdmin: isAllowedAdmin(profile, user),
+    isAdmin: isAllowedAdmin(profile),
     refresh,
     signInWithGoogle,
     signInWithEmail,

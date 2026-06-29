@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Menu,
   Music2,
+  SlidersHorizontal,
   UserRound,
   X,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ export const appNav = [
   { to: '/app/himnario', label: 'Himnario', icon: BookMarked },
   { to: '/app/academia', label: 'Academia', icon: GraduationCap },
   { to: '/app/recursos', label: 'Recursos', icon: FolderOpen },
+  { to: '/app/herramientas', label: 'Herramientas', icon: SlidersHorizontal },
   { to: '/app/perfil', label: 'Perfil', icon: UserRound },
 ];
 

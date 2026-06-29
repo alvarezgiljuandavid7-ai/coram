@@ -10,9 +10,9 @@ export function AdminRoute() {
 
   useEffect(() => {
     if (!auth.loading) {
-      void logAdminAccess(location.pathname, Boolean(auth.isAdmin));
+      void logAdminAccess(location.pathname, auth.role === 'admin');
     }
-  }, [auth.loading, auth.isAdmin, location.pathname]);
+  }, [auth.loading, auth.role, location.pathname]);
 
   if (auth.loading) {
     return (
@@ -26,7 +26,7 @@ export function AdminRoute() {
     return <Navigate to="/login" replace state={{ from: '/admin' }} />;
   }
 
-  if (!auth.isAdmin) {
+  if (auth.role !== 'admin') {
     return <Navigate to="/app" replace />;
   }
 

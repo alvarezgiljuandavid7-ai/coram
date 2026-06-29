@@ -233,6 +233,8 @@ interface PhoneSimulatorProps {
   mentorships: MentorshipSession[];
   monetizationSettings?: { id: string; name: string; isPremium: boolean; price: string }[];
   immersive?: boolean;
+  initialScreen?: string;
+  toolOnly?: boolean;
   onSignOut?: () => Promise<void> | void;
   isAdmin?: boolean;
   onOpenAdmin?: () => void;
@@ -277,12 +279,22 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   mentorships,
   monetizationSettings = [],
   immersive = false,
+  initialScreen = getInitialPhoneScreen(),
+  toolOnly = false,
   onSignOut,
 }) => {
-  const layout = getPhoneSimulatorLayout(immersive);
+  const layout = toolOnly
+    ? {
+        rootClassName:
+          'relative flex min-h-[720px] w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-sm',
+        screenClassName:
+          'h-full w-full overflow-hidden relative flex flex-col transition-colors duration-300',
+        showDeviceChrome: false,
+      }
+    : getPhoneSimulatorLayout(immersive);
 
   // Mobile navigation state
-  const [currentScreen, setCurrentScreen] = useState<string>(getInitialPhoneScreen);
+  const [currentScreen, setCurrentScreen] = useState<string>(initialScreen);
   const [selectedCorario, setSelectedCorario] = useState<Corario | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [onboardingIndex, setOnboardingIndex] = useState<number>(0);
@@ -1153,7 +1165,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
             onClick={() => {
               if (backTo === 'corarios-list') setSelectedCorario(null);
               if (backTo === 'academy') setSelectedCourse(null);
-              setCurrentScreen(backTo);
+              setCurrentScreen(toolOnly ? initialScreen : backTo);
             }} 
             className={`p-1 rounded-full transition-colors ${
               isDarkMode ? 'hover:bg-slate-700 text-slate-200' : 'hover:bg-gray-100 text-slate-700'
@@ -2925,6 +2937,11 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                 </div>
 
                 {/* Primary Mic Trigger Buttons */}
+                {!tunerActive && (
+                  <div className="rounded-2xl border border-sky-200 bg-sky-50 px-3 py-2 text-[10px] font-bold leading-relaxed text-sky-900">
+                    Antes de activar el afinador, tu navegador te pedira permiso para usar el microfono.
+                  </div>
+                )}
                 <div className="flex space-x-2.5">
                   <button
                     id="btn-toggle-tuner-active-action"
