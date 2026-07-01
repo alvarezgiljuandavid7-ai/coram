@@ -59,8 +59,8 @@ export function HimnarioPage() {
         <SearchInputPremium value={query} onChange={setQuery} placeholder="Buscar por numero, titulo o letra" />
       </section>
 
-      <div className="grid gap-4 xl:grid-cols-[1fr_430px]">
-        <section className="space-y-3">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_430px]">
+        <section className="min-w-0 space-y-3">
           <SectionHeader eyebrow="Lista" title="Himnos disponibles" />
           {hymnsLoading ? (
             <LoadingStatePremium label="Cargando himnario..." />
@@ -97,7 +97,7 @@ export function HimnarioPage() {
           )}
         </section>
 
-        <aside className="xl:sticky xl:top-28 xl:h-fit">
+        <aside className="min-w-0 xl:sticky xl:top-28 xl:h-fit">
           <PremiumCard dark className="p-5">
             <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">
               {selected ? `Himno ${selected.number}` : `${filtered.length} himnos`}

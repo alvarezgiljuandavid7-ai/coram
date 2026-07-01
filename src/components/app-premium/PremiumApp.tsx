@@ -122,7 +122,7 @@ export function PremiumCard({ children, className = '', dark = false }: PremiumC
       whileHover={{ y: -3 }}
       whileTap={{ scale: 0.985 }}
       transition={{ duration: 0.18, ease: softEase }}
-      className={`relative overflow-hidden rounded-[1.4rem] border p-4 shadow-lg ${
+      className={`relative min-w-0 max-w-full overflow-hidden rounded-[1.4rem] border p-4 shadow-lg ${
         dark
           ? 'border-white/10 bg-[#071426] text-white shadow-[#0B2545]/18'
           : 'border-slate-200/80 bg-[oklch(99%_0.004_90)] text-slate-900 shadow-slate-950/6'
@@ -139,7 +139,7 @@ export function PremiumLinkCard({ to, children, className = '', dark = false, ..
     <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }} transition={{ duration: 0.18, ease: softEase }}>
       <Link
         to={to}
-        className={`relative block min-h-32 overflow-hidden rounded-[1.4rem] border p-4 shadow-lg transition ${
+        className={`relative block min-h-32 min-w-0 max-w-full overflow-hidden rounded-[1.4rem] border p-4 shadow-lg transition ${
           dark
             ? 'border-white/10 bg-[#071426] text-white shadow-[#0B2545]/18'
             : 'border-slate-200/80 bg-[oklch(99%_0.004_90)] text-slate-900 shadow-slate-950/6'
@@ -339,7 +339,7 @@ export function StatCard({ label, value, detail, icon: Icon }: { label: string; 
     <PremiumCard className="min-w-0 p-3.5">
       <div className="flex items-center gap-3">
         <BrandedIcon icon={Icon} tone="navy" className="h-11 w-11" />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-[clamp(1.35rem,7vw,1.75rem)] font-black tracking-tight text-[#0B2545]">{value}</p>
           <p className="text-xs font-black text-slate-900">{label}</p>
           <p className="truncate text-[11px] font-semibold text-slate-500">{detail}</p>
