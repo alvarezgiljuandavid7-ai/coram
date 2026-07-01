@@ -336,11 +336,11 @@ function getResourceIcon(category: Resource['category']) {
 
 export function StatCard({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: LucideIcon }) {
   return (
-    <PremiumCard className="p-3.5">
+    <PremiumCard className="min-w-0 p-3.5">
       <div className="flex items-center gap-3">
         <BrandedIcon icon={Icon} tone="navy" className="h-11 w-11" />
         <div className="min-w-0">
-          <p className="text-2xl font-black tracking-tight text-[#0B2545]">{value}</p>
+          <p className="truncate text-[clamp(1.35rem,7vw,1.75rem)] font-black tracking-tight text-[#0B2545]">{value}</p>
           <p className="text-xs font-black text-slate-900">{label}</p>
           <p className="truncate text-[11px] font-semibold text-slate-500">{detail}</p>
         </div>
