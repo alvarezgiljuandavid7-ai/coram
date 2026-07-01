@@ -15,6 +15,7 @@ import {
 import { AuthPanel } from '../components/AuthPanel';
 import { CookieConsent } from '../components/CookieConsent';
 import { CoramLogo } from '../components/CoramLogo';
+import { BrandedIcon, PremiumBottomNav, PremiumSidebar, PremiumTopBar } from '../components/app-premium/PremiumApp';
 import { LegalFooter } from '../components/LegalFooter';
 import { useCoramApp } from '../app/CoramAppContext';
 
@@ -27,6 +28,10 @@ export const appNav = [
   { to: '/app/herramientas', label: 'Herramientas', icon: SlidersHorizontal },
   { to: '/app/perfil', label: 'Perfil', icon: UserRound },
 ];
+
+const bottomNav = appNav.filter((item) =>
+  ['/app/inicio', '/app/corarios', '/app/himnario', '/app/herramientas', '/app/perfil'].includes(item.to),
+);
 
 export function isImmersiveAppRoute(pathname: string): boolean {
   void pathname;
@@ -47,24 +52,17 @@ export function AppLayout() {
   }, [open]);
 
   return (
-    <div className={`min-h-screen bg-[oklch(98%_0.006_90)] text-slate-900 ${immersiveAppRoute ? 'max-md:bg-slate-950' : ''}`}>
-      <motion.aside
-        initial={false}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-200 bg-[oklch(99%_0.004_90)] px-4 py-5 shadow-xl shadow-slate-950/5 transition-transform lg:translate-x-0 ${
-          open ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
+    <div className={`min-h-screen bg-[oklch(97.5%_0.008_90)] text-slate-900 ${immersiveAppRoute ? 'max-md:bg-slate-950' : ''}`}>
+      <PremiumSidebar open={open}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CoramLogo variant="icon" size={46} />
             <div>
-              <h1 className="text-xl font-black tracking-tight text-[#0B2545]">CorAM</h1>
-              <p className="text-xs font-semibold text-slate-500">Aplicacion ministerial</p>
+              <h1 className="text-xl font-black tracking-tight text-[#D4AF37]">CorAM</h1>
+              <p className="text-xs font-semibold text-slate-300">Aplicacion ministerial</p>
             </div>
           </div>
-          <button type="button" onClick={() => setOpen(false)} className="rounded-xl p-2 transition hover:bg-slate-100 active:scale-95 lg:hidden">
+          <button type="button" onClick={() => setOpen(false)} className="rounded-xl p-2 text-slate-200 transition hover:bg-white/10 active:scale-95 lg:hidden">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -79,10 +77,10 @@ export function AppLayout() {
                 end={item.to === '/app/inicio'}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition active:scale-[0.99] ${
+                  `flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition active:scale-[0.99] ${
                     isActive
-                      ? 'bg-[#0B2545] text-slate-50 shadow-md shadow-[#0B2545]/15'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-[#0B2545]'
+                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#9F6B18] text-slate-950 shadow-lg shadow-[#D4AF37]/20'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -92,8 +90,12 @@ export function AppLayout() {
             );
           })}
         </nav>
-
-      </motion.aside>
+        <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">Plan actual</p>
+          <p className="mt-2 text-sm font-black">CorAM abierto</p>
+          <p className="mt-1 text-xs leading-5 text-slate-300">Herramientas, corarios y recursos listos para ministrar.</p>
+        </div>
+      </PremiumSidebar>
 
       {open && (
         <motion.button
@@ -101,38 +103,44 @@ export function AppLayout() {
           aria-label="Cerrar menu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
       <div className="lg:pl-72">
-        <header className={`${immersiveAppRoute ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-3 py-2 md:py-3 backdrop-blur md:px-6`}>
+        <PremiumTopBar immersive={immersiveAppRoute} className="py-2 md:py-3">
           <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-[#0B2545] transition hover:-translate-y-0.5 hover:bg-white active:scale-95 lg:hidden"
+                className="rounded-2xl border border-slate-200 bg-white p-2 text-[#0B2545] shadow-sm transition hover:-translate-y-0.5 active:scale-95 lg:hidden"
               >
                 <Menu className="h-5 w-5" />
               </button>
+              <div className="hidden lg:block">
+                <BrandedIcon icon={LayoutDashboard} tone="gold" className="h-10 w-10" />
+              </div>
               <div>
                 <p className="hidden text-[10px] font-black uppercase tracking-widest text-[#B5811F] sm:block">CorAM Web</p>
                 <h2 className="text-lg md:text-2xl font-black tracking-tight text-[#0B2545]">Aplicacion</h2>
               </div>
             </div>
-            <AuthPanel auth={auth} compact />
+            <div className="max-w-full overflow-hidden">
+              <AuthPanel auth={auth} compact />
+            </div>
           </div>
-        </header>
+        </PremiumTopBar>
 
-        <main className={immersiveAppRoute ? 'p-0' : 'px-4 py-5 md:px-6 md:py-7'}>
+        <main className={immersiveAppRoute ? 'p-0' : 'px-3 py-4 pb-28 min-[390px]:px-4 md:px-6 md:py-7 md:pb-7'}>
           <Outlet />
         </main>
         <div className={immersiveAppRoute ? 'hidden' : ''}>
           <LegalFooter />
         </div>
       </div>
+      <PremiumBottomNav items={bottomNav} />
       <CookieConsent />
     </div>
   );

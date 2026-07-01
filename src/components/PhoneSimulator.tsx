@@ -288,7 +288,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   const layout = toolOnly
     ? {
         rootClassName:
-          'relative flex min-h-[720px] w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-sm',
+          'relative flex min-h-[100dvh] w-full flex-col overflow-hidden bg-slate-950',
         screenClassName:
           'h-full w-full overflow-hidden relative flex flex-col transition-colors duration-300',
         showDeviceChrome: false,

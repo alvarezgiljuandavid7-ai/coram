@@ -1,31 +1,91 @@
-import { Download } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { FolderOpen, Search } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
-import { PageHeading } from './AcademiaPage';
+import {
+  AppHero,
+  EmptyStatePremium,
+  PremiumScreen,
+  ResourceCard,
+  SearchInputPremium,
+  SectionHeader,
+} from '../../components/app-premium/PremiumApp';
+
+const filters = ['Todos', 'PDF Acordes', 'Guías Prácticas', 'Pistas / Audio', 'Partituras'] as const;
 
 export function RecursosPage() {
   const { state } = useCoramApp();
+  const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>('Todos');
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return state.resources.filter((resource) => {
+      const matchesFilter = activeFilter === 'Todos' || resource.category === activeFilter;
+      const matchesQuery =
+        !normalizedQuery ||
+        resource.title.toLowerCase().includes(normalizedQuery) ||
+        resource.description.toLowerCase().includes(normalizedQuery);
+
+      return matchesFilter && matchesQuery;
+    });
+  }, [activeFilter, query, state.resources]);
 
   return (
-    <section className="space-y-5">
-      <PageHeading title="Recursos" subtitle="Material descargable para ensayos, clases y preparacion ministerial." />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {state.resources.map((resource) => (
-          <article key={resource.id} className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">{resource.category}</p>
-                <h3 className="mt-1 text-lg font-black text-[#0B2545]">{resource.title}</h3>
-              </div>
-              <Download className="h-5 w-5 text-emerald-600" />
-            </div>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{resource.description}</p>
-            <div className="mt-5 flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>{resource.fileSize}</span>
-              <span>{resource.downloadsCount} descargas</span>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
+    <PremiumScreen>
+      <AppHero
+        eyebrow="Biblioteca CorAM"
+        title={
+          <>
+            Recursos para <span className="text-[#D4AF37]">preparar tu servicio.</span>
+          </>
+        }
+        body="Material descargable para ensayos, clases y preparacion ministerial, listo para crecer con Supabase Storage."
+      />
+
+      <section className="space-y-3">
+        <SectionHeader eyebrow="Filtros" title="Encuentra tu material" />
+        <SearchInputPremium value={query} onChange={setQuery} placeholder="Buscar recursos..." />
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setActiveFilter(filter)}
+              className={`min-h-10 shrink-0 rounded-2xl px-4 text-xs font-black transition active:scale-95 ${
+                activeFilter === filter
+                  ? 'bg-[#0B2545] text-white shadow-lg shadow-[#0B2545]/20'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:border-[#D4AF37]/50'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeader eyebrow="Recursos" title="Biblioteca descargable" />
+        {state.resources.length === 0 ? (
+          <EmptyStatePremium
+            icon={FolderOpen}
+            title="Aun no hay recursos publicados"
+            body="Cuando el administrador suba PDFs, audios, videos o guias en Supabase, apareceran en esta biblioteca."
+          />
+        ) : filtered.length === 0 ? (
+          <EmptyStatePremium
+            icon={Search}
+            title="No hay recursos en este filtro"
+            body="Prueba otra categoria o publica nuevos recursos desde el panel administrador."
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((resource) => (
+              <ResourceCard key={resource.id} resource={resource} />
+            ))}
+          </div>
+        )}
+      </section>
+    </PremiumScreen>
   );
 }

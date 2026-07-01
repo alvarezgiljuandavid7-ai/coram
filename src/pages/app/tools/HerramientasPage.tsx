@@ -1,56 +1,71 @@
-import { Link } from 'react-router-dom';
-import { Mic2, Music2, Wind } from 'lucide-react';
+import { Activity, Mic2, Music2, Piano, Radio, Wind } from 'lucide-react';
+import {
+  AppHero,
+  PremiumScreen,
+  SectionHeader,
+  ToolCard,
+} from '../../../components/app-premium/PremiumApp';
 
 const tools = [
   {
     title: 'Afinador vocal',
-    detail: 'Activa el microfono y compara tu voz contra la nota objetivo.',
+    detail: 'Activa el microfono y compara tu voz contra la nota objetivo con lectura en tiempo real.',
     to: '/app/herramientas/afinador',
     icon: Mic2,
+    accent: 'Microfono · precision vocal',
   },
   {
     title: 'Piano / teclado',
-    detail: 'Escucha notas y acordes de referencia desde el teclado acustico.',
+    detail: 'Escucha notas y acordes de referencia con un teclado listo para ensayar y estudiar.',
     to: '/app/herramientas/piano',
-    icon: Music2,
+    icon: Piano,
+    accent: 'Teclado · acordes',
   },
   {
     title: 'Calentamiento vocal',
-    detail: 'Practica respiracion, registros y escalas antes de ministrar.',
+    detail: 'Prepara respiracion, registro y escalas antes de ministrar o grabar.',
     to: '/app/herramientas/calentamiento',
     icon: Wind,
+    accent: 'Rutina · voz sana',
   },
 ];
 
 export function HerramientasPage() {
   return (
-    <section className="space-y-5">
-      <div className="rounded-3xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm sm:p-6">
-        <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">Herramientas</p>
-        <h1 className="mt-3 text-[clamp(1.6rem,6vw,2.25rem)] font-black tracking-tight text-[#0B2545]">Entrenamiento vocal y piano</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Usa las herramientas reales de CorAM dentro de la app, sin mockups ni pantallas promocionales.
-        </p>
-      </div>
+    <PremiumScreen>
+      <AppHero
+        eyebrow="Suite musical"
+        title={
+          <>
+            Herramientas para <span className="text-[#D4AF37]">afinar tu llamado.</span>
+          </>
+        }
+        body="Afinador, piano y calentamiento vocal viven aqui como una suite profesional para voces y ministerios."
+      >
+        <div className="grid grid-cols-3 gap-2">
+          <MiniSignal icon={Mic2} label="Voz" />
+          <MiniSignal icon={Music2} label="Notas" />
+          <MiniSignal icon={Activity} label="Ritmo" />
+        </div>
+      </AppHero>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        {tools.map((tool) => {
-          const Icon = tool.icon;
-          return (
-            <Link
-              key={tool.to}
-              to={tool.to}
-              className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[#D4AF37]/60 hover:shadow-md active:scale-[0.99]"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0B2545] text-slate-50">
-                <Icon className="h-5 w-5" />
-              </span>
-              <h2 className="mt-4 text-lg font-black text-[#0B2545]">{tool.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{tool.detail}</p>
-            </Link>
-          );
-        })}
-      </div>
-    </section>
+      <section className="space-y-3">
+        <SectionHeader eyebrow="Entrenamiento" title="Elige tu herramienta" />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {tools.map((tool) => (
+            <ToolCard key={tool.to} {...tool} />
+          ))}
+        </div>
+      </section>
+    </PremiumScreen>
+  );
+}
+
+function MiniSignal({ icon: Icon, label }: { icon: typeof Radio; label: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+      <Icon className="h-4 w-4 text-[#D4AF37]" />
+      <p className="mt-2 text-[11px] font-black text-white">{label}</p>
+    </div>
   );
 }
