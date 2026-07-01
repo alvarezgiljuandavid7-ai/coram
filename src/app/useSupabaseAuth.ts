@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../shared/supabase/client';
 import {
   getCurrentCoramSession,
+  appleOAuthEnabled,
   sendPasswordReset,
+  signInWithApple,
   signInWithEmail,
   signInWithGoogle,
   signOut as signOutFromSupabase,
@@ -20,7 +22,9 @@ export interface CoramAuthState {
   profile: CoramAuthProfile | null;
   role: string;
   isAdmin: boolean;
+  appleOAuthEnabled: boolean;
   refresh: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, fullName: string) => Promise<void>;
@@ -38,11 +42,19 @@ export function useSupabaseAuth(): CoramAuthState {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const session = await getCurrentCoramSession();
-    setUser(session.user);
-    setProfile(session.profile);
-    setRole(session.role);
-    setLoading(false);
+    try {
+      const session = await getCurrentCoramSession();
+      setUser(session.user);
+      setProfile(session.profile);
+      setRole(session.role);
+    } catch (error) {
+      console.error('Unable to refresh Supabase auth session', error);
+      setUser(null);
+      setProfile(null);
+      setRole('guest');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const handleSignOut = useCallback(async () => {
@@ -77,7 +89,9 @@ export function useSupabaseAuth(): CoramAuthState {
     profile,
     role,
     isAdmin: isAllowedAdmin(profile),
+    appleOAuthEnabled,
     refresh,
+    signInWithApple,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,

@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { AuthPanel } from '../components/AuthPanel';
 import { useCoramApp } from '../app/CoramAppContext';
+import { getPostLoginRedirect } from '../domain/auth/postLoginRedirect';
 
 export function ForgotPasswordPage() {
   const { auth } = useCoramApp();
@@ -8,7 +9,7 @@ export function ForgotPasswordPage() {
   const from = (location.state as { from?: string } | null)?.from;
 
   if (!auth.loading && auth.user && !auth.recoveryMode) {
-    return <Navigate to={auth.isAdmin ? from || '/admin' : '/app'} replace />;
+    return <Navigate to={getPostLoginRedirect(auth.role, from)} replace />;
   }
 
   return <AuthPanel auth={auth} initialMode="reset" />;

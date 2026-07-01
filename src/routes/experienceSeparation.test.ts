@@ -54,7 +54,6 @@ describe('experience separation', () => {
     expect(adminLayout).toContain("label: 'Usuarios'");
     expect(adminLayout).toContain("label: 'Configuracion'");
     expect(adminLayout).not.toContain("label: 'Campañas'");
-    expect(adminLayout).not.toContain("label: 'CampaÃ±as'");
   });
 
   it('does not render the phone mockup or commercial hero from /app', () => {
@@ -88,7 +87,30 @@ describe('experience separation', () => {
     expect(toolsShell).toContain('toolOnly');
     expect(phoneSimulator).toContain('initialScreen = getInitialPhoneScreen()');
     expect(phoneSimulator).toContain('toolOnly = false');
-    expect(phoneSimulator).toContain('setCurrentScreen(toolOnly ? initialScreen : backTo)');
+    expect(phoneSimulator).toContain("navigate('/app/herramientas')");
+    expect(phoneSimulator).toContain("academy: '/app/academia'");
+    expect(phoneSimulator).toContain("'corarios-list': '/app/corarios'");
+    expect(phoneSimulator).toContain("himnarios: '/app/himnario'");
     expect(phoneSimulator).toContain('Antes de activar el afinador, tu navegador te pedira permiso para usar el microfono.');
+  });
+
+  it('keeps Apple sign in behind an explicit provider flag', () => {
+    const authPanel = source('src/components/AuthPanel.tsx');
+    const authRepository = source('src/domain/auth/authRepository.ts');
+
+    expect(authPanel).toContain('auth.appleOAuthEnabled');
+    expect(authPanel).toContain('Continuar con Apple');
+    expect(authRepository).toContain("provider: 'apple'");
+  });
+
+  it('keeps mobile auth and app headers compact after polish', () => {
+    const authLayout = source('src/layouts/AuthLayout.tsx');
+    const appLayout = source('src/layouts/AppLayout.tsx');
+
+    expect(authLayout).toContain('items-start');
+    expect(authLayout).toContain('pt-4');
+    expect(authLayout).toContain('clamp(');
+    expect(appLayout).toContain('py-2 md:py-3');
+    expect(appLayout).toContain('text-lg md:text-2xl');
   });
 });

@@ -12,6 +12,7 @@ import { RouteAnalytics } from './RouteAnalytics';
 const LoginPage = lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 const LandingPage = lazy(() => import('../pages/public/LandingPage').then((m) => ({ default: m.LandingPage })));
 const AppHomePage = lazy(() => import('../pages/app/AppHomePage').then((m) => ({ default: m.AppHomePage })));
 const AppInicioPage = lazy(() => import('../pages/app/AppInicioPage').then((m) => ({ default: m.AppInicioPage })));
@@ -94,7 +95,7 @@ export function AppRouter() {
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

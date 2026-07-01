@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { CoramLogo } from './CoramLogo';
 import { transposeChords } from '../domain/corarios/chords';
 import {
@@ -283,6 +284,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
   toolOnly = false,
   onSignOut,
 }) => {
+  const navigate = useNavigate();
   const layout = toolOnly
     ? {
         rootClassName:
@@ -1143,6 +1145,31 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
     showToast(`Descargando ${res.title}... ¡Guardado en tu dispositivo!`);
   };
 
+  const backRouteFallbacks: Record<string, string> = {
+    home: '/app/inicio',
+    academy: '/app/academia',
+    'corarios-list': '/app/corarios',
+    himnarios: '/app/himnario',
+    recursos: '/app/recursos',
+    profile: '/app/perfil',
+  };
+
+  const goBackToScreen = (backTo: string) => {
+    if (toolOnly) {
+      navigate('/app/herramientas');
+      return;
+    }
+
+    if (backTo === 'corarios-list') setSelectedCorario(null);
+    if (backTo === 'academy') setSelectedCourse(null);
+    setCurrentScreen(backTo);
+
+    const fallbackRoute = backRouteFallbacks[backTo];
+    if (fallbackRoute) {
+      navigate(fallbackRoute, { replace: true });
+    }
+  };
+
   // Header Component for inside screens
   const InnerHeader = ({ 
     title, 
@@ -1162,11 +1189,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
         {showBack && (
           <button 
             id={`btn-back-to-${backTo}`}
-            onClick={() => {
-              if (backTo === 'corarios-list') setSelectedCorario(null);
-              if (backTo === 'academy') setSelectedCourse(null);
-              setCurrentScreen(toolOnly ? initialScreen : backTo);
-            }} 
+            onClick={() => goBackToScreen(backTo)} 
             className={`p-1 rounded-full transition-colors ${
               isDarkMode ? 'hover:bg-slate-700 text-slate-200' : 'hover:bg-gray-100 text-slate-700'
             }`}
@@ -3147,7 +3170,10 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
                   <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 shadow-xs sticky top-0 z-10">
                     <button
                       id="btn-back-to-hymn-list"
-                      onClick={() => setSelectedHymn(null)}
+                      onClick={() => {
+                        setSelectedHymn(null);
+                        navigate('/app/himnario', { replace: true });
+                      }}
                       className="flex items-center space-x-1 text-xs font-black text-[#0B2545] hover:underline"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />

@@ -1,5 +1,6 @@
-import { PlayCircle, Star } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Star } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCoramApp } from '../../app/CoramAppContext';
 import type { Course } from '../../types';
 
@@ -7,6 +8,7 @@ export function AcademiaPage() {
   const { state } = useCoramApp();
   const { courses, profile, setProfile } = state;
   const [selected, setSelected] = useState<Course | null>(null);
+  const navigate = useNavigate();
 
   const toggleCourse = (courseId: string) => {
     setProfile((current) => ({
@@ -17,12 +19,22 @@ export function AcademiaPage() {
     }));
   };
 
+  const closeCourseDetail = () => {
+    setSelected(null);
+    navigate('/app/academia', { replace: true });
+  };
+
   return (
     <section className="space-y-5">
       <PageHeading title="Academia CorAM" subtitle="Cursos para voces, directores, musicos y equipos de alabanza." />
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+        {courses.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-[oklch(99%_0.004_90)] p-5 text-sm font-semibold text-slate-500">
+            Todavia no hay cursos publicados.
+          </div>
+        )}
         {courses.map((course) => (
-          <article key={course.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] shadow-sm">
+          <article key={course.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] shadow-sm transition hover:-translate-y-0.5 hover:border-[#D4AF37]/60 hover:shadow-md active:scale-[0.99]">
             <img src={course.imageUrl} alt="" className="h-44 w-full object-cover" />
             <div className="space-y-4 p-5">
               <div>
@@ -39,10 +51,10 @@ export function AcademiaPage() {
                 <span>Gratis</span>
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setSelected(course)} className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-xs font-black text-[#0B2545]">
+                <button type="button" onClick={() => setSelected(course)} className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-xs font-black text-[#0B2545] transition hover:bg-slate-50 active:scale-[0.99]">
                   Ver detalles
                 </button>
-                <button type="button" onClick={() => toggleCourse(course.id)} className="flex-1 rounded-xl bg-[#0B2545] px-3 py-2 text-xs font-black text-slate-50">
+                <button type="button" onClick={() => toggleCourse(course.id)} className="flex-1 rounded-xl bg-[#0B2545] px-3 py-2 text-xs font-black text-slate-50 transition hover:bg-slate-900 active:scale-[0.99]">
                   {profile.enrolledCourses.includes(course.id) ? 'Inscrito' : 'Inscribirme'}
                 </button>
               </div>
@@ -52,6 +64,14 @@ export function AcademiaPage() {
       </div>
       {selected && (
         <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm">
+          <button
+            type="button"
+            onClick={closeCourseDetail}
+            className="mb-3 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-[#0B2545] transition hover:bg-slate-50 active:scale-[0.99]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a academia
+          </button>
           <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">Contenido del curso</p>
           <h3 className="mt-1 text-xl font-black text-[#0B2545]">{selected.title}</h3>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -75,7 +95,7 @@ export function PageHeading({ title, subtitle }: { title: string; subtitle: stri
   return (
     <div>
       <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">CorAM</p>
-      <h1 className="mt-1 text-2xl font-black tracking-tight text-[#0B2545]">{title}</h1>
+      <h1 className="mt-1 text-[clamp(1.45rem,5vw,2rem)] font-black tracking-tight text-[#0B2545]">{title}</h1>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{subtitle}</p>
     </div>
   );

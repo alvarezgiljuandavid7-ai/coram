@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Heart, Search } from 'lucide-react';
+import { ArrowLeft, Heart, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCoramApp } from '../../app/CoramAppContext';
 import type { Corario } from '../../types';
 
@@ -8,6 +9,7 @@ export function CorariosPage() {
   const { corarios, profile, setProfile } = state;
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Corario | null>(null);
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -26,6 +28,11 @@ export function CorariosPage() {
     }));
   };
 
+  const closeCorarioDetail = () => {
+    setSelected(null);
+    navigate('/app/corarios', { replace: true });
+  };
+
   return (
     <section className="space-y-5">
       <LibraryHeader
@@ -37,12 +44,17 @@ export function CorariosPage() {
       />
       <div className="grid gap-4 xl:grid-cols-[1fr_420px]">
         <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
+          {filtered.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-[oklch(99%_0.004_90)] p-5 text-sm font-semibold text-slate-500">
+              No encontramos corarios con esa busqueda.
+            </div>
+          )}
           {filtered.map((corario) => (
             <button
               key={corario.id}
               type="button"
               onClick={() => setSelected(corario)}
-              className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
+              className={`rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99] ${
                 selected?.id === corario.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-slate-200 bg-[oklch(99%_0.004_90)]'
               }`}
             >
@@ -70,8 +82,16 @@ export function CorariosPage() {
             <>
               <button
                 type="button"
+                onClick={closeCorarioDetail}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-[#0B2545] transition hover:bg-slate-50 active:scale-[0.99]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver a corarios
+              </button>
+              <button
+                type="button"
                 onClick={() => toggleFavorite(selected.id)}
-                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-xs font-black text-slate-50"
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-xs font-black text-slate-50 transition hover:bg-slate-900 active:scale-[0.99]"
               >
                 <Heart className="h-4 w-4" />
                 {profile.favoriteCorarios.includes(selected.id) ? 'Quitar favorito' : 'Guardar favorito'}
@@ -108,7 +128,7 @@ export function LibraryHeader({
     <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
       <div>
         <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">CorAM</p>
-        <h1 className="mt-1 text-2xl font-black tracking-tight text-[#0B2545]">{title}</h1>
+        <h1 className="mt-1 text-[clamp(1.45rem,5vw,2rem)] font-black tracking-tight text-[#0B2545]">{title}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">{subtitle}</p>
       </div>
       <label className="relative w-full xl:w-[420px]">

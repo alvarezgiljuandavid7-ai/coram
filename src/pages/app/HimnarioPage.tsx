@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCoramApp } from '../../app/CoramAppContext';
 import type { Hymn } from '../../domain/hymns/types';
 import { LibraryHeader } from './CorariosPage';
@@ -8,6 +9,7 @@ export function HimnarioPage() {
   const { hymns, hymnsLoading, hymnsError } = useCoramApp();
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Hymn | null>(null);
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -16,6 +18,11 @@ export function HimnarioPage() {
       [hymn.title, hymn.hymnalName, hymn.lyrics, String(hymn.number)].some((value) => value.toLowerCase().includes(term)),
     );
   }, [hymns, query]);
+
+  const closeHymnDetail = () => {
+    setSelected(null);
+    navigate('/app/himnario', { replace: true });
+  };
 
   return (
     <section className="space-y-5">
@@ -31,6 +38,8 @@ export function HimnarioPage() {
         <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)]">
           {hymnsLoading ? (
             <div className="p-6 text-sm font-bold text-slate-500">Cargando himnario...</div>
+          ) : filtered.length === 0 ? (
+            <div className="p-6 text-sm font-semibold text-slate-500">No encontramos himnos con esa busqueda.</div>
           ) : (
             <div className="divide-y divide-slate-100">
               {filtered.map((hymn) => (
@@ -38,7 +47,7 @@ export function HimnarioPage() {
                   key={hymn.id}
                   type="button"
                   onClick={() => setSelected(hymn)}
-                  className={`flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-slate-50 ${
+                  className={`flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-slate-50 active:scale-[0.99] ${
                     selected?.id === hymn.id ? 'bg-[#D4AF37]/10' : ''
                   }`}
                 >
@@ -62,9 +71,19 @@ export function HimnarioPage() {
           </p>
           <h3 className="mt-1 text-xl font-black tracking-tight text-[#0B2545]">{selected?.title ?? 'Selecciona un himno'}</h3>
           {selected ? (
-            <pre className="mt-5 max-h-[66vh] overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-950 p-5 font-mono text-xs leading-6 text-slate-50">
-              {selected.lyrics}
-            </pre>
+            <>
+              <button
+                type="button"
+                onClick={closeHymnDetail}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-[#0B2545] transition hover:bg-slate-50 active:scale-[0.99]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver al himnario
+              </button>
+              <pre className="mt-5 max-h-[66vh] overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-950 p-5 font-mono text-xs leading-6 text-slate-50">
+                {selected.lyrics}
+              </pre>
+            </>
           ) : (
             <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-500">
               Elige un himno para ver la letra completa.

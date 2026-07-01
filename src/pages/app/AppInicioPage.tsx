@@ -10,11 +10,11 @@ export function AppInicioPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-3xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm sm:p-6">
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-emerald-700">
           Plataforma activa
         </span>
-        <h1 className="mt-5 max-w-3xl text-3xl font-black tracking-tight text-[#0B2545]">
+        <h1 className="mt-4 max-w-3xl text-[clamp(1.65rem,6vw,2.25rem)] font-black tracking-tight text-[#0B2545] sm:mt-5">
           CorAM centraliza corarios, himnarios, cursos y recursos para el ministerio.
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
@@ -40,7 +40,7 @@ export function AppInicioPage() {
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-4 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#D4AF37]/50 hover:shadow-md active:scale-[0.99]">
       <p className="text-xs font-black uppercase tracking-widest text-slate-500">{label}</p>
       <p className="mt-2 text-3xl font-black tracking-tight text-[#0B2545]">{value}</p>
       <p className="mt-1 text-xs font-semibold text-slate-500">{detail}</p>
@@ -50,7 +50,7 @@ function Stat({ label, value, detail }: { label: string; value: string; detail: 
 
 function QuickPanel({ title, icon: Icon, to, items }: { title: string; icon: ElementType; to: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-[oklch(99%_0.004_90)] p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[#D4AF37]/50 hover:shadow-md active:scale-[0.99]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0B2545] text-slate-50">
@@ -58,11 +58,11 @@ function QuickPanel({ title, icon: Icon, to, items }: { title: string; icon: Ele
           </span>
           <h3 className="font-black text-[#0B2545]">{title}</h3>
         </div>
-        <Link to={to} className="text-xs font-black text-[#B5811F]">Abrir</Link>
+        <Link to={to} className="rounded-lg px-2 py-1 text-xs font-black text-[#B5811F] transition hover:bg-[#D4AF37]/10 active:scale-95">Abrir</Link>
       </div>
       <div className="mt-4 space-y-2">
         {items.map((item) => (
-          <div key={item} className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700">
+          <div key={item} className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-white">
             <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
             <span className="truncate">{item}</span>
           </div>

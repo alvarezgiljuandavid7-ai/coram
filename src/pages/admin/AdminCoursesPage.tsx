@@ -1,4 +1,5 @@
-import { AdminHomePage } from './AdminHomePage';
+import { AdminCrudPage } from './AdminCrudPage';
+
 export function AdminCoursesPage() {
-  return <AdminHomePage initialTab="courses" />;
+  return <AdminCrudPage kind="courses" />;
 }

@@ -1,4 +1,5 @@
-import { AdminHomePage } from './AdminHomePage';
+import { AdminCrudPage } from './AdminCrudPage';
+
 export function AdminUsersPage() {
-  return <AdminHomePage initialTab="users" />;
+  return <AdminCrudPage kind="profiles" />;
 }

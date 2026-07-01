@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Check, KeyRound, Loader2, LogOut, Mail, ShieldCheck } from 'lucide-react';
 import type { CoramAuthState } from '../app/useSupabaseAuth';
 import { humanizeAuthError } from '../domain/auth/authErrors';
@@ -12,6 +13,7 @@ interface AuthPanelProps {
 type AuthMode = 'signin' | 'signup' | 'reset';
 
 export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: AuthPanelProps) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -61,6 +63,25 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
     }
   };
 
+  const startAppleSignIn = async () => {
+    setWorking(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await auth.signInWithApple();
+    } catch (caughtError) {
+      setError(humanizeAuthError(caughtError));
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const closeSession = async () => {
+    await auth.signOut();
+    navigate('/login', { replace: true });
+  };
+
   if (auth.loading) {
     return (
       <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-bold text-slate-500">
@@ -84,8 +105,8 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
         {auth.isAdmin && <ShieldCheck className="h-4 w-4 text-emerald-600" />}
         <button
           type="button"
-          onClick={() => void auth.signOut()}
-          className="rounded-xl bg-white p-2 text-slate-500 transition-colors hover:text-[#0B2545]"
+          onClick={() => void closeSession()}
+          className="rounded-xl bg-white p-2 text-slate-500 transition hover:-translate-y-0.5 hover:text-[#0B2545] active:scale-95"
           title="Cerrar sesión"
         >
           <LogOut className="h-4 w-4" />
@@ -107,7 +128,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
           <button
             type="button"
             onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-            className="text-[10px] font-black text-[#C29031] hover:underline"
+            className="text-[10px] font-black text-[#C29031] transition hover:underline active:scale-95"
           >
             {mode === 'signin' ? 'Registrarme' : 'Ingresar'}
           </button>
@@ -120,10 +141,22 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             type="button"
             disabled={working}
             onClick={() => void startGoogleSignIn()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 disabled:cursor-wait disabled:text-slate-400"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-100 active:scale-[0.99] disabled:cursor-wait disabled:text-slate-400"
           >
             {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5 text-[#C29031]" />}
             <span>Continuar con Google</span>
+          </button>
+        )}
+
+        {auth.appleOAuthEnabled && !auth.recoveryMode && mode !== 'reset' && (
+          <button
+            type="button"
+            disabled={working}
+            onClick={() => void startAppleSignIn()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:-translate-y-0.5 hover:bg-slate-900 active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
+          >
+            {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5 text-[#D4AF37]" />}
+            <span>Continuar con Apple</span>
           </button>
         )}
 
@@ -132,7 +165,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
             placeholder="Nombre"
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden focus:border-[#C29031]"
+             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         )}
         {!auth.recoveryMode && (
@@ -141,7 +174,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="correo@dominio.com"
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden focus:border-[#C29031]"
+             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         )}
         {mode !== 'reset' || auth.recoveryMode ? (
@@ -150,7 +183,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder={auth.recoveryMode ? 'Nueva contraseña' : 'Contraseña'}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden focus:border-[#C29031]"
+             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         ) : null}
 
@@ -171,7 +204,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
           <button
             type="submit"
             disabled={working}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white hover:bg-slate-900 disabled:cursor-wait disabled:bg-slate-400"
+             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:-translate-y-0.5 hover:bg-slate-900 active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
           >
             {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
             <span>{auth.recoveryMode ? 'Actualizar' : mode === 'reset' ? 'Enviar' : mode === 'signup' ? 'Crear cuenta' : 'Entrar'}</span>
@@ -182,7 +215,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
           <button
             type="button"
             onClick={() => setMode(mode === 'reset' ? 'signin' : 'reset')}
-            className="flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-[#0B2545]"
+             className="flex items-center gap-1 text-[10px] font-bold text-slate-500 transition hover:text-[#0B2545] active:scale-95"
           >
             <KeyRound className="h-3 w-3" />
             <span>{mode === 'reset' ? 'Volver al login' : 'Olvidé mi contraseña'}</span>

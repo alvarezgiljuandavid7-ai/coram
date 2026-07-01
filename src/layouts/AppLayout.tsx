@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   BookMarked,
@@ -38,9 +39,19 @@ export function AppLayout() {
   const location = useLocation();
   const immersiveAppRoute = isImmersiveAppRoute(location.pathname);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
   return (
     <div className={`min-h-screen bg-[oklch(98%_0.006_90)] text-slate-900 ${immersiveAppRoute ? 'max-md:bg-slate-950' : ''}`}>
-      <aside
+      <motion.aside
+        initial={false}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-200 bg-[oklch(99%_0.004_90)] px-4 py-5 shadow-xl shadow-slate-950/5 transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -53,7 +64,7 @@ export function AppLayout() {
               <p className="text-xs font-semibold text-slate-500">Aplicacion ministerial</p>
             </div>
           </div>
-          <button type="button" onClick={() => setOpen(false)} className="lg:hidden">
+          <button type="button" onClick={() => setOpen(false)} className="rounded-xl p-2 transition hover:bg-slate-100 active:scale-95 lg:hidden">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -68,7 +79,7 @@ export function AppLayout() {
                 end={item.to === '/app/inicio'}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition active:scale-[0.99] ${
                     isActive
                       ? 'bg-[#0B2545] text-slate-50 shadow-md shadow-[#0B2545]/15'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-[#0B2545]'
@@ -82,24 +93,33 @@ export function AppLayout() {
           })}
         </nav>
 
-      </aside>
+      </motion.aside>
 
-      {open && <button type="button" aria-label="Cerrar menu" className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden" onClick={() => setOpen(false)} />}
+      {open && (
+        <motion.button
+          type="button"
+          aria-label="Cerrar menu"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-40 bg-slate-950/30 lg:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
       <div className="lg:pl-72">
-        <header className={`${immersiveAppRoute ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-4 py-3 backdrop-blur md:px-6`}>
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex items-center gap-3">
+        <header className={`${immersiveAppRoute ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200 bg-[oklch(99%_0.004_90)]/95 px-3 py-2 md:py-3 backdrop-blur md:px-6`}>
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-[#0B2545] lg:hidden"
+                className="rounded-xl border border-slate-200 bg-slate-50 p-2 text-[#0B2545] transition hover:-translate-y-0.5 hover:bg-white active:scale-95 lg:hidden"
               >
                 <Menu className="h-5 w-5" />
               </button>
               <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#B5811F]">CorAM Web</p>
-                <h2 className="text-xl font-black tracking-tight text-[#0B2545] md:text-2xl">Aplicacion</h2>
+                <p className="hidden text-[10px] font-black uppercase tracking-widest text-[#B5811F] sm:block">CorAM Web</p>
+                <h2 className="text-lg md:text-2xl font-black tracking-tight text-[#0B2545]">Aplicacion</h2>
               </div>
             </div>
             <AuthPanel auth={auth} compact />

@@ -29,6 +29,7 @@ interface ProfileRow {
 }
 
 const configuredPublicAppUrl = (import.meta.env.VITE_CORAM_PUBLIC_URL as string | undefined)?.trim();
+export const appleOAuthEnabled = (import.meta.env.VITE_CORAM_ENABLE_APPLE_AUTH as string | undefined) === 'true';
 
 export function buildAuthRedirectUrl(
   path: string,
@@ -98,6 +99,26 @@ export async function signInWithGoogle(): Promise<void> {
       queryParams: {
         prompt: 'select_account',
       },
+    },
+  });
+
+  if (error) throw error;
+
+  if (data.url) {
+    window.location.assign(data.url);
+  }
+}
+
+export async function signInWithApple(): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase no esta configurado.');
+  }
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'apple',
+    options: {
+      redirectTo: buildAuthRedirectUrl('/login'),
+      skipBrowserRedirect: true,
     },
   });
 

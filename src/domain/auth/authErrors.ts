@@ -14,11 +14,19 @@ export function humanizeAuthError(error: unknown): string {
     return 'Supabase alcanzo el limite temporal de correos. Intenta registrarte mas tarde o entra con Google.';
   }
 
+  if (normalized.includes('email address not authorized')) {
+    return 'Supabase no esta enviando correos a este destinatario. En produccion configura SMTP propio para permitir iCloud y otros correos reales.';
+  }
+
   if (normalized.includes('email address') && normalized.includes('invalid')) {
     return 'Ese correo no parece valido para Supabase. Usa un correo real o continua con Google.';
   }
 
   if (normalized.includes('provider is not enabled')) {
+    if (normalized.includes('apple')) {
+      return 'Continuar con Apple aun no esta configurado en Supabase. Activa el proveedor Apple en Authentication > Providers.';
+    }
+
     return 'El proveedor de Google no esta habilitado en Supabase. Revisa Authentication > Providers.';
   }
 
