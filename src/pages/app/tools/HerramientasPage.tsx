@@ -12,21 +12,21 @@ const tools = [
     detail: 'Activa el microfono y compara tu voz contra la nota objetivo con lectura en tiempo real.',
     to: '/app/herramientas/afinador',
     icon: Mic2,
-    accent: 'Microfono · precision vocal',
+    accent: 'Microfono / precision vocal',
   },
   {
     title: 'Piano / teclado',
     detail: 'Escucha notas y acordes de referencia con un teclado listo para ensayar y estudiar.',
     to: '/app/herramientas/piano',
     icon: Piano,
-    accent: 'Teclado · acordes',
+    accent: 'Teclado / acordes',
   },
   {
     title: 'Calentamiento vocal',
     detail: 'Prepara respiracion, registro y escalas antes de ministrar o grabar.',
     to: '/app/herramientas/calentamiento',
     icon: Wind,
-    accent: 'Rutina · voz sana',
+    accent: 'Rutina / voz sana',
   },
 ];
 

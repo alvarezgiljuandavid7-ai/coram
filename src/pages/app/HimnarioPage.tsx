@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, BookMarked, ChevronRight, LibraryBig, Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, BookMarked, ChevronRight, LibraryBig, Search, X } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import { filterHymns, getHymnLyrics } from '../../domain/hymns/hymnSearch';
 import type { Hymn } from '../../domain/hymns/types';
@@ -25,6 +25,16 @@ export function HimnarioPage() {
   }, [hymns, query]);
 
   const closeHymnDetail = () => setSelected(null);
+
+  useEffect(() => {
+    if (!selected) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selected]);
 
   return (
     <PremiumScreen>
@@ -54,12 +64,6 @@ export function HimnarioPage() {
         <SectionHeader eyebrow="Buscar" title="Encuentra un himno" />
         <SearchInputPremium value={query} onChange={setQuery} placeholder="Buscar por numero, titulo o letra" />
       </section>
-
-      {selected && (
-        <section className="xl:hidden">
-          <HymnDetailCard selected={selected} onClose={closeHymnDetail} />
-        </section>
-      )}
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_430px]">
         <section className="min-w-0 space-y-3">
@@ -113,6 +117,8 @@ export function HimnarioPage() {
           )}
         </aside>
       </div>
+
+      {selected && <MobileHymnDialog selected={selected} onClose={closeHymnDetail} />}
     </PremiumScreen>
   );
 }
@@ -134,5 +140,37 @@ function HymnDetailCard({ selected, onClose }: { selected: Hymn; onClose: () => 
         {getHymnLyrics(selected)}
       </pre>
     </PremiumCard>
+  );
+}
+
+function MobileHymnDialog({ selected, onClose }: { selected: Hymn; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end bg-slate-950/70 px-3 pb-3 pt-16 xl:hidden" role="dialog" aria-modal="true">
+      <button type="button" aria-label="Cerrar letra" className="absolute inset-0 cursor-default" onClick={onClose} />
+      <section className="relative flex max-h-[86vh] w-full flex-col overflow-hidden rounded-[1.6rem] border border-white/10 bg-[#071426] text-white shadow-2xl shadow-slate-950/40">
+        <div className="border-b border-white/10 bg-[#071426] px-4 py-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">Himno {selected.number}</p>
+              <h3 className="mt-1 line-clamp-2 text-xl font-black leading-tight text-white">{selected.title}</h3>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-[#0B2545] shadow-sm transition active:scale-95"
+              aria-label="Cerrar letra"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap bg-slate-950/45 p-4 font-mono text-sm leading-7 text-slate-50">
+          {getHymnLyrics(selected)}
+        </pre>
+        <button type="button" onClick={onClose} className="min-h-12 border-t border-white/10 bg-white px-4 text-sm font-black text-[#0B2545] active:bg-slate-100">
+          Volver al listado
+        </button>
+      </section>
+    </div>
   );
 }

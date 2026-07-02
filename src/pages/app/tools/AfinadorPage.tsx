@@ -1,5 +1,5 @@
-import { VocalToolsShell } from './VocalToolsShell';
+import { VocalToolPage } from './VocalToolPage';
 
 export function AfinadorPage() {
-  return <VocalToolsShell initialScreen="vocal-tuner" />;
+  return <VocalToolPage mode="tuner" />;
 }

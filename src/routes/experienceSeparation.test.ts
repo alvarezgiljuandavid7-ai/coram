@@ -78,13 +78,17 @@ describe('experience separation', () => {
     expect(router).toContain('path="herramientas/calentamiento" element={<CalentamientoPage />}');
   });
 
-  it('reuses the existing vocal tools engine without exposing the old phone home in tool routes', () => {
-    const toolsShell = source('src/pages/app/tools/VocalToolsShell.tsx');
+  it('keeps vocal tools as native app pages instead of the old phone simulator', () => {
+    const toolsPage = source('src/pages/app/tools/VocalToolPage.tsx');
+    const afinadorPage = source('src/pages/app/tools/AfinadorPage.tsx');
+    const pianoPage = source('src/pages/app/tools/PianoPage.tsx');
+    const calentamientoPage = source('src/pages/app/tools/CalentamientoPage.tsx');
     const phoneSimulator = source('src/components/PhoneSimulator.tsx');
 
-    expect(toolsShell).toContain('PhoneSimulator');
-    expect(toolsShell).toContain('initialScreen');
-    expect(toolsShell).toContain('toolOnly');
+    expect(toolsPage).not.toContain('PhoneSimulator');
+    expect(afinadorPage).not.toContain('VocalToolsShell');
+    expect(pianoPage).not.toContain('VocalToolsShell');
+    expect(calentamientoPage).not.toContain('VocalToolsShell');
     expect(phoneSimulator).toContain('initialScreen = getInitialPhoneScreen()');
     expect(phoneSimulator).toContain('toolOnly = false');
     expect(phoneSimulator).toContain("navigate('/app/herramientas')");
