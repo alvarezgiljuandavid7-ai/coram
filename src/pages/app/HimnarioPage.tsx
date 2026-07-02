@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { BookMarked, ChevronRight, LibraryBig, Search } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
+import { filterHymns, getHymnLyrics } from '../../domain/hymns/hymnSearch';
 import type { Hymn } from '../../domain/hymns/types';
 import {
   AppHero,
@@ -21,11 +22,7 @@ export function HimnarioPage() {
   const [selected, setSelected] = useState<Hymn | null>(null);
 
   const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!term) return hymns;
-    return hymns.filter((hymn) =>
-      [hymn.title, hymn.hymnalName, hymn.lyrics, String(hymn.number)].some((value) => value.toLowerCase().includes(term)),
-    );
+    return filterHymns(hymns, query);
   }, [hymns, query]);
 
   const closeHymnDetail = () => setSelected(null);
@@ -109,7 +106,7 @@ export function HimnarioPage() {
                   <BackButton fallbackTo="/app/himnario" label="Volver al himnario" onBeforeNavigate={closeHymnDetail} />
                 </div>
                 <pre className="mt-5 max-h-[66vh] overflow-auto whitespace-pre-wrap rounded-3xl border border-white/10 bg-slate-950/65 p-5 font-mono text-xs leading-6 text-slate-50">
-                  {selected.lyrics}
+                  {getHymnLyrics(selected)}
                 </pre>
               </>
             ) : (
