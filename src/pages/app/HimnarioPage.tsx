@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
-import { BookMarked, ChevronRight, LibraryBig, Search } from 'lucide-react';
+import { ArrowLeft, BookMarked, ChevronRight, LibraryBig, Search } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import { filterHymns, getHymnLyrics } from '../../domain/hymns/hymnSearch';
 import type { Hymn } from '../../domain/hymns/types';
 import {
   AppHero,
-  BackButton,
   BrandedIcon,
   EmptyStatePremium,
   LoadingStatePremium,
@@ -56,6 +55,12 @@ export function HimnarioPage() {
         <SearchInputPremium value={query} onChange={setQuery} placeholder="Buscar por numero, titulo o letra" />
       </section>
 
+      {selected && (
+        <section className="xl:hidden">
+          <HymnDetailCard selected={selected} onClose={closeHymnDetail} />
+        </section>
+      )}
+
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_430px]">
         <section className="min-w-0 space-y-3">
           <SectionHeader eyebrow="Lista" title="Himnos disponibles" />
@@ -94,29 +99,40 @@ export function HimnarioPage() {
           )}
         </section>
 
-        <aside className="min-w-0 xl:sticky xl:top-28 xl:h-fit">
-          <PremiumCard dark className="p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">
-              {selected ? `Himno ${selected.number}` : `${filtered.length} himnos`}
-            </p>
-            <h3 className="mt-2 text-2xl font-black leading-tight text-white">{selected?.title ?? 'Selecciona un himno'}</h3>
-            {selected ? (
-              <>
-                <div className="mt-4">
-                  <BackButton fallbackTo="/app/himnario" label="Volver al himnario" onBeforeNavigate={closeHymnDetail} />
-                </div>
-                <pre className="mt-5 max-h-[66vh] overflow-auto whitespace-pre-wrap rounded-3xl border border-white/10 bg-slate-950/65 p-5 font-mono text-xs leading-6 text-slate-50">
-                  {getHymnLyrics(selected)}
-                </pre>
-              </>
-            ) : (
+        <aside className="hidden min-w-0 xl:sticky xl:top-28 xl:block xl:h-fit">
+          {selected ? (
+            <HymnDetailCard selected={selected} onClose={closeHymnDetail} />
+          ) : (
+            <PremiumCard dark className="p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">{filtered.length} himnos</p>
+              <h3 className="mt-2 text-2xl font-black leading-tight text-white">Selecciona un himno</h3>
               <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-semibold leading-6 text-slate-300">
                 Elige un himno para ver la letra completa.
               </p>
-            )}
-          </PremiumCard>
+            </PremiumCard>
+          )}
         </aside>
       </div>
     </PremiumScreen>
+  );
+}
+
+function HymnDetailCard({ selected, onClose }: { selected: Hymn; onClose: () => void }) {
+  return (
+    <PremiumCard dark className="p-5">
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">Himno {selected.number}</p>
+      <h3 className="mt-2 text-2xl font-black leading-tight text-white">{selected.title}</h3>
+      <button
+        type="button"
+        onClick={onClose}
+        className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-2xl border border-white/10 bg-white px-3 py-2 text-xs font-black text-[#0B2545] shadow-sm transition active:scale-[0.99]"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Volver al listado
+      </button>
+      <pre className="mt-5 max-h-[58vh] overflow-auto whitespace-pre-wrap rounded-3xl border border-white/10 bg-slate-950/65 p-5 font-mono text-xs leading-6 text-slate-50 xl:max-h-[66vh]">
+        {getHymnLyrics(selected)}
+      </pre>
+    </PremiumCard>
   );
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   BookMarked,
@@ -98,12 +97,10 @@ export function AppLayout() {
       </PremiumSidebar>
 
       {open && (
-        <motion.button
+        <button
           type="button"
           aria-label="Cerrar menu"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/60 lg:hidden"
           onClick={() => setOpen(false)}
         />
       )}

@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -15,18 +14,11 @@ import { Link, NavLink, useNavigate, type LinkProps } from 'react-router-dom';
 import type { Key, ReactNode } from 'react';
 import type { Course, Resource } from '../../types';
 
-const softEase = [0.23, 1, 0.32, 1] as const;
-
 export function PremiumScreen({ children }: { children: ReactNode }) {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.24, ease: softEase }}
-      className="mx-auto w-full max-w-7xl space-y-5 pb-24 md:space-y-7 md:pb-0"
-    >
+    <section className="mx-auto w-full max-w-7xl space-y-5 pb-24 md:space-y-7 md:pb-0">
       {children}
-    </motion.section>
+    </section>
   );
 }
 
@@ -70,10 +62,7 @@ interface AppHeroProps {
 
 export function AppHero({ eyebrow, title, body, cta, children }: AppHeroProps) {
   return (
-    <motion.div
-      whileTap={{ scale: 0.995 }}
-      className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#071426] px-5 py-5 text-white shadow-2xl shadow-[#0B2545]/20 md:px-8 md:py-8"
-    >
+    <div className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#071426] px-5 py-5 text-white shadow-2xl shadow-[#0B2545]/20 md:px-8 md:py-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(212,175,55,0.34),transparent_28%),linear-gradient(135deg,rgba(4,14,28,0.98),rgba(11,37,69,0.92))]" />
       <div className="absolute right-[-70px] top-5 h-44 w-64 rotate-[-16deg] rounded-full border border-[#D4AF37]/20" />
       <div className="absolute bottom-3 right-0 h-24 w-2/3 bg-[repeating-linear-gradient(0deg,transparent_0_14px,rgba(212,175,55,0.16)_14px_15px)] opacity-70" />
@@ -93,7 +82,7 @@ export function AppHero({ eyebrow, title, body, cta, children }: AppHeroProps) {
         )}
       </div>
       {children && <div className="relative z-10 mt-5">{children}</div>}
-    </motion.div>
+    </div>
   );
 }
 
@@ -118,10 +107,7 @@ interface PremiumCardProps {
 
 export function PremiumCard({ children, className = '', dark = false }: PremiumCardProps) {
   return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ duration: 0.18, ease: softEase }}
+    <div
       className={`relative min-w-0 max-w-full overflow-hidden rounded-[1.4rem] border p-4 shadow-lg ${
         dark
           ? 'border-white/10 bg-[#071426] text-white shadow-[#0B2545]/18'
@@ -130,13 +116,13 @@ export function PremiumCard({ children, className = '', dark = false }: PremiumC
     >
       {dark && <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_0%,rgba(212,175,55,0.18),transparent_35%)]" />}
       <div className="relative">{children}</div>
-    </motion.div>
+    </div>
   );
 }
 
 export function PremiumLinkCard({ to, children, className = '', dark = false, ...props }: LinkProps & { dark?: boolean }) {
   return (
-    <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }} transition={{ duration: 0.18, ease: softEase }}>
+    <div className="transition active:scale-[0.99]">
       <Link
         to={to}
         className={`relative block min-h-32 min-w-0 max-w-full overflow-hidden rounded-[1.4rem] border p-4 shadow-lg transition ${
@@ -149,7 +135,7 @@ export function PremiumLinkCard({ to, children, className = '', dark = false, ..
         {dark && <span className="absolute inset-0 bg-[radial-gradient(circle_at_85%_0%,rgba(212,175,55,0.18),transparent_35%)]" />}
         <span className="relative block">{children}</span>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
@@ -161,7 +147,7 @@ interface PremiumNavItem {
 
 export function PremiumBottomNav({ items }: { items: PremiumNavItem[] }) {
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[1.6rem] border border-white/15 bg-[#061326]/94 px-2 py-2 shadow-2xl shadow-slate-950/35 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[1.6rem] border border-white/15 bg-[#061326] px-2 py-2 shadow-2xl shadow-slate-950/35 md:hidden">
       <div className="grid grid-cols-5 gap-1">
         {items.map((item) => {
           const Icon = item.icon;
@@ -188,17 +174,14 @@ export function PremiumBottomNav({ items }: { items: PremiumNavItem[] }) {
 
 export function PremiumSidebar({ children, open }: { children: ReactNode; open: boolean }) {
   return (
-    <motion.aside
-      initial={false}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, ease: softEase }}
+    <aside
       className={`fixed inset-y-0 left-0 z-50 w-72 overflow-hidden border-r border-white/10 bg-[#061326] px-4 py-5 text-white shadow-2xl shadow-slate-950/30 transition-transform lg:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(212,175,55,0.2),transparent_28%),linear-gradient(180deg,rgba(2,8,23,0),rgba(2,8,23,0.55))]" />
       <div className="relative">{children}</div>
-    </motion.aside>
+    </aside>
   );
 }
 
@@ -212,7 +195,7 @@ export function PremiumTopBar({
   className?: string;
 }) {
   return (
-    <header className={`${immersive ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200/70 bg-[oklch(99%_0.004_90)]/88 px-3 backdrop-blur-xl md:px-6 ${className}`}>
+    <header className={`${immersive ? 'hidden' : ''} sticky top-0 z-30 border-b border-slate-200/70 bg-[oklch(99%_0.004_90)] px-3 md:px-6 ${className}`}>
       {children}
     </header>
   );

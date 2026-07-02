@@ -31,16 +31,16 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
     try {
       if (auth.recoveryMode) {
         await auth.updateCurrentPassword(password);
-        setMessage('Contraseña actualizada. Ya puedes continuar con tu sesión.');
+        setMessage('Contrasena actualizada. Ya puedes continuar con tu sesion.');
       } else if (mode === 'signin') {
         await auth.signInWithEmail(email, password);
-        setMessage('Sesión iniciada correctamente.');
+        setMessage('Sesion iniciada correctamente.');
       } else if (mode === 'signup') {
         await auth.signUpWithEmail(email, password, fullName);
-        setMessage('Cuenta creada. Revisa tu correo si Supabase solicita confirmación.');
+        setMessage('Cuenta creada. Revisa tu correo si Supabase solicita confirmacion.');
       } else {
         await auth.sendPasswordReset(email);
-        setMessage('Te enviamos un enlace para recuperar tu contraseña.');
+        setMessage('Te enviamos un enlace para recuperar tu contrasena.');
       }
     } catch (caughtError) {
       setError(humanizeAuthError(caughtError));
@@ -84,30 +84,30 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
 
   if (auth.loading) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] font-bold text-slate-500">
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold text-slate-500">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        <span>Validando sesión...</span>
+        <span>Validando sesion...</span>
       </div>
     );
   }
 
   if (auth.user) {
     return (
-      <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
-        <div className="text-right leading-tight">
+      <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+        <div className="min-w-0 text-right leading-tight">
           <span className="block text-[10px] font-black uppercase tracking-wider text-[#0B2545]">
-          {auth.isAdmin ? 'Administrador' : 'Miembro'}
+            {auth.isAdmin ? 'Administrador' : 'Miembro'}
           </span>
           <span className="block max-w-[180px] truncate text-[11px] font-semibold text-slate-500">
             {auth.profile?.email ?? auth.user.email}
           </span>
         </div>
-        {auth.isAdmin && <ShieldCheck className="h-4 w-4 text-emerald-600" />}
+        {auth.isAdmin && <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />}
         <button
           type="button"
           onClick={() => void closeSession()}
-          className="rounded-xl bg-white p-2 text-slate-500 transition hover:-translate-y-0.5 hover:text-[#0B2545] active:scale-95"
-          title="Cerrar sesión"
+          className="rounded-xl bg-slate-50 p-2 text-slate-500 transition active:scale-95"
+          title="Cerrar sesion"
         >
           <LogOut className="h-4 w-4" />
         </button>
@@ -115,33 +115,41 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
     );
   }
 
+  const modeLabel = auth.recoveryMode
+    ? 'Nueva contrasena'
+    : mode === 'signin'
+      ? 'Acceso CorAM'
+      : mode === 'signup'
+        ? 'Crear cuenta'
+        : 'Recuperar acceso';
+
   return (
     <form
       onSubmit={submit}
-      className={`w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-3xs ${compact ? 'max-w-md' : 'max-w-sm'}`}
+      className={`w-full rounded-[1.4rem] border border-slate-200 bg-white shadow-lg shadow-slate-950/6 ${
+        compact ? 'max-w-md p-3' : 'mx-auto max-w-md p-4 sm:p-5'
+      }`}
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-[10px] font-black uppercase tracking-wider text-[#0B2545]">
-          {auth.recoveryMode ? 'Nueva contraseña' : mode === 'signin' ? 'Acceso real' : mode === 'signup' ? 'Crear cuenta' : 'Recuperar acceso'}
-        </span>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B5811F]">{modeLabel}</span>
         {!auth.recoveryMode && (
           <button
             type="button"
             onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-            className="text-[10px] font-black text-[#C29031] transition hover:underline active:scale-95"
+            className="rounded-full bg-[#D4AF37]/10 px-3 py-1 text-[10px] font-black text-[#8A5B12] transition active:scale-95"
           >
             {mode === 'signin' ? 'Registrarme' : 'Ingresar'}
           </button>
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {!auth.recoveryMode && mode !== 'reset' && (
           <button
             type="button"
             disabled={working}
             onClick={() => void startGoogleSignIn()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-100 active:scale-[0.99] disabled:cursor-wait disabled:text-slate-400"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs font-black text-slate-700 shadow-sm transition active:scale-[0.99] disabled:cursor-wait disabled:text-slate-400"
           >
             {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5 text-[#C29031]" />}
             <span>Continuar con Google</span>
@@ -153,7 +161,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             type="button"
             disabled={working}
             onClick={() => void startAppleSignIn()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-white transition hover:-translate-y-0.5 hover:bg-slate-900 active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#0B2545] px-3 py-3 text-xs font-black text-white transition active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
           >
             {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5 text-[#D4AF37]" />}
             <span>Continuar con Apple</span>
@@ -165,60 +173,61 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
             placeholder="Nombre"
-             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
+            className="min-h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-[#0B2545] outline-none transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         )}
+
         {!auth.recoveryMode && (
           <input
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="correo@dominio.com"
-             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
+            className="min-h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-[#0B2545] outline-none transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         )}
+
         {mode !== 'reset' || auth.recoveryMode ? (
           <input
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder={auth.recoveryMode ? 'Nueva contraseña' : 'Contraseña'}
-             className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold outline-hidden transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
+            placeholder={auth.recoveryMode ? 'Nueva contrasena' : 'Contrasena'}
+            className="min-h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-[#0B2545] outline-none transition focus:border-[#C29031] focus:ring-4 focus:ring-[#D4AF37]/15"
           />
         ) : null}
 
         {error && (
-          <div className="flex gap-1.5 rounded-lg border border-red-200 bg-red-50 px-2 py-1.5 text-[10px] font-bold text-red-700">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          <div className="flex gap-2 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
+
         {message && (
-          <div className="flex gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-[10px] font-bold text-emerald-700">
-            <Check className="h-3.5 w-3.5 shrink-0" />
+          <div className="flex gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
+            <Check className="h-4 w-4 shrink-0" />
             <span>{message}</span>
           </div>
         )}
 
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={working}
-             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B2545] px-3 py-2 text-[10px] font-black uppercase tracking-wider text-white transition hover:-translate-y-0.5 hover:bg-slate-900 active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
-          >
-            {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
-            <span>{auth.recoveryMode ? 'Actualizar' : mode === 'reset' ? 'Enviar' : mode === 'signup' ? 'Crear cuenta' : 'Entrar'}</span>
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={working}
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#0B2545] px-3 py-3 text-xs font-black uppercase tracking-wider text-white transition active:scale-[0.99] disabled:cursor-wait disabled:bg-slate-400"
+        >
+          {working ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+          <span>{auth.recoveryMode ? 'Actualizar' : mode === 'reset' ? 'Enviar' : mode === 'signup' ? 'Crear cuenta' : 'Entrar'}</span>
+        </button>
 
         {!auth.recoveryMode && (
           <button
             type="button"
             onClick={() => setMode(mode === 'reset' ? 'signin' : 'reset')}
-             className="flex items-center gap-1 text-[10px] font-bold text-slate-500 transition hover:text-[#0B2545] active:scale-95"
+            className="flex items-center gap-1 text-xs font-bold text-slate-500 transition hover:text-[#0B2545] active:scale-95"
           >
             <KeyRound className="h-3 w-3" />
-            <span>{mode === 'reset' ? 'Volver al login' : 'Olvidé mi contraseña'}</span>
+            <span>{mode === 'reset' ? 'Volver al login' : 'Olvide mi contrasena'}</span>
           </button>
         )}
       </div>
