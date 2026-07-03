@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { AlertCircle, CheckCircle2, Loader2, Pencil, Plus, Power, Trash2, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Pencil, Plus, Power, Search, Trash2, UploadCloud, X } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import {
   adminCrudConfigs,
@@ -13,6 +13,7 @@ import {
   type AdminFieldConfig,
   type AdminRecord,
 } from '../../domain/admin/adminCrudRepository';
+import { uploadMediaAsset } from '../../domain/media/mediaAssets';
 
 interface AdminCrudPageProps {
   kind: AdminContentKind;
@@ -27,8 +28,25 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [editing, setEditing] = useState<AdminRecord | null>(null);
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('Todos');
 
   const canCreate = config.allowCreate !== false;
+  const visibleRecords = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return records.filter((record) => {
+      const matchesQuery =
+        !normalizedQuery ||
+        (config.searchableFields ?? []).some((field) => String(record[field] ?? '').toLowerCase().includes(normalizedQuery));
+      const matchesFilter =
+        filter === 'Todos' ||
+        !config.filterField ||
+        String(record[config.filterField]) === filter;
+
+      return matchesQuery && matchesFilter;
+    });
+  }, [config.filterField, config.searchableFields, filter, query, records]);
 
   const loadRecords = async () => {
     setLoading(true);
@@ -111,6 +129,8 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
       {error && <AdminNotice tone="error" message={error} />}
       {message && <AdminNotice tone="success" message={message} />}
 
+      <AdminCrudToolbar config={config} query={query} filter={filter} onQuery={setQuery} onFilter={setFilter} />
+
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -120,9 +140,11 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
           <AdminLoading />
         ) : records.length === 0 ? (
           <AdminEmpty config={config} canCreate={canCreate} onCreate={openCreate} />
+        ) : visibleRecords.length === 0 ? (
+          <div className="p-6 text-sm font-semibold text-slate-400">No hay resultados con los filtros actuales.</div>
         ) : (
           <div className="divide-y divide-slate-800">
-            {records.map((record) => (
+            {visibleRecords.map((record) => (
               <motion.article
                 key={String(record.id)}
                 whileTap={{ scale: 0.995 }}
@@ -165,9 +187,52 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
           onClose={() => setEditing(null)}
           onSave={(payload) => void saveRecord(payload)}
           onChange={setEditing}
+          onError={setError}
         />
       )}
     </section>
+  );
+}
+
+function AdminCrudToolbar({
+  config,
+  query,
+  filter,
+  onQuery,
+  onFilter,
+}: {
+  config: AdminCrudConfig;
+  query: string;
+  filter: string;
+  onQuery: (value: string) => void;
+  onFilter: (value: string) => void;
+}) {
+  return (
+    <div className="grid gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-3 md:grid-cols-[1fr_220px]">
+      <label className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm font-semibold text-slate-300 focus-within:border-[#D4AF37]">
+        <Search className="h-4 w-4 text-[#D4AF37]" />
+        <input
+          value={query}
+          onChange={(event) => onQuery(event.target.value)}
+          placeholder={`Buscar en ${config.title.toLowerCase()}...`}
+          className="min-w-0 flex-1 bg-transparent text-slate-100 outline-none placeholder:text-slate-600"
+        />
+      </label>
+      {config.filterField && (
+        <select
+          value={filter}
+          onChange={(event) => onFilter(event.target.value)}
+          className="min-h-11 rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm font-black text-slate-100 outline-none focus:border-[#D4AF37]"
+        >
+          <option value="Todos">Todos</option>
+          {(config.filterOptions ?? []).map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
   );
 }
 
@@ -210,6 +275,7 @@ function AdminCrudEditor({
   onClose,
   onSave,
   onChange,
+  onError,
 }: {
   config: AdminCrudConfig;
   record: AdminRecord;
@@ -217,6 +283,7 @@ function AdminCrudEditor({
   onClose: () => void;
   onSave: (payload: AdminRecord) => void;
   onChange: (record: AdminRecord) => void;
+  onError: (message: string) => void;
 }) {
   const [validationError, setValidationError] = useState('');
 
@@ -258,8 +325,9 @@ function AdminCrudEditor({
             <AdminField
               key={field.name}
               field={field}
-              value={record[field.name]}
-              onChange={(value) => onChange({ ...record, [field.name]: value })}
+              value={record[field.targetField ?? field.name]}
+              onChange={(value) => onChange({ ...record, [field.targetField ?? field.name]: value })}
+              onError={onError}
             />
           ))}
         </div>
@@ -290,20 +358,57 @@ function AdminField({
   field,
   value,
   onChange,
+  onError,
 }: {
   key?: string;
   field: AdminFieldConfig;
   value: AdminRecord[string] | undefined;
   onChange: (value: AdminRecord[string]) => void;
+  onError: (message: string) => void;
 }) {
+  const [uploading, setUploading] = useState(false);
   const baseClass =
     'mt-1 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#D4AF37]/10';
+
+  const uploadFile = async (file: File | undefined) => {
+    if (!file || !field.bucketId || !field.assetType) return;
+    setUploading(true);
+    onError('');
+    try {
+      const uploaded = await uploadMediaAsset({
+        file,
+        bucketId: field.bucketId,
+        assetType: field.assetType,
+        visibility: 'public',
+        linkedEntityType: field.linkedEntityType,
+      });
+      onChange(uploaded.publicUrl ?? `${uploaded.bucketId}/${uploaded.objectPath}`);
+    } catch (caughtError) {
+      onError(caughtError instanceof Error ? caughtError.message : 'No se pudo subir el archivo.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <label className="text-xs font-black uppercase tracking-wider text-slate-400">
       {field.label}
       {field.kind === 'textarea' ? (
         <textarea value={String(value ?? '')} onChange={(event) => onChange(event.target.value)} rows={5} className={baseClass} />
+      ) : field.kind === 'file' ? (
+        <span className="mt-2 flex flex-col gap-2 rounded-xl border border-dashed border-slate-700 bg-slate-900 p-3 normal-case tracking-normal text-slate-200">
+          <span className="flex items-center gap-2 text-xs font-bold text-slate-300">
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4 text-[#D4AF37]" />}
+            {uploading ? 'Subiendo a Supabase Storage...' : 'Selecciona archivo para subir a Supabase Storage'}
+          </span>
+          <input
+            type="file"
+            disabled={uploading}
+            onChange={(event) => void uploadFile(event.target.files?.[0])}
+            className="text-xs font-semibold text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-[#D4AF37] file:px-3 file:py-2 file:text-xs file:font-black file:text-slate-950"
+          />
+          {value && <span className="break-all text-[11px] font-semibold text-emerald-200">Guardado: {String(value)}</span>}
+        </span>
       ) : field.kind === 'boolean' ? (
         <span className="mt-2 flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 normal-case tracking-normal text-slate-200">
           <input type="checkbox" checked={Boolean(value)} onChange={(event) => onChange(event.target.checked)} className="h-4 w-4 accent-[#D4AF37]" />
@@ -317,6 +422,13 @@ function AdminField({
             </option>
           ))}
         </select>
+      ) : field.kind === 'datetime-local' ? (
+        <input
+          type="datetime-local"
+          value={formatDatetimeLocalValue(value)}
+          onChange={(event) => onChange(event.target.value)}
+          className={baseClass}
+        />
       ) : (
         <input
           type={field.kind === 'number' ? 'number' : 'text'}
@@ -327,6 +439,13 @@ function AdminField({
       )}
     </label>
   );
+}
+
+function formatDatetimeLocalValue(value: AdminRecord[string] | undefined): string {
+  if (!value) return '';
+  const asString = String(value);
+  if (!asString) return '';
+  return asString.includes('T') ? asString.slice(0, 16) : asString;
 }
 
 function AdminLoading() {
@@ -373,6 +492,10 @@ function stripId(record: AdminRecord): AdminRecord {
 
 function normalizePayload(config: AdminCrudConfig, record: AdminRecord): AdminRecord {
   const payload = record.id ? stripId(record) : stripId(record);
+  config.fields.forEach((field) => {
+    if (field.kind === 'file') delete payload[field.name];
+    if (field.kind === 'datetime-local' && payload[field.name] === '') payload[field.name] = null;
+  });
   if (config.kind === 'hymns' && payload.slug === '') {
     payload.slug = String(payload.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }

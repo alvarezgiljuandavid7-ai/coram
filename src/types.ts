@@ -7,6 +7,7 @@ export interface Corario {
   author?: string;
   tempo?: number; // BPM
   isPremium?: boolean;
+  isPublished?: boolean;
   audioUrl?: string | null;
 }
 
@@ -64,6 +65,48 @@ export interface Advertisement {
   status: 'draft' | 'active' | 'paused' | 'ended';
   viewsCount: number;
   clicksCount: number;
+}
+
+export type ContentStatus = 'draft' | 'published' | 'archived';
+
+export interface Campaign {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  body?: string | null;
+  imageUrl?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  status: ContentStatus;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  sortOrder: number;
+}
+
+export interface FeaturedVideo {
+  id: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  thumbnailUrl?: string | null;
+  videoUrl?: string | null;
+  duration?: string | null;
+  status: ContentStatus;
+  isFeatured: boolean;
+  sortOrder: number;
+}
+
+export interface HomeBanner {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  body?: string | null;
+  imageUrl?: string | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  placement: string;
+  status: ContentStatus;
+  sortOrder: number;
 }
 
 export interface AnalyticsEventPayload {

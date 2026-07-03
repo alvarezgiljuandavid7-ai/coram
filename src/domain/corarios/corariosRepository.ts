@@ -8,6 +8,7 @@ interface CorarioRow {
   tono: string | null;
   letra: string;
   premium: boolean | null;
+  is_published: boolean;
   audio_url: string | null;
 }
 
@@ -19,6 +20,7 @@ function mapCorario(row: CorarioRow): Corario {
     lyrics: row.letra,
     key: row.tono || 'C',
     isPremium: row.premium ?? false,
+    isPublished: row.is_published,
     audioUrl: row.audio_url,
   };
 }
@@ -30,7 +32,8 @@ export async function fetchCorarios(): Promise<Corario[]> {
 
   const { data, error } = await supabase
     .from('corarios')
-    .select('id, titulo, categoria, tono, letra, premium, audio_url')
+    .select('id, titulo, categoria, tono, letra, premium, is_published, audio_url')
+    .eq('is_published', true)
     .order('titulo', { ascending: true });
 
   if (error) {

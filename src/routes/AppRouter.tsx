@@ -30,6 +30,10 @@ const AdminCoursesPage = lazy(() => import('../pages/admin/AdminCoursesPage').th
 const AdminCorariosPage = lazy(() => import('../pages/admin/AdminCorariosPage').then((m) => ({ default: m.AdminCorariosPage })));
 const AdminHymnsPage = lazy(() => import('../pages/admin/AdminHymnsPage').then((m) => ({ default: m.AdminHymnsPage })));
 const AdminResourcesPage = lazy(() => import('../pages/admin/AdminResourcesPage').then((m) => ({ default: m.AdminResourcesPage })));
+const AdminCampaignsPage = lazy(() => import('../pages/admin/AdminCampaignsPage').then((m) => ({ default: m.AdminCampaignsPage })));
+const AdminAdvertisementsPage = lazy(() => import('../pages/admin/AdminAdvertisementsPage').then((m) => ({ default: m.AdminAdvertisementsPage })));
+const AdminVideosPage = lazy(() => import('../pages/admin/AdminVideosPage').then((m) => ({ default: m.AdminVideosPage })));
+const AdminBannersPage = lazy(() => import('../pages/admin/AdminBannersPage').then((m) => ({ default: m.AdminBannersPage })));
 const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
 const LegalPage = lazy(() => import('../pages/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
@@ -88,8 +92,15 @@ export function AppRouter() {
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="cursos" element={<AdminCoursesPage />} />
               <Route path="corarios" element={<AdminCorariosPage />} />
-              <Route path="himnos" element={<AdminHymnsPage />} />
+              <Route path="himnarios" element={<AdminHymnsPage />} />
+              <Route path="himnos" element={<Navigate to="/admin/himnarios" replace />} />
               <Route path="recursos" element={<AdminResourcesPage />} />
+              <Route path="campanas" element={<AdminCampaignsPage />} />
+              <Route path="campañas" element={<AdminCampaignsPage />} />
+              <Route path="publicidad" element={<AdminAdvertisementsPage />} />
+              <Route path="anuncios" element={<AdminAdvertisementsPage />} />
+              <Route path="videos" element={<AdminVideosPage />} />
+              <Route path="banners" element={<AdminBannersPage />} />
               <Route path="usuarios" element={<AdminUsersPage />} />
               <Route path="configuracion" element={<AdminSettingsPage />} />
             </Route>

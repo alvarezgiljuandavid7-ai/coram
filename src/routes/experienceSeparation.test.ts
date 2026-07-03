@@ -49,11 +49,14 @@ describe('experience separation', () => {
     expect(adminLayout).toContain("label: 'Dashboard'");
     expect(adminLayout).toContain("label: 'Cursos'");
     expect(adminLayout).toContain("label: 'Corarios'");
-    expect(adminLayout).toContain("label: 'Himnos'");
+    expect(adminLayout).toContain("label: 'Himnarios'");
     expect(adminLayout).toContain("label: 'Recursos'");
+    expect(adminLayout).toContain("label: 'Campanas'");
+    expect(adminLayout).toContain("label: 'Publicidad'");
+    expect(adminLayout).toContain("label: 'Videos'");
+    expect(adminLayout).toContain("label: 'Banners'");
     expect(adminLayout).toContain("label: 'Usuarios'");
     expect(adminLayout).toContain("label: 'Configuracion'");
-    expect(adminLayout).not.toContain("label: 'Campañas'");
   });
 
   it('does not render the phone mockup or commercial hero from /app', () => {

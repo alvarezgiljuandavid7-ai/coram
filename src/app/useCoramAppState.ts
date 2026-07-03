@@ -2,16 +2,35 @@ import { useEffect, useMemo, useState } from 'react';
 import { fetchCorarios } from '../domain/corarios/corariosRepository';
 import { fetchCourses } from '../domain/courses/coursesRepository';
 import { fetchResources } from '../domain/resources/resourcesRepository';
-import { fetchSponsors } from '../domain/sponsors/sponsorsRepository';
+import { fetchAdvertisements, fetchSponsors } from '../domain/sponsors/sponsorsRepository';
+import { fetchPublishedCampaigns } from '../domain/campaigns/campaignsRepository';
+import { fetchPublishedFeaturedVideos } from '../domain/videos/featuredVideosRepository';
+import { fetchPublishedHomeBanners } from '../domain/banners/bannersRepository';
 import { createPersistentStateStore } from '../shared/storage/persistentState';
 import { createInitialCoramState } from './initialCoramState';
-import type { Corario, Course, DashboardMetric, MonetizationToolSetting, Resource, Sponsor, UserProfile } from '../types';
+import type {
+  Advertisement,
+  Campaign,
+  Corario,
+  Course,
+  DashboardMetric,
+  FeaturedVideo,
+  HomeBanner,
+  MonetizationToolSetting,
+  Resource,
+  Sponsor,
+  UserProfile,
+} from '../types';
 
 export interface CoramPersistedState {
   corarios: Corario[];
   courses: Course[];
   resources: Resource[];
   sponsors: Sponsor[];
+  advertisements: Advertisement[];
+  campaigns: Campaign[];
+  featuredVideos: FeaturedVideo[];
+  homeBanners: HomeBanner[];
   profile: UserProfile;
   metrics: DashboardMetric;
   monetizationSettings: MonetizationToolSetting[];
@@ -20,7 +39,7 @@ export interface CoramPersistedState {
 const USE_DEMO_CONTENT = import.meta.env.DEV || import.meta.env.VITE_CORAM_ENABLE_DEMO === 'true';
 const seedState = createInitialCoramState({ useDemoContent: USE_DEMO_CONTENT });
 const CORAM_STATE_KEY = USE_DEMO_CONTENT ? 'coram.app.state.demo' : 'coram.app.state.production';
-const CORAM_STATE_VERSION = 2;
+const CORAM_STATE_VERSION = 3;
 
 type StateSetter<T> = T | ((prev: T) => T);
 
@@ -82,6 +101,46 @@ export function useCoramAppState() {
         console.error('Unable to load Supabase sponsors', error);
       });
 
+    fetchAdvertisements()
+      .then((advertisements) => {
+        if (isMounted) {
+          setState((prev) => ({ ...prev, advertisements }));
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to load Supabase advertisements', error);
+      });
+
+    fetchPublishedCampaigns()
+      .then((campaigns) => {
+        if (isMounted) {
+          setState((prev) => ({ ...prev, campaigns }));
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to load Supabase campaigns', error);
+      });
+
+    fetchPublishedFeaturedVideos()
+      .then((featuredVideos) => {
+        if (isMounted) {
+          setState((prev) => ({ ...prev, featuredVideos }));
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to load Supabase featured videos', error);
+      });
+
+    fetchPublishedHomeBanners()
+      .then((homeBanners) => {
+        if (isMounted) {
+          setState((prev) => ({ ...prev, homeBanners }));
+        }
+      })
+      .catch((error) => {
+        console.error('Unable to load Supabase home banners', error);
+      });
+
     return () => {
       isMounted = false;
     };
@@ -95,6 +154,14 @@ export function useCoramAppState() {
       setState((prev) => ({ ...prev, courses: resolveSetter(courses, prev.courses) })),
     setSponsors: (sponsors: StateSetter<Sponsor[]>) =>
       setState((prev) => ({ ...prev, sponsors: resolveSetter(sponsors, prev.sponsors) })),
+    setAdvertisements: (advertisements: StateSetter<Advertisement[]>) =>
+      setState((prev) => ({ ...prev, advertisements: resolveSetter(advertisements, prev.advertisements) })),
+    setCampaigns: (campaigns: StateSetter<Campaign[]>) =>
+      setState((prev) => ({ ...prev, campaigns: resolveSetter(campaigns, prev.campaigns) })),
+    setFeaturedVideos: (featuredVideos: StateSetter<FeaturedVideo[]>) =>
+      setState((prev) => ({ ...prev, featuredVideos: resolveSetter(featuredVideos, prev.featuredVideos) })),
+    setHomeBanners: (homeBanners: StateSetter<HomeBanner[]>) =>
+      setState((prev) => ({ ...prev, homeBanners: resolveSetter(homeBanners, prev.homeBanners) })),
     setProfile: (profile: StateSetter<UserProfile>) =>
       setState((prev) => ({ ...prev, profile: resolveSetter(profile, prev.profile) })),
     setMetrics: (metrics: StateSetter<DashboardMetric>) =>

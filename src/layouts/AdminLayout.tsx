@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { BookMarked, FolderOpen, GraduationCap, LayoutDashboard, Menu, Music2, Settings, UsersRound, X } from 'lucide-react';
+import { BookMarked, FolderOpen, GraduationCap, Images, LayoutDashboard, Megaphone, Menu, Music2, Settings, UsersRound, Video, X } from 'lucide-react';
 import { AuthPanel } from '../components/AuthPanel';
 import { CoramLogo } from '../components/CoramLogo';
 import { LegalFooter } from '../components/LegalFooter';
@@ -11,8 +11,12 @@ export const adminNav = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/cursos', label: 'Cursos', icon: GraduationCap },
   { to: '/admin/corarios', label: 'Corarios', icon: Music2 },
-  { to: '/admin/himnos', label: 'Himnos', icon: BookMarked },
+  { to: '/admin/himnarios', label: 'Himnarios', icon: BookMarked },
   { to: '/admin/recursos', label: 'Recursos', icon: FolderOpen },
+  { to: '/admin/campanas', label: 'Campanas', icon: Megaphone },
+  { to: '/admin/publicidad', label: 'Publicidad', icon: Megaphone },
+  { to: '/admin/videos', label: 'Videos', icon: Video },
+  { to: '/admin/banners', label: 'Banners', icon: Images },
   { to: '/admin/usuarios', label: 'Usuarios', icon: UsersRound },
   { to: '/admin/configuracion', label: 'Configuracion', icon: Settings },
 ];

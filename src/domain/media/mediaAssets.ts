@@ -2,14 +2,22 @@ import { supabase } from '../../shared/supabase/client';
 
 export type MediaAssetType = 'image' | 'video' | 'pdf' | 'audio' | 'document';
 export type MediaAssetVisibility = 'public' | 'private' | 'premium';
-export type CoramMediaBucket = 'course-images' | 'course-videos' | 'resources' | 'avatars' | 'sponsors';
+export type CoramMediaBucket =
+  | 'course-images'
+  | 'course-videos'
+  | 'resources'
+  | 'avatars'
+  | 'sponsors'
+  | 'campaigns'
+  | 'banners'
+  | 'videos';
 
 export interface UploadMediaAssetInput {
   file: File;
   bucketId: CoramMediaBucket;
   assetType: MediaAssetType;
   visibility: MediaAssetVisibility;
-  linkedEntityType?: 'course' | 'lesson' | 'resource' | 'profile' | 'sponsor' | 'ad';
+  linkedEntityType?: 'course' | 'lesson' | 'resource' | 'profile' | 'sponsor' | 'ad' | 'campaign' | 'banner' | 'featured_video';
   linkedEntityId?: string;
 }
 

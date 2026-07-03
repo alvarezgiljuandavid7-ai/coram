@@ -14,15 +14,15 @@ import {
 
 export function AppInicioPage() {
   const { state, hymns } = useCoramApp();
-  const { corarios, courses, resources, profile } = state;
+  const { advertisements, campaigns, corarios, courses, featuredVideos, homeBanners, resources, profile } = state;
   const favoritesCount = corarios.filter((corario) => profile.favoriteCorarios.includes(corario.id)).length;
   const displayName = profile.name?.trim() || profile.email?.split('@')[0] || 'ministro';
 
   return (
     <PremiumScreen>
-      <HomeHeroPremium displayName={displayName} />
-      <FeaturedCampaignCarousel />
-      <VideoHighlights />
+      <HomeHeroPremium displayName={displayName} banners={homeBanners} />
+      <FeaturedCampaignCarousel campaigns={campaigns} advertisements={advertisements} />
+      <VideoHighlights videos={featuredVideos} />
       <QuickAccessPremium />
       <FeaturedTools />
       <FeaturedCourses courses={courses} />

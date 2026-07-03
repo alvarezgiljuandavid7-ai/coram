@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import type { Key } from 'react';
+import type { Key, ReactNode } from 'react';
 import {
   BookMarked,
   CalendarDays,
@@ -23,51 +23,31 @@ import {
   PremiumLinkCard,
   SectionHeader,
 } from '../../../components/app-premium/PremiumApp';
-import type { Course, Resource, UserProfile } from '../../../types';
+import type { Advertisement, Campaign, Course, FeaturedVideo, HomeBanner, Resource, UserProfile } from '../../../types';
 import type { Hymn } from '../../../domain/hymns/types';
 import type { Corario } from '../../../types';
 
-const campaigns = [
-  {
-    label: 'Demo',
-    title: 'Lanzamiento ministerial CorAM',
-    body: 'Espacio preparado para campanas, anuncios, eventos, ofertas y novedades desde Supabase.',
-    cta: 'Ver herramientas',
-    to: '/app/herramientas',
-  },
-  {
-    label: 'Demo',
-    title: 'Academia vocal de adoracion',
-    body: 'Banner destacado para clases, cohortes, mentorias o contenido patrocinado.',
-    cta: 'Ver academia',
-    to: '/app/academia',
-  },
-];
+export function HomeHeroPremium({ displayName, banners }: { displayName: string; banners: HomeBanner[] }) {
+  const mainBanner = banners[0];
 
-const videos = [
-  { title: 'Como preparar una voz antes del culto', category: 'Tutorial demo', duration: '08:24' },
-  { title: 'Afinacion con piano para corarios', category: 'Clase demo', duration: '12:10' },
-  { title: 'Testimonio ministerial CorAM', category: 'Video demo', duration: '04:42' },
-];
-
-export function HomeHeroPremium({ displayName }: { displayName: string }) {
   return (
     <section className="relative overflow-hidden rounded-[1.9rem] border border-white/10 bg-[#071426] px-5 py-6 text-white shadow-2xl shadow-[#0B2545]/20 md:px-8 md:py-9">
+      {mainBanner?.imageUrl && <img src={mainBanner.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_12%,rgba(212,175,55,0.34),transparent_30%),linear-gradient(135deg,rgba(3,10,23,0.98),rgba(11,37,69,0.94))]" />
       <div className="absolute bottom-0 right-0 h-40 w-3/4 bg-[repeating-linear-gradient(0deg,transparent_0_13px,rgba(212,175,55,0.13)_13px_14px)] opacity-80" />
       <div className="relative z-10 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#D4AF37]">Bienvenido, {displayName}</p>
           <h1 className="mt-3 max-w-3xl text-[clamp(2.35rem,11vw,5rem)] font-black leading-[0.95] tracking-tight">
-            Tu ministerio musical en un solo lugar.
+            {mainBanner?.title || 'Tu ministerio musical en un solo lugar.'}
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-200 md:text-base">
-            Corarios, himnos, academia, recursos, videos y herramientas vocales listos para servir con excelencia.
+            {mainBanner?.body || 'Corarios, himnos, academia, recursos, videos y herramientas vocales listos para servir con excelencia.'}
           </p>
           <div className="mt-6 flex flex-col gap-2 min-[430px]:flex-row">
-            <Link to="/app/herramientas" className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#D4AF37] px-5 text-sm font-black text-slate-950 shadow-lg shadow-[#D4AF37]/20 active:scale-[0.99]">
-              Explorar herramientas
-            </Link>
+            <SmartLink to={mainBanner?.ctaUrl || '/app/herramientas'} className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#D4AF37] px-5 text-sm font-black text-slate-950 shadow-lg shadow-[#D4AF37]/20 active:scale-[0.99]">
+              {mainBanner?.ctaLabel || 'Explorar herramientas'}
+            </SmartLink>
             <Link to="/app/academia" className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/8 px-5 text-sm font-black text-white active:scale-[0.99]">
               Ver academia
             </Link>
@@ -86,55 +66,86 @@ export function HomeHeroPremium({ displayName }: { displayName: string }) {
   );
 }
 
-export function FeaturedCampaignCarousel() {
+export function FeaturedCampaignCarousel({ campaigns, advertisements }: { campaigns: Campaign[]; advertisements: Advertisement[] }) {
+  const items = [
+    ...campaigns.map((campaign) => ({
+      id: campaign.id,
+      label: 'Campana',
+      title: campaign.title,
+      body: campaign.body || campaign.subtitle || 'Campana publicada por el administrador.',
+      imageUrl: campaign.imageUrl,
+      cta: campaign.ctaLabel || 'Abrir',
+      to: campaign.ctaUrl || '/app/inicio',
+    })),
+    ...advertisements.map((ad) => ({
+      id: ad.id,
+      label: 'Publicidad',
+      title: ad.title,
+      body: ad.placement || 'Anuncio activo.',
+      imageUrl: ad.imageUrl,
+      cta: 'Abrir',
+      to: ad.targetUrl || '/app/inicio',
+    })),
+  ];
+
   return (
     <section className="space-y-3">
       <SectionHeader eyebrow="Campanas / anuncios" title="Destacados ministeriales" />
+      {items.length === 0 ? (
+        <EmptyStatePremium icon={Sparkles} title="Sin campanas publicadas" body="Cuando el administrador publique campanas o anuncios activos desde Supabase, apareceran aqui." />
+      ) : (
       <div className="flex snap-x gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none]">
-        {campaigns.map((campaign) => (
+        {items.map((campaign) => (
           <motion.article
-            key={campaign.title}
+            key={`${campaign.label}-${campaign.id}`}
             whileTap={{ scale: 0.99 }}
             className="relative min-w-[86%] snap-start overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#071426] p-5 text-white shadow-xl shadow-[#0B2545]/15 sm:min-w-[420px]"
           >
+            {campaign.imageUrl && <img src={campaign.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(212,175,55,0.28),transparent_32%)]" />
             <div className="relative">
               <span className="rounded-full bg-[#D4AF37] px-3 py-1 text-[10px] font-black uppercase text-slate-950">{campaign.label}</span>
               <h3 className="mt-5 text-2xl font-black leading-tight">{campaign.title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-300">{campaign.body}</p>
-              <Link to={campaign.to} className="mt-5 inline-flex min-h-11 items-center rounded-2xl bg-white px-4 text-xs font-black text-[#0B2545]">
+              <SmartLink to={campaign.to} className="mt-5 inline-flex min-h-11 items-center rounded-2xl bg-white px-4 text-xs font-black text-[#0B2545]">
                 {campaign.cta}
-              </Link>
+              </SmartLink>
             </div>
           </motion.article>
         ))}
       </div>
+      )}
     </section>
   );
 }
 
-export function VideoHighlights() {
+export function VideoHighlights({ videos }: { videos: FeaturedVideo[] }) {
   return (
     <section className="space-y-3">
       <SectionHeader eyebrow="Videos destacados" title="Contenido para crecer" />
+      {videos.length === 0 ? (
+        <EmptyStatePremium icon={Film} title="Sin videos destacados" body="Publica videos desde el panel administrador para llenar esta seccion." />
+      ) : (
       <div className="flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible">
         {videos.map((video) => (
           <PremiumCard key={video.title} dark className="min-w-[78%] p-0 md:min-w-0">
             <div className="relative flex min-h-36 items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#071426,#0B2545)]">
+              {video.thumbnailUrl && <img src={video.thumbnailUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" />}
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_45%_20%,rgba(212,175,55,0.24),transparent_30%)]" />
               <PlayCircle className="relative h-12 w-12 text-[#D4AF37]" />
             </div>
             <div className="p-4">
-              <p className="text-[10px] font-black uppercase tracking-wider text-[#D4AF37]">{video.category}</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#D4AF37]">{video.category || 'Video'}</p>
               <h3 className="mt-2 line-clamp-2 text-lg font-black text-white">{video.title}</h3>
               <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-slate-400">
                 <Clock3 className="h-3.5 w-3.5" />
-                {video.duration}
+                {video.duration || 'Disponible'}
               </p>
             </div>
           </PremiumCard>
         ))}
       </div>
+      )}
     </section>
   );
 }
@@ -267,6 +278,24 @@ function MiniMetric({ icon: Icon, value }: { icon: LucideIcon; value: string }) 
       <Icon className="mx-auto h-5 w-5 text-[#D4AF37]" />
       <p className="mt-2 text-[11px] font-black text-white">{value}</p>
     </div>
+  );
+}
+
+function SmartLink({ to, className, children }: { to: string; className?: string; children: ReactNode }) {
+  const isExternal = /^https?:\/\//i.test(to);
+
+  if (isExternal) {
+    return (
+      <a href={to} target="_blank" rel="noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={to} className={className}>
+      {children}
+    </Link>
   );
 }
 
