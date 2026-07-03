@@ -1,5 +1,5 @@
-import { VocalToolPage } from './VocalToolPage';
+import { VocalTunerPremium } from './VocalTunerPremium';
 
 export function AfinadorPage() {
-  return <VocalToolPage mode="tuner" />;
+  return <VocalTunerPremium />;
 }

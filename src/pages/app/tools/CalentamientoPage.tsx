@@ -1,5 +1,5 @@
-import { VocalToolPage } from './VocalToolPage';
+import { VocalToolsShell } from './VocalToolsShell';
 
 export function CalentamientoPage() {
-  return <VocalToolPage mode="warmup" />;
+  return <VocalToolsShell initialScreen="vocal-warmup" />;
 }

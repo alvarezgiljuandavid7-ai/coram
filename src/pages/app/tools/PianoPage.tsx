@@ -1,5 +1,5 @@
-import { VocalToolPage } from './VocalToolPage';
+import { VocalTunerPremium } from './VocalTunerPremium';
 
 export function PianoPage() {
-  return <VocalToolPage mode="piano" />;
+  return <VocalTunerPremium />;
 }
