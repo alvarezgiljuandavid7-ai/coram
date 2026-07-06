@@ -1,0 +1,6 @@
+{
+  "name": "CorAM",
+  "description": "Plataforma premium para ministerios de alabanza, corarios, cursos y recursos musicales cristianos",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

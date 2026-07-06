@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/* --- ACCENT & DESIGN STYLING OVERRIDES FOR DARK MODE SIMULATOR --- */
+
+/* App background */
+.dark-theme-simulator {
+  background-color: #0f172a !important; /* slate-900 */
+}
+
+/* Base text color overrides to ensure excellent readability */
+.dark-theme-simulator span,
+.dark-theme-simulator p,
+.dark-theme-simulator h1,
+.dark-theme-simulator h2,
+.dark-theme-simulator h3,
+.dark-theme-simulator h4,
+.dark-theme-simulator h5,
+.dark-theme-simulator h6,
+.dark-theme-simulator label,
+.dark-theme-simulator strong {
+  transition: color 200ms ease;
+}
+
+/* Background class mappings */
+.dark-theme-simulator .bg-white {
+  background-color: #1e293b !important; /* slate-800 */
+}
+
+.dark-theme-simulator .bg-slate-50 {
+  background-color: #0f172a !important; /* slate-900 */
+}
+
+.dark-theme-simulator .bg-slate-100 {
+  background-color: #1e293b !important; /* slate-800 */
+}
+
+.dark-theme-simulator .bg-slate-200 {
+  background-color: #334155 !important; /* slate-700 */
+}
+
+.dark-theme-simulator .bg-white\/70 {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+/* Text class mappings */
+.dark-theme-simulator .text-slate-900,
+.dark-theme-simulator .text-slate-800,
+.dark-theme-simulator .text-slate-950,
+.dark-theme-simulator .text-zinc-900,
+.dark-theme-simulator .text-slate-850 {
+  color: #f1f5f9 !important; /* slate-100 */
+}
+
+.dark-theme-simulator .text-slate-700,
+.dark-theme-simulator .text-slate-600 {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+
+.dark-theme-simulator .text-slate-500,
+.dark-theme-simulator .text-slate-400 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+/* Override #0B2545 custom dark navy color used as branding text in headings,
+   which is unreadable on true slate-900 / dark mode. Paint them beautiful gold/amber or light sky */
+.dark-theme-simulator .text-\[\#0B2545\] {
+  color: #38bdf8 !important; /* sky-400 */
+}
+
+.dark-theme-simulator .bg-\[\#0B2545\] {
+  background-color: #334155 !important; /* hoverable dark-blue/slate */
+}
+
+/* Make icons stand out */
+.dark-theme-simulator .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.dark-theme-simulator .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+/* Borders */
+.dark-theme-simulator .border-slate-100,
+.dark-theme-simulator .border-slate-200,
+.dark-theme-simulator .border-gray-100,
+.dark-theme-simulator .border-gray-200,
+.dark-theme-simulator .border-slate-250 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Hover background swaps for lists and buttons */
+.dark-theme-simulator .hover\:bg-slate-50:hover,
+.dark-theme-simulator .hover\:bg-slate-100:hover,
+.dark-theme-simulator .hover\:bg-gray-50:hover {
+  background-color: #334155 !important; /* slate-700 hover state */
+}
+
+/* Inputs styling */
+.dark-theme-simulator input,
+.dark-theme-simulator select,
+.dark-theme-simulator textarea {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #f8fafc !important; /* slate-50 */
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark-theme-simulator input::placeholder,
+.dark-theme-simulator textarea::placeholder {
+  color: #64748b !important; /* slate-500 */
+}
+
+/* Fix specific cards that might need dark background manually */
+.dark-theme-simulator .bg-emerald-50,
+.dark-theme-simulator .bg-teal-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.dark-theme-simulator .text-emerald-800,
+.dark-theme-simulator .text-emerald-700,
+.dark-theme-simulator .text-teal-800 {
+  color: #34d399 !important; /* emerald-400 */
+}
+
+.dark-theme-simulator .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+.dark-theme-simulator .text-blue-800,
+.dark-theme-simulator .text-blue-900 {
+  color: #60a5fa !important; /* blue-400 */
+}
+
+/* Custom card list wrappers inside classes */
+.dark-theme-simulator .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.dark-theme-simulator .text-amber-800,
+.dark-theme-simulator .text-amber-900,
+.dark-theme-simulator .text-amber-950 {
+  color: #fbbf24 !important; /* amber-400 */
+}
+
+/* Drop shadow elements */
+.dark-theme-simulator .shadow-xs,
+.dark-theme-simulator .shadow-sm,
+.dark-theme-simulator .shadow-md,
+.dark-theme-simulator .shadow-2xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -1px rgba(0, 0, 0, 0.25) !important;
+}

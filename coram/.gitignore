@@ -1,0 +1,11 @@
+# CorAM local/runtime files
+app/node_modules/
+app/dist/
+app/.env
+app/.env.local
+app/.env.*.local
+
+# Logs and temporary files
+*.log
+.DS_Store
+Thumbs.db
