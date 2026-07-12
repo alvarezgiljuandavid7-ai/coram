@@ -4,11 +4,24 @@
 }
 
 .drawerSurface {
+  isolation: isolate;
   background:
-    radial-gradient(circle at 92% 5%, rgba(229, 240, 223, 0.92), transparent 27%),
+    radial-gradient(circle at 100% 0%, rgba(229, 240, 223, 0.98), transparent 30%),
+    radial-gradient(circle at 0% 42%, rgba(231, 220, 245, 0.34), transparent 25%),
     linear-gradient(180deg, #fffdf8 0%, #f8f1e6 100%);
   color: #0b2545;
-  box-shadow: 18px 0 44px rgba(24, 45, 71, 0.16);
+  box-shadow: 22px 0 64px rgba(24, 45, 71, 0.2);
+}
+
+.drawerSurface::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(11, 37, 69, 0.055) 0.7px, transparent 0.7px);
+  background-size: 11px 11px;
+  content: '';
+  opacity: 0.22;
+  pointer-events: none;
 }
 
 .drawerHeader {
@@ -18,7 +31,38 @@
   justify-content: space-between;
   gap: 0.75rem;
   border-bottom: 1px solid rgba(11, 37, 69, 0.09);
-  padding: 0.25rem 0 1rem;
+  padding: 0.25rem 0 1.15rem;
+}
+
+.drawerKicker,
+.sectionTitle {
+  color: #b5811f;
+  font-size: 0.625rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.drawerTitle {
+  color: #0b2545;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.drawerSubtitle {
+  overflow: hidden;
+  margin-top: 0.35rem;
+  color: #687487;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .closeButton {
@@ -52,13 +96,13 @@
 .navigationItem {
   position: relative;
   display: flex;
-  min-height: 3rem;
+  min-height: 3.25rem;
   align-items: center;
   gap: 0.75rem;
   overflow: hidden;
   border: 1px solid transparent;
-  border-radius: 1rem;
-  padding: 0.5rem 0.75rem;
+  border-radius: 1.15rem;
+  padding: 0.5rem 0.8rem;
   color: #33435a;
   font-size: 0.9375rem;
   font-weight: 700;
@@ -77,10 +121,10 @@
 }
 
 .navigationItemActive {
-  border-color: rgba(74, 138, 85, 0.2);
-  background: linear-gradient(90deg, #e5f0df, #fffaf0);
+  border-color: rgba(74, 138, 85, 0.24);
+  background: linear-gradient(105deg, rgba(229, 240, 223, 0.98), rgba(255, 250, 240, 0.84));
   color: #17305a;
-  box-shadow: 0 8px 20px rgba(61, 113, 70, 0.1);
+  box-shadow: 0 10px 24px rgba(61, 113, 70, 0.12);
 }
 
 .iconSurface {

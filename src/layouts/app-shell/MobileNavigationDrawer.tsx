@@ -78,8 +78,9 @@ export function MobileNavigationDrawer({ open, onClose }: { open: boolean; onClo
           <Link to="/app/inicio" onClick={onClose} className="flex min-w-0 items-center gap-3" aria-label="Ir al inicio de CorAM">
             <CoramLogo variant="icon" size={48} className="rounded-2xl" />
             <div className="min-w-0">
-              <p className="font-serif text-2xl leading-none text-[#0B2545]">CorAM</p>
-              <p className="mt-1 truncate text-[9px] font-black uppercase tracking-[0.16em] text-[#a56b09]">Musica · Alabanza · Formacion</p>
+              <p className={styles.drawerKicker}>Tu espacio</p>
+              <p className={styles.drawerTitle}>CorAM</p>
+              <p className={styles.drawerSubtitle}>Música · Alabanza · Formación</p>
             </div>
           </Link>
           <button type="button" onClick={onClose} className={styles.closeButton} aria-label="Cerrar menu">
@@ -119,7 +120,7 @@ function DrawerNavigationSection({
 
   return (
     <section aria-label={title}>
-      <p className="px-3 text-[10px] font-black uppercase tracking-[0.22em] text-[#a56b09]">{title}</p>
+      <p className={styles.sectionTitle}>{title}</p>
       <div className="mt-2 space-y-1">
         {items.map((item) => (
           <DrawerNavigationItem key={item.id} item={item} active={isNavigationItemActive(item, pathname)} onClose={onClose} />
