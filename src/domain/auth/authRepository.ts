@@ -28,15 +28,16 @@ interface ProfileRow {
   role: 'admin' | 'premium' | 'member' | null;
 }
 
-const configuredPublicAppUrl = (import.meta.env.VITE_CORAM_PUBLIC_URL as string | undefined)?.trim();
 export const appleOAuthEnabled = (import.meta.env.VITE_CORAM_ENABLE_APPLE_AUTH as string | undefined) === 'true';
 
 export function buildAuthRedirectUrl(
   path: string,
   currentOrigin = window.location.origin,
-  configuredOrigin = configuredPublicAppUrl,
+  _configuredOrigin?: string,
 ): string {
-  const origin = (configuredOrigin || currentOrigin).replace(/\/+$/, '');
+  // Browser auth must return to the origin that initiated the flow. This keeps
+  // localhost and Vercel Preview deployments isolated from production.
+  const origin = currentOrigin.replace(/\/+$/, '');
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
   return `${origin}${normalizedPath}`;

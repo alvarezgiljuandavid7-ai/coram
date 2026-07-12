@@ -80,12 +80,13 @@ describe('authRepository', () => {
     expect(mocks.assign).toHaveBeenCalledWith('https://appleid.apple.com/auth/authorize?client_id=coram');
   });
 
-  it('builds auth redirect URLs from a configured public app URL', async () => {
+  it('keeps auth redirects on the current origin in Preview and local environments', async () => {
     const { buildAuthRedirectUrl } = await import('./authRepository');
 
-    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe(
-      'https://coram-two.vercel.app/login',
-    );
+    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe('http://localhost:3000/login');
+    expect(
+      buildAuthRedirectUrl('/login', 'https://coram-co1nryl1h-alvarezgiljuandavid7-ais-projects.vercel.app', 'https://coram-two.vercel.app/'),
+    ).toBe('https://coram-co1nryl1h-alvarezgiljuandavid7-ais-projects.vercel.app/login');
   });
 
   it('trims email before password sign in', async () => {
