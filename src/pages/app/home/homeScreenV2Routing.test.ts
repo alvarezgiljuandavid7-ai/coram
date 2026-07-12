@@ -14,6 +14,18 @@ describe('HomeScreenV2 routing', () => {
     expect(inicioPage).not.toContain('Adora. Aprende. Sirve.');
   });
 
+  it('keeps the approved editorial Home V2 composition in the active screen', () => {
+    const home = source('src/pages/app/home/HomeScreenV2.tsx');
+
+    expect(home).toContain('function HomeGreetingHero');
+    expect(home).toContain('function HomeCampaignCard');
+    expect(home).toContain('function HomeLibraryGatewayCard');
+    expect(home).toContain('function HomeToolCard');
+    expect(home).toContain('function HomeAcademyCard');
+    expect(home).toContain('function HomeInspirationCard');
+    expect(home).not.toContain('Adora. Aprende. Sirve.');
+  });
+
   it('keeps /app as the alias for /app/inicio and gives Inicio the V2 canvas', () => {
     const router = source('src/routes/AppRouter.tsx');
     const navigation = source('src/layouts/app-shell/appNavigation.ts');

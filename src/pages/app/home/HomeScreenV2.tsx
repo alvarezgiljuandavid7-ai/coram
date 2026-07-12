@@ -47,45 +47,8 @@ export function HomeScreenV2() {
   return (
     <ExperienceCanvas className="home-screen-v2">
       <section className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.04fr)_minmax(330px,0.96fr)] xl:gap-6">
-        <div className="min-w-0 rounded-[1.8rem] border border-white/90 bg-[linear-gradient(135deg,#fffdf8_0%,#f8f1df_55%,#edf3e8_100%)] p-6 shadow-[0_16px_38px_rgba(24,45,71,0.08)] sm:p-8 md:p-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#a56b09]">CorAM · musica, alabanza y formacion</p>
-          <h1 className="mt-4 max-w-3xl break-words font-serif text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.9] text-[#0B2545]">
-            Buenos dias,{' '}<span className="text-[#4a8a55]">{firstName}</span>.
-          </h1>
-          <p className="mt-5 max-w-xl text-[clamp(1rem,2.2vw,1.2rem)] leading-7 text-[#46546a]">
-            Todo lo que necesitas para preparar, servir y crecer con tu ministerio.
-          </p>
-          <div className="mt-7 flex flex-col gap-3 min-[430px]:flex-row">
-            <Link to="/app/herramientas" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#4a8a55]/20 transition hover:bg-[#3d7146] active:scale-[0.98]">
-              Explorar herramientas <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link to="/app/academia" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B2545]/12 bg-white/75 px-5 text-sm font-bold text-[#17305a] transition hover:bg-white active:scale-[0.98]">
-              Ver academia
-            </Link>
-          </div>
-        </div>
-
-        <EditorialCard className="relative min-w-0 overflow-hidden bg-[#f9f4e9] p-0 shadow-[0_16px_38px_rgba(24,45,71,0.08)]">
-          {heroContent?.imageUrl && <img src={heroContent.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
-          <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(255,253,248,0.95),rgba(255,253,248,0.72)_58%,rgba(221,235,216,0.76))]" />
-          <div className="relative flex h-full min-h-72 flex-col justify-end p-6 sm:p-8">
-            <span className="w-fit rounded-full bg-[#e5f0df] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-[#3d7146]">Editorial CorAM</span>
-            {heroContent ? (
-              <>
-                <h2 className="mt-4 max-w-md break-words font-serif text-[clamp(2rem,5vw,3.35rem)] leading-[0.95] text-[#17305a]">{heroContent.title}</h2>
-                <p className="mt-3 max-w-md text-sm leading-6 text-[#46546a]">{heroContent.body || heroContent.subtitle || 'Una novedad preparada para acompanar tu ministerio.'}</p>
-                <Link to={heroContent.ctaUrl || '/app/inicio'} className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-[#3d7146] underline decoration-[#d7a934] decoration-2 underline-offset-4">
-                  {heroContent.ctaLabel || 'Descubrir ahora'} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </>
-            ) : (
-              <>
-                <h2 className="mt-4 max-w-md font-serif text-[clamp(2rem,5vw,3.35rem)] leading-[0.95] text-[#17305a]">Tu espacio para preparar el proximo servicio.</h2>
-                <p className="mt-3 max-w-md text-sm leading-6 text-[#46546a]">Las campanas y novedades publicadas por el equipo apareceran aqui.</p>
-              </>
-            )}
-          </div>
-        </EditorialCard>
+        <HomeGreetingHero firstName={firstName} />
+        <HomeCampaignCard content={heroContent} />
       </section>
 
       <section>
@@ -117,22 +80,22 @@ export function HomeScreenV2() {
       <section>
         <SectionHeading eyebrow="Tu biblioteca" title="Corarios e himnos para servir" action={<Link to="/app/corarios" className="text-sm font-bold text-[#3d7146]">Explorar biblioteca</Link>} />
         <div className="mt-4 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <LibraryPreview title="Corarios" count={corarios.length} detail="Letras y tonos publicados" to="/app/corarios" icon={Music2} items={corarios.slice(0, 3).map((item) => item.title)} />
-          <LibraryPreview title="Himnario" count={hymns.length} detail="Himnos disponibles" to="/app/himnario" icon={BookOpen} items={hymns.slice(0, 3).map((item) => item.title)} />
+          <HomeLibraryGatewayCard title="Corarios" count={corarios.length} detail="Letras y tonos publicados" to="/app/corarios" icon={Music2} items={corarios.slice(0, 3).map((item) => item.title)} />
+          <HomeLibraryGatewayCard title="Himnario" count={hymns.length} detail="Himnos disponibles" to="/app/himnario" icon={BookOpen} items={hymns.slice(0, 3).map((item) => item.title)} />
         </div>
       </section>
 
       <section>
         <SectionHeading eyebrow="Preparacion vocal" title="Herramientas para tu voz" action={<Link to="/app/herramientas" className="text-sm font-bold text-[#3d7146]">Ver todas</Link>} />
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {featuredTools.map((tool) => <HomeLinkCard key={tool.to} title={tool.title} detail={tool.body} to={tool.to} icon={tool.icon} />)}
+          {featuredTools.map((tool) => <HomeToolCard key={tool.to} title={tool.title} detail={tool.body} to={tool.to} icon={tool.icon} />)}
         </div>
       </section>
 
       <section className="grid gap-7 xl:grid-cols-[1.15fr_0.85fr]">
         <div>
           <SectionHeading eyebrow="Academia" title="Sigue aprendiendo" action={<Link to="/app/academia" className="text-sm font-bold text-[#3d7146]">Ver academia</Link>} />
-          {courses.length === 0 ? <div className="mt-4"><StatePanel icon={GraduationCap} title="Academia en preparacion" body="Los cursos publicados por el administrador apareceran aqui." /></div> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{courses.slice(0, 2).map((course) => <HomeLinkCard key={course.id} to="/app/academia" title={course.title} detail={course.instructor || 'Curso disponible'} icon={GraduationCap} />)}</div>}
+          {courses.length === 0 ? <div className="mt-4"><StatePanel icon={GraduationCap} title="Academia en preparacion" body="Los cursos publicados por el administrador apareceran aqui." /></div> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{courses.slice(0, 2).map((course) => <HomeAcademyCard key={course.id} to="/app/academia" title={course.title} detail={course.instructor || 'Curso disponible'} icon={GraduationCap} />)}</div>}
         </div>
         <div>
           <SectionHeading eyebrow="Recursos" title="Material reciente" action={<Link to="/app/recursos" className="text-sm font-bold text-[#3d7146]">Ver recursos</Link>} />
@@ -150,14 +113,22 @@ export function HomeScreenV2() {
         </div>
       </section>
 
-      <EditorialCard className="overflow-hidden bg-[linear-gradient(135deg,#eef4ea,#fffaf0)] p-6 sm:p-8">
-        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a56b09]">Inspiracion</p>
-        <p className="mt-3 max-w-3xl font-serif text-[clamp(1.8rem,4vw,3rem)] leading-tight text-[#17305a]">"Servid a Jehova con alegria; venid ante su presencia con regocijo."</p>
-        <p className="mt-3 text-sm font-bold text-[#4a8a55]">Salmo 100:2</p>
-      </EditorialCard>
+      <HomeInspirationCard />
     </ExperienceCanvas>
   );
 }
+
+function HomeGreetingHero({ firstName }: { firstName: string }) {
+  return <div className="min-w-0 rounded-[1.8rem] border border-white/90 bg-[linear-gradient(135deg,#fffdf8_0%,#f8f1df_55%,#edf3e8_100%)] p-6 shadow-[0_16px_38px_rgba(24,45,71,0.08)] sm:p-8 md:p-10"><p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#a56b09]">CorAM · musica, alabanza y formacion</p><h1 className="mt-4 max-w-3xl break-words font-serif text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.9] text-[#0B2545]">Buenos dias, <span className="text-[#4a8a55]">{firstName}</span>.</h1><p className="mt-5 max-w-xl text-[clamp(1rem,2.2vw,1.2rem)] leading-7 text-[#46546a]">Todo lo que necesitas para preparar, servir y crecer con tu ministerio.</p><div className="mt-7 flex flex-col gap-3 min-[430px]:flex-row"><Link to="/app/herramientas" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#4a8a55]/20 transition hover:bg-[#3d7146] active:scale-[0.98]">Explorar herramientas <ArrowRight className="h-4 w-4" /></Link><Link to="/app/academia" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B2545]/12 bg-white/75 px-5 text-sm font-bold text-[#17305a] transition hover:bg-white active:scale-[0.98]">Ver academia</Link></div></div>;
+}
+
+function HomeCampaignCard({ content }: { content: { title: string; body?: string; subtitle?: string; ctaUrl?: string; ctaLabel?: string; imageUrl?: string } | undefined }) {
+  return <EditorialCard className="relative min-w-0 overflow-hidden bg-[#f9f4e9] p-0 shadow-[0_16px_38px_rgba(24,45,71,0.08)]">{content?.imageUrl && <img src={content.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}<div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(255,253,248,0.95),rgba(255,253,248,0.72)_58%,rgba(221,235,216,0.76))]" /><div className="relative flex h-full min-h-72 flex-col justify-end p-6 sm:p-8"><span className="w-fit rounded-full bg-[#e5f0df] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-[#3d7146]">Editorial CorAM</span><h2 className="mt-4 max-w-md break-words font-serif text-[clamp(2rem,5vw,3.35rem)] leading-[0.95] text-[#17305a]">{content?.title || 'Tu espacio para preparar el proximo servicio.'}</h2><p className="mt-3 max-w-md text-sm leading-6 text-[#46546a]">{content?.body || content?.subtitle || 'Las campanas y novedades publicadas por el equipo apareceran aqui.'}</p>{content && <Link to={content.ctaUrl || '/app/inicio'} className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-[#3d7146] underline decoration-[#d7a934] decoration-2 underline-offset-4">{content.ctaLabel || 'Descubrir ahora'} <ArrowRight className="h-4 w-4" /></Link>}</div></EditorialCard>;
+}
+
+function HomeToolCard(props: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) { return <HomeLinkCard {...props} />; }
+function HomeAcademyCard(props: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) { return <HomeLinkCard {...props} />; }
+function HomeInspirationCard() { return <EditorialCard className="overflow-hidden bg-[linear-gradient(135deg,#eef4ea,#fffaf0)] p-6 sm:p-8"><p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a56b09]">Inspiracion</p><p className="mt-3 max-w-3xl font-serif text-[clamp(1.8rem,4vw,3rem)] leading-tight text-[#17305a]">"Servid a Jehova con alegria; venid ante su presencia con regocijo."</p><p className="mt-3 text-sm font-bold text-[#4a8a55]">Salmo 100:2</p></EditorialCard>; }
 
 function HomeLinkCard({ title, detail, to, icon: Icon }: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) {
   return (
@@ -172,7 +143,7 @@ function HomeLinkCard({ title, detail, to, icon: Icon }: { key?: Key; title: str
   );
 }
 
-function LibraryPreview({ title, count, detail, to, icon: Icon, items }: { key?: Key; title: string; count: number; detail: string; to: string; icon: LucideIcon; items: string[] }) {
+function HomeLibraryGatewayCard({ title, count, detail, to, icon: Icon, items }: { key?: Key; title: string; count: number; detail: string; to: string; icon: LucideIcon; items: string[] }) {
   return (
     <EditorialCard className="p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0d1] text-[#b5811f]"><Icon className="h-6 w-6" /></span><Link to={to} className="rounded-full bg-[#edf3e8] px-3 py-2 text-xs font-bold text-[#3d7146]">Ver todo</Link></div>
