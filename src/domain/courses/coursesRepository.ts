@@ -1,4 +1,5 @@
 import { supabase } from '../../shared/supabase/client';
+import { getRenderableMediaUrl } from '../media/mediaAssets';
 import type { Course } from '../../types';
 
 interface CourseRow {
@@ -11,7 +12,7 @@ interface CourseRow {
   is_premium: boolean;
 }
 
-function mapCourse(row: CourseRow): Course {
+async function mapCourse(row: CourseRow): Promise<Course> {
   return {
     id: row.id,
     title: row.title,
@@ -20,8 +21,8 @@ function mapCourse(row: CourseRow): Course {
     isPremium: row.is_premium,
     description: row.description ?? '',
     rating: 5,
-    imageUrl: row.image_url ?? '',
-    videoUrl: row.video_url ?? undefined,
+    imageUrl: (await getRenderableMediaUrl(row.image_url)) ?? '',
+    videoUrl: await getRenderableMediaUrl(row.video_url),
     syllabus: [],
   };
 }
@@ -32,9 +33,9 @@ export async function fetchCourses(): Promise<Course[]> {
   const { data, error } = await supabase
     .from('courses')
     .select('id, title, description, instructor, image_url, video_url, is_premium')
-    .eq('is_published', true)
+    .eq('status', 'published')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return ((data ?? []) as CourseRow[]).map(mapCourse);
+  return Promise.all(((data ?? []) as CourseRow[]).map(mapCourse));
 }

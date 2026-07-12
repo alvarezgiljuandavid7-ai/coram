@@ -30,17 +30,16 @@ describe('experience separation', () => {
   });
 
   it('keeps the user app menu scoped to member navigation only', () => {
-    const appLayout = source('src/layouts/AppLayout.tsx');
+    const appNavigation = source('src/layouts/app-shell/appNavigation.ts');
 
-    expect(appLayout).toContain("label: 'Inicio'");
-    expect(appLayout).toContain("label: 'Corarios'");
-    expect(appLayout).toContain("label: 'Himnario'");
-    expect(appLayout).toContain("label: 'Academia'");
-    expect(appLayout).toContain("label: 'Recursos'");
-    expect(appLayout).toContain("label: 'Herramientas'");
-    expect(appLayout).toContain("label: 'Perfil'");
-    expect(appLayout).not.toContain("label: 'Aplicacion'");
-    expect(appLayout).not.toContain('Ir al panel administrador');
+    expect(appNavigation).toContain("label: 'Inicio'");
+    expect(appNavigation).toContain("label: 'Corarios'");
+    expect(appNavigation).toContain("label: 'Himnario'");
+    expect(appNavigation).toContain("label: 'Academia'");
+    expect(appNavigation).toContain("label: 'Recursos'");
+    expect(appNavigation).toContain("label: 'Herramientas'");
+    expect(appNavigation).toContain("label: 'Perfil'");
+    expect(appNavigation).not.toContain('Ir al panel administrador');
   });
 
   it('keeps the admin menu scoped to administrator navigation only', () => {
@@ -113,12 +112,15 @@ describe('experience separation', () => {
 
   it('keeps mobile auth and app headers compact after polish', () => {
     const authLayout = source('src/layouts/AuthLayout.tsx');
-    const appLayout = source('src/layouts/AppLayout.tsx');
+    const authLayoutV2 = source('src/pages/auth/AuthLayoutV2.tsx');
+    const authLayoutV2Styles = source('src/pages/auth/AuthLayoutV2.module.css');
+    const appTopbar = source('src/layouts/app-shell/CoramTopbar.tsx');
 
-    expect(authLayout).toContain('items-start');
-    expect(authLayout).toContain('pt-4');
-    expect(authLayout).toContain('clamp(');
-    expect(appLayout).toContain('py-2 md:py-3');
-    expect(appLayout).toContain('text-lg md:text-2xl');
+    expect(authLayout).toContain('AuthLayoutV2');
+    expect(authLayoutV2).toContain('mobileBrand');
+    expect(authLayoutV2Styles).toContain('safe-area-inset-top');
+    expect(authLayoutV2Styles).toContain('clamp(');
+    expect(appTopbar).toContain('min-h-[4.5rem]');
+    expect(appTopbar).toContain('text-lg');
   });
 });

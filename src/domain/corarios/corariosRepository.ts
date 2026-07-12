@@ -33,7 +33,7 @@ export async function fetchCorarios(): Promise<Corario[]> {
   const { data, error } = await supabase
     .from('corarios')
     .select('id, titulo, categoria, tono, letra, premium, is_published, audio_url')
-    .eq('is_published', true)
+    .eq('status', 'published')
     .order('titulo', { ascending: true });
 
   if (error) {

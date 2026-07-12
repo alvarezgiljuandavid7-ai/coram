@@ -20,6 +20,9 @@ const CorariosPage = lazy(() => import('../pages/app/CorariosPage').then((m) => 
 const HimnarioPage = lazy(() => import('../pages/app/HimnarioPage').then((m) => ({ default: m.HimnarioPage })));
 const AcademiaPage = lazy(() => import('../pages/app/AcademiaPage').then((m) => ({ default: m.AcademiaPage })));
 const RecursosPage = lazy(() => import('../pages/app/RecursosPage').then((m) => ({ default: m.RecursosPage })));
+const ColeccionesPage = lazy(() => import('../pages/app/ColeccionesPage').then((m) => ({ default: m.ColeccionesPage })));
+const ReadingModePage = lazy(() => import('../pages/app/ReadingModePage').then((m) => ({ default: m.ReadingModePage })));
+const FavoritosPage = lazy(() => import('../pages/app/FavoritosPage').then((m) => ({ default: m.FavoritosPage })));
 const ProfilePage = lazy(() => import('../pages/app/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
 const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
@@ -78,10 +81,14 @@ export function AppRouter() {
               <Route path="himnario" element={<HimnarioPage />} />
               <Route path="academia" element={<AcademiaPage />} />
               <Route path="recursos" element={<RecursosPage />} />
+              <Route path="colecciones" element={<ColeccionesPage />} />
+              <Route path="favoritos" element={<FavoritosPage />} />
+              <Route path="ensayo/:entityType/:entityId" element={<ReadingModePage />} />
               <Route path="herramientas" element={<HerramientasPage />} />
               <Route path="herramientas/afinador" element={<AfinadorPage />} />
               <Route path="herramientas/piano" element={<PianoPage />} />
               <Route path="herramientas/calentamiento" element={<CalentamientoPage />} />
+              <Route path="herramientas/warmup" element={<Navigate to="/app/herramientas/calentamiento" replace />} />
               <Route path="perfil" element={<ProfilePage />} />
             </Route>
           </Route>

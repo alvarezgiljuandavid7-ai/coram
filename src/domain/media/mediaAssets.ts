@@ -125,3 +125,62 @@ export async function uploadMediaAsset(input: UploadMediaAssetInput): Promise<Up
     publicUrl: row.public_url,
   };
 }
+
+export async function removeMediaAssetByUrl(assetUrl: string | null | undefined): Promise<void> {
+  if (!supabase || !assetUrl) return;
+
+  const parsed = parseStoredAssetReference(assetUrl);
+  if (!parsed) return;
+
+  await supabase.storage.from(parsed.bucketId).remove([parsed.objectPath]);
+  await supabase
+    .from('media_assets')
+    .delete()
+    .eq('bucket_id', parsed.bucketId)
+    .eq('object_path', parsed.objectPath);
+}
+
+export async function getRenderableMediaUrl(assetUrl: string | null | undefined): Promise<string | undefined> {
+  if (!supabase || !assetUrl) return assetUrl ?? undefined;
+  if (/^https?:\/\//i.test(assetUrl)) return assetUrl;
+
+  const parsed = parseStoredAssetReference(assetUrl);
+  if (!parsed) return assetUrl;
+
+  const { data, error } = await supabase.storage.from(parsed.bucketId).createSignedUrl(parsed.objectPath, 60 * 60);
+  if (error) return assetUrl;
+
+  return data.signedUrl;
+}
+
+function parseStoredAssetReference(assetUrl: string): { bucketId: CoramMediaBucket; objectPath: string } | null {
+  const buckets: CoramMediaBucket[] = [
+    'course-images',
+    'course-videos',
+    'resources',
+    'avatars',
+    'sponsors',
+    'campaigns',
+    'banners',
+    'videos',
+  ];
+
+  const supabaseReference = assetUrl.match(/^supabase:\/\/([^/]+)\/(.+)$/);
+  if (supabaseReference) {
+    const bucketId = supabaseReference[1] as CoramMediaBucket;
+    return buckets.includes(bucketId) ? { bucketId, objectPath: decodeURIComponent(supabaseReference[2]) } : null;
+  }
+
+  for (const bucketId of buckets) {
+    const marker = `/${bucketId}/`;
+    const markerIndex = assetUrl.indexOf(marker);
+    if (markerIndex !== -1) {
+      return {
+        bucketId,
+        objectPath: decodeURIComponent(assetUrl.slice(markerIndex + marker.length).split('?')[0]),
+      };
+    }
+  }
+
+  return null;
+}

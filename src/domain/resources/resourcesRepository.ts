@@ -1,4 +1,5 @@
 import { supabase } from '../../shared/supabase/client';
+import { getRenderableMediaUrl } from '../media/mediaAssets';
 import type { Resource } from '../../types';
 
 interface ResourceRow {
@@ -6,6 +7,7 @@ interface ResourceRow {
   title: string;
   description: string | null;
   category: string | null;
+  file_url: string | null;
   is_premium: boolean;
 }
 
@@ -17,7 +19,7 @@ function mapCategory(category: string | null): Resource['category'] {
     : 'Guías Prácticas';
 }
 
-function mapResource(row: ResourceRow): Resource {
+async function mapResource(row: ResourceRow): Promise<Resource> {
   return {
     id: row.id,
     title: row.title,
@@ -26,6 +28,7 @@ function mapResource(row: ResourceRow): Resource {
     fileSize: 'Disponible',
     downloadsCount: 0,
     isPremium: row.is_premium,
+    fileUrl: await getRenderableMediaUrl(row.file_url),
   };
 }
 
@@ -34,10 +37,10 @@ export async function fetchResources(): Promise<Resource[]> {
 
   const { data, error } = await supabase
     .from('resources')
-    .select('id, title, description, category, is_premium')
-    .eq('is_published', true)
+    .select('id, title, description, category, file_url, is_premium')
+    .eq('status', 'published')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return ((data ?? []) as ResourceRow[]).map(mapResource);
+  return Promise.all(((data ?? []) as ResourceRow[]).map(mapResource));
 }

@@ -1,10 +1,13 @@
 import {
   ArrowLeft,
   ArrowRight,
+  ExternalLink,
   Download,
   FileAudio,
   FileText,
+  Heart,
   Loader2,
+  PlayCircle,
   Search,
   Star,
   Video,
@@ -14,9 +17,9 @@ import { Link, NavLink, useNavigate, type LinkProps } from 'react-router-dom';
 import type { Key, ReactNode } from 'react';
 import type { Course, Resource } from '../../types';
 
-export function PremiumScreen({ children }: { children: ReactNode }) {
+export function PremiumScreen({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-5 pb-24 md:space-y-7 md:pb-0">
+    <section className={`mx-auto w-full max-w-7xl space-y-5 md:space-y-7 ${className}`}>
       {children}
     </section>
   );
@@ -147,8 +150,8 @@ interface PremiumNavItem {
 
 export function PremiumBottomNav({ items }: { items: PremiumNavItem[] }) {
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[1.6rem] border border-white/15 bg-[#061326] px-2 py-2 shadow-2xl shadow-slate-950/35 md:hidden">
-      <div className="grid grid-cols-5 gap-1">
+    <nav className="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 rounded-[1.6rem] border border-white/15 bg-[#061326]/95 px-2 py-2 shadow-2xl shadow-slate-950/35 backdrop-blur-xl md:hidden">
+      <div className={`grid gap-1 ${items.length === 4 ? 'grid-cols-4' : 'grid-cols-5'}`}>
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -241,12 +244,16 @@ export function CourseCard({
   enrolled,
   onDetails,
   onToggle,
+  favorite = false,
+  onFavorite,
 }: {
   key?: Key;
   course: Course;
   enrolled: boolean;
   onDetails: () => void;
   onToggle: () => void;
+  favorite?: boolean;
+  onFavorite?: () => void;
 }) {
   return (
     <PremiumCard dark className="p-0">
@@ -258,6 +265,16 @@ export function CourseCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#071426] via-[#071426]/55 to-transparent" />
         <div className="relative flex min-h-44 flex-col justify-end p-4">
+          {onFavorite && (
+            <button
+              type="button"
+              onClick={onFavorite}
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/45 text-[#D4AF37] backdrop-blur transition active:scale-95"
+              aria-label={favorite ? 'Quitar favorito' : 'Guardar favorito'}
+            >
+              <Heart className={`h-4 w-4 ${favorite ? 'fill-current' : ''}`} />
+            </button>
+          )}
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#D4AF37]">{course.instructor}</p>
           <h3 className="mt-2 text-xl font-black leading-tight text-white">{course.title}</h3>
         </div>
@@ -280,12 +297,32 @@ export function CourseCard({
             {enrolled ? 'Inscrito' : 'Inscribirme'}
           </button>
         </div>
+        {course.videoUrl && (
+          <a
+            href={course.videoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-[#D4AF37]/40 px-3 py-2 text-xs font-black text-[#D4AF37] transition hover:bg-[#D4AF37]/10 active:scale-[0.99]"
+          >
+            <PlayCircle className="h-4 w-4" />
+            Ver video
+          </a>
+        )}
       </div>
     </PremiumCard>
   );
 }
 
-export function ResourceCard({ resource }: { key?: Key; resource: Resource }) {
+export function ResourceCard({
+  resource,
+  favorite = false,
+  onFavorite,
+}: {
+  key?: Key;
+  resource: Resource;
+  favorite?: boolean;
+  onFavorite?: () => void;
+}) {
   const Icon = getResourceIcon(resource.category);
 
   return (
@@ -293,19 +330,38 @@ export function ResourceCard({ resource }: { key?: Key; resource: Resource }) {
       <div className="absolute bottom-0 right-0 h-24 w-40 bg-[linear-gradient(120deg,transparent,rgba(212,175,55,0.16),transparent)]" />
       <div className="flex items-start justify-between gap-3">
         <BrandedIcon icon={Icon} tone="gold" />
-        <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#D4AF37]">
-          {resource.fileSize}
-        </span>
+        <div className="flex items-center gap-2">
+          {onFavorite && (
+            <button
+              type="button"
+              onClick={onFavorite}
+              className="flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 text-[#D4AF37] transition active:scale-95"
+              aria-label={favorite ? 'Quitar favorito' : 'Guardar favorito'}
+            >
+              <Heart className={`h-4 w-4 ${favorite ? 'fill-current' : ''}`} />
+            </button>
+          )}
+          <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-[#D4AF37]">
+            {resource.fileSize}
+          </span>
+        </div>
       </div>
       <p className="mt-5 text-[10px] font-black uppercase tracking-[0.24em] text-[#D4AF37]">{resource.category}</p>
       <h3 className="mt-2 text-xl font-black leading-tight text-white">{resource.title}</h3>
       <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-300">{resource.description}</p>
-      <div className="mt-5 flex items-center justify-between text-xs font-bold text-slate-400">
+      <div className="mt-5 flex items-center justify-between gap-3 text-xs font-bold text-slate-400">
         <span>{resource.downloadsCount} descargas</span>
-        <span className="inline-flex items-center gap-1 text-[#D4AF37]">
-          <Download className="h-4 w-4" />
-          Abrir
-        </span>
+        {resource.fileUrl ? (
+          <a href={resource.fileUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[#D4AF37]">
+            <ExternalLink className="h-4 w-4" />
+            Abrir
+          </a>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-[#D4AF37]">
+            <Download className="h-4 w-4" />
+            Pronto
+          </span>
+        )}
       </div>
     </PremiumCard>
   );

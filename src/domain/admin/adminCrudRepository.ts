@@ -1,6 +1,6 @@
 import { supabase } from '../../shared/supabase/client';
 import type { CoramAuthProfile } from '../auth/authRepository';
-import type { CoramMediaBucket, MediaAssetType, UploadMediaAssetInput } from '../media/mediaAssets';
+import { removeMediaAssetByUrl, type CoramMediaBucket, type MediaAssetType, type UploadMediaAssetInput } from '../media/mediaAssets';
 
 export type AdminContentKind =
   | 'courses'
@@ -106,9 +106,21 @@ export async function deleteAdminRecord(
   config: AdminCrudConfig,
   profile: CoramAuthProfile | null,
   id: string,
+  record?: AdminRecord,
 ): Promise<void> {
   requireAdmin(profile);
   const client = requireSupabase();
+
+  if (record) {
+    const mediaFields = config.fields
+      .filter((field) => field.kind === 'file' && field.targetField)
+      .map((field) => String(field.targetField));
+
+    await Promise.all(
+      mediaFields.map((fieldName) => removeMediaAssetByUrl(typeof record[fieldName] === 'string' ? record[fieldName] : null)),
+    );
+  }
+
   const { error } = await client.from(config.table).delete().eq('id', id);
 
   if (error) throw error;
@@ -125,9 +137,9 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     description: 'Publica y administra cursos visibles en la academia CorAM.',
     table: 'courses',
     orderBy: 'title',
-    select: 'id, title, description, instructor, image_url, video_url, is_premium, is_published',
+    select: 'id, title, description, instructor, image_url, video_url, is_premium, is_published, status',
     displayTitle: (row) => String(row.title || 'Curso sin titulo'),
-    displayMeta: (row) => `${row.instructor || 'CorAM'} / ${row.is_published ? 'Publicado' : 'Oculto'}`,
+    displayMeta: (row) => `${row.instructor || 'CorAM'} / ${row.status || (row.is_published ? 'published' : 'draft')}`,
     createDefaults: {
       title: '',
       description: '',
@@ -136,11 +148,12 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       video_url: '',
       is_premium: false,
       is_published: true,
+      status: 'published',
     },
-    deactivate: () => ({ is_published: false }),
+    deactivate: () => ({ status: 'archived' }),
     searchableFields: ['title', 'description', 'instructor'],
-    filterField: 'is_published',
-    filterOptions: ['true', 'false'],
+    filterField: 'status',
+    filterOptions: statusOptions,
     fields: [
       { name: 'title', label: 'Titulo', kind: 'text', required: true },
       { name: 'description', label: 'Descripcion', kind: 'textarea', required: true },
@@ -150,7 +163,7 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'video_upload', label: 'Subir video', kind: 'file', targetField: 'video_url', bucketId: 'course-videos', assetType: 'video', linkedEntityType: 'course' },
       { name: 'video_url', label: 'URL de video', kind: 'text' },
       { name: 'is_premium', label: 'Premium', kind: 'boolean' },
-      { name: 'is_published', label: 'Publicado', kind: 'boolean' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
     ],
   },
   corarios: {
@@ -160,9 +173,9 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     description: 'Gestiona letras, tonos y categorias del cancionero. No se mezcla con Himnarios.',
     table: 'corarios',
     orderBy: 'titulo',
-    select: 'id, titulo, categoria, tono, letra, premium, audio_url, is_published',
+    select: 'id, titulo, categoria, tono, letra, premium, audio_url, is_published, status',
     displayTitle: (row) => String(row.titulo || 'Corario sin titulo'),
-    displayMeta: (row) => `${row.categoria || 'Corarios'} / Tono ${row.tono || 'C'} / ${row.is_published ? 'Publicado' : 'Oculto'}`,
+    displayMeta: (row) => `${row.categoria || 'Corarios'} / Tono ${row.tono || 'C'} / ${row.status || (row.is_published ? 'published' : 'draft')}`,
     createDefaults: {
       titulo: '',
       categoria: 'Corarios',
@@ -171,12 +184,13 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       premium: false,
       audio_url: '',
       is_published: true,
+      status: 'published',
     },
     allowDelete: true,
-    deactivate: () => ({ is_published: false }),
+    deactivate: () => ({ status: 'archived' }),
     searchableFields: ['titulo', 'categoria', 'tono', 'letra'],
-    filterField: 'is_published',
-    filterOptions: ['true', 'false'],
+    filterField: 'status',
+    filterOptions: statusOptions,
     fields: [
       { name: 'titulo', label: 'Titulo', kind: 'text', required: true },
       { name: 'categoria', label: 'Categoria', kind: 'text' },
@@ -185,7 +199,7 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'audio_upload', label: 'Subir audio', kind: 'file', targetField: 'audio_url', bucketId: 'resources', assetType: 'audio', linkedEntityType: 'resource' },
       { name: 'audio_url', label: 'URL de audio', kind: 'text' },
       { name: 'premium', label: 'Premium', kind: 'boolean' },
-      { name: 'is_published', label: 'Publicado', kind: 'boolean' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
     ],
   },
   hymns: {
@@ -195,9 +209,9 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     description: 'Edita himnos del Himnario Manantial y su publicacion. Separado de Corarios.',
     table: 'hymns',
     orderBy: 'hymn_number',
-    select: 'id, collection_id, hymn_number, title, slug, original_key, lyrics, chords, is_published',
+    select: 'id, collection_id, hymn_number, title, slug, original_key, lyrics, chords, is_published, status',
     displayTitle: (row) => `${row.hymn_number || '-'} / ${row.title || 'Himno sin titulo'}`,
-    displayMeta: (row) => `Tono ${row.original_key || 'C'} / ${row.is_published ? 'Publicado' : 'Oculto'}`,
+    displayMeta: (row) => `Tono ${row.original_key || 'C'} / ${row.status || (row.is_published ? 'published' : 'draft')}`,
     createDefaults: {
       collection_id: MANANTIAL_COLLECTION_ID,
       hymn_number: 0,
@@ -207,18 +221,19 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       lyrics: '',
       chords: [],
       is_published: true,
+      status: 'published',
     },
-    deactivate: () => ({ is_published: false }),
+    deactivate: () => ({ status: 'archived' }),
     searchableFields: ['title', 'lyrics', 'original_key'],
-    filterField: 'is_published',
-    filterOptions: ['true', 'false'],
+    filterField: 'status',
+    filterOptions: statusOptions,
     fields: [
       { name: 'hymn_number', label: 'Numero', kind: 'number', required: true },
       { name: 'title', label: 'Titulo', kind: 'text', required: true },
       { name: 'slug', label: 'Slug', kind: 'text' },
       { name: 'original_key', label: 'Tono', kind: 'text' },
       { name: 'lyrics', label: 'Letra', kind: 'textarea', required: true },
-      { name: 'is_published', label: 'Publicado', kind: 'boolean' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
     ],
   },
   resources: {
@@ -228,9 +243,9 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     description: 'Administra materiales descargables y enlaces de recursos.',
     table: 'resources',
     orderBy: 'title',
-    select: 'id, title, description, category, file_url, is_premium, is_published',
+    select: 'id, title, description, category, file_url, is_premium, is_published, status',
     displayTitle: (row) => String(row.title || 'Recurso sin titulo'),
-    displayMeta: (row) => `${row.category || 'Recurso'} / ${row.is_published ? 'Publicado' : 'Oculto'}`,
+    displayMeta: (row) => `${row.category || 'Recurso'} / ${row.status || (row.is_published ? 'published' : 'draft')}`,
     createDefaults: {
       title: '',
       description: '',
@@ -238,11 +253,12 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       file_url: '',
       is_premium: false,
       is_published: true,
+      status: 'published',
     },
-    deactivate: () => ({ is_published: false }),
+    deactivate: () => ({ status: 'archived' }),
     searchableFields: ['title', 'description', 'category'],
-    filterField: 'is_published',
-    filterOptions: ['true', 'false'],
+    filterField: 'status',
+    filterOptions: statusOptions,
     fields: [
       { name: 'title', label: 'Titulo', kind: 'text', required: true },
       { name: 'description', label: 'Descripcion', kind: 'textarea', required: true },
@@ -250,7 +266,7 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'file_upload', label: 'Subir archivo', kind: 'file', targetField: 'file_url', bucketId: 'resources', assetType: 'document', linkedEntityType: 'resource' },
       { name: 'file_url', label: 'URL de archivo', kind: 'text' },
       { name: 'is_premium', label: 'Premium', kind: 'boolean' },
-      { name: 'is_published', label: 'Publicado', kind: 'boolean' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
     ],
   },
   campaigns: {

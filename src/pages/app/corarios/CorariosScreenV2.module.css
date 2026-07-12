@@ -1,0 +1,50 @@
+.screen {
+  background:
+    radial-gradient(circle at 8% 5%, rgba(220, 177, 71, 0.13), transparent 24rem),
+    linear-gradient(135deg, #fbf8ef 0%, #fffdf9 55%, #f8f1e3 100%);
+}
+
+.heading {
+  position: relative;
+  overflow: hidden;
+}
+
+.heading::after {
+  position: absolute;
+  right: -8rem;
+  top: -3rem;
+  width: 28rem;
+  height: 19rem;
+  border: 1px solid rgba(190, 135, 29, 0.16);
+  border-radius: 46% 54% 60% 40%;
+  box-shadow:
+    0 13px 0 -12px rgba(190, 135, 29, 0.14),
+    0 26px 0 -24px rgba(190, 135, 29, 0.12),
+    0 39px 0 -36px rgba(190, 135, 29, 0.1);
+  content: '';
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
+.heroImage {
+  background-image:
+    linear-gradient(90deg, rgba(255, 252, 245, 0.98) 2%, rgba(255, 252, 245, 0.82) 35%, rgba(11, 37, 69, 0.12) 68%, rgba(11, 37, 69, 0.34)),
+    url('https://images.unsplash.com/photo-1524650359799-842906ca8a0e?auto=format&fit=crop&w=1500&q=82');
+  background-position: center;
+  background-size: cover;
+}
+
+.noteField {
+  background-image:
+    linear-gradient(135deg, transparent 0 43%, rgba(191, 137, 37, 0.12) 43.4% 43.8%, transparent 44.2% 100%),
+    linear-gradient(35deg, transparent 0 59%, rgba(191, 137, 37, 0.1) 59.3% 59.7%, transparent 60% 100%);
+}
+
+.rowActive {
+  background: linear-gradient(100deg, rgba(227, 239, 222, 0.86), rgba(255, 253, 249, 0.95));
+}
+
+.corarioRow {
+  content-visibility: auto;
+  contain-intrinsic-size: 96px;
+}

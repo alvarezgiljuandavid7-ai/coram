@@ -34,6 +34,68 @@ export interface Resource {
   fileSize: string;
   downloadsCount: number;
   isPremium: boolean;
+  fileUrl?: string;
+}
+
+export type FavoriteEntityType = 'corario' | 'hymn' | 'resource' | 'course';
+export type RecentEntityType = FavoriteEntityType | 'tool';
+
+export interface FavoriteItem {
+  id: string;
+  userId: string;
+  entityType: FavoriteEntityType;
+  entityId: string;
+  createdAt: string;
+}
+
+export interface RecentActivityItem {
+  id: string;
+  userId: string;
+  entityType: RecentEntityType;
+  entityId: string;
+  title: string;
+  route: string;
+  metadata?: Record<string, unknown>;
+  lastSeenAt: string;
+}
+
+export interface InternalNotification {
+  id: string;
+  title: string;
+  body?: string | null;
+  type: 'course' | 'resource' | 'campaign' | 'video' | 'system';
+  entityType?: string | null;
+  entityId?: string | null;
+  route?: string | null;
+  publishedAt?: string | null;
+}
+
+export interface UserCollectionItem {
+  id: string;
+  collectionId: string;
+  entityType: 'corario' | 'hymn';
+  entityId: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface UserCollection {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string | null;
+  visibility: 'private' | 'shared';
+  createdAt: string;
+  updatedAt: string;
+  items: UserCollectionItem[];
+}
+
+export interface ReadingPreferences {
+  userId: string;
+  fontSize: number;
+  lineHeight: number;
+  theme: 'light' | 'dark';
+  updatedAt: string;
 }
 
 export interface MentorshipSession {

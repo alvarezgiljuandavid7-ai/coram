@@ -2,12 +2,11 @@ import { useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Mic2, SlidersHorizontal, Volume2, Zap } from 'lucide-react';
 import {
-  AppHero,
   BackButton,
   PremiumCard,
-  PremiumScreen,
   SectionHeader,
 } from '../../../components/app-premium/PremiumApp';
+import { EditorialHeading, ExperienceCanvas } from '../../../components/experience-v2/ExperienceV2';
 import { createReusableAudioContext, getBrowserAudioContextClass } from '../../../domain/audio/reusableAudioContext';
 import { getHeldPitchState } from '../../../domain/audio/pitchHold';
 import { getTunerMatchScore } from '../../../domain/audio/tunerMatch';
@@ -144,7 +143,7 @@ function autoCorrelateFrequency(buffer: Float32Array, sampleRate: number) {
   return sampleRate / fundamentalLag;
 }
 
-export function VocalTunerPremium() {
+export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano' }) {
   const tools = useHerramientasVocalesModule();
   const micStreamRef = useRef<MediaStream | null>(null);
   const tunerAudioContextRef = useRef<AudioContext | null>(null);
@@ -349,16 +348,13 @@ export function VocalTunerPremium() {
   }
 
   return (
-    <PremiumScreen>
+    <ExperienceCanvas>
       <BackButton fallbackTo="/app/herramientas" label="Herramientas" />
-      <AppHero
-        eyebrow="Microfono / piano vocal"
-        title={
-          <>
-            Afinador de <span className="text-[#D4AF37]">Piano Vocal</span>
-          </>
-        }
-        body="Recupera la herramienta original de entrenamiento: teclado, acordes, microfono, deteccion de tono y luces de afinacion."
+      <EditorialHeading
+        eyebrow={mode === 'piano' ? 'Teclado y armonia' : 'Microfono y precision vocal'}
+        title={mode === 'piano' ? 'Piano' : 'Afinador vocal'}
+        body={mode === 'piano' ? 'Practica notas y acordes con el motor de audio original, un teclado responsive y referencias claras para cada registro.' : 'Escucha tu voz en tiempo real, compara la nota objetivo y corrige frecuencia y desviacion sin perder el flujo original.'}
+        icon={mode === 'piano' ? Volume2 : Mic2}
       />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
@@ -586,7 +582,7 @@ export function VocalTunerPremium() {
           </PremiumCard>
         </aside>
       </div>
-    </PremiumScreen>
+    </ExperienceCanvas>
   );
 }
 

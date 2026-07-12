@@ -100,23 +100,39 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
     }
   };
 
-  const deactivateRecord = async (record: AdminRecord) => {
-    if (!record.id) return;
+  const hideRecord = async (record: AdminRecord) => {
+    if (!record.id || !config.deactivate) return;
     setSaving(true);
     setError('');
     setMessage('');
 
     try {
-      if (config.deactivate) {
-        await updateAdminRecord(config, auth.profile, String(record.id), config.deactivate(record));
-        setMessage('Registro desactivado.');
-      } else {
-        await deleteAdminRecord(config, auth.profile, String(record.id));
-        setMessage('Registro eliminado.');
-      }
+      await updateAdminRecord(config, auth.profile, String(record.id), config.deactivate(record));
+      setMessage('Registro ocultado. Ya no aparecera en la app de usuarios.');
       await loadRecords();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo completar la accion.');
+      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo ocultar el registro.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const removeRecord = async (record: AdminRecord) => {
+    if (!record.id) return;
+    const title = config.displayTitle(record);
+    const confirmed = window.confirm(`Eliminar "${title}" de Supabase? Esta accion no se puede deshacer.`);
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await deleteAdminRecord(config, auth.profile, String(record.id), record);
+      setMessage('Registro eliminado de Supabase.');
+      await loadRecords();
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo eliminar el registro.');
     } finally {
       setSaving(false);
     }
@@ -163,15 +179,28 @@ export function AdminCrudPage({ kind }: AdminCrudPageProps) {
                     <Pencil className="h-4 w-4" />
                     Editar
                   </button>
-                  <button
-                    type="button"
-                    disabled={saving}
-                    onClick={() => void deactivateRecord(record)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-red-500/30 px-3 py-2 text-xs font-black text-red-200 transition hover:bg-red-950/40 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
-                  >
-                    {config.deactivate ? <Power className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                    {config.deactivate ? 'Desactivar' : 'Eliminar'}
-                  </button>
+                  {config.deactivate && (
+                    <button
+                      type="button"
+                      disabled={saving}
+                      onClick={() => void hideRecord(record)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 px-3 py-2 text-xs font-black text-amber-100 transition hover:bg-amber-950/30 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Power className="h-4 w-4" />
+                      Ocultar
+                    </button>
+                  )}
+                  {config.allowDelete !== false && (
+                    <button
+                      type="button"
+                      disabled={saving}
+                      onClick={() => void removeRecord(record)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-red-500/30 px-3 py-2 text-xs font-black text-red-200 transition hover:bg-red-950/40 active:scale-[0.99] disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </motion.article>
             ))}

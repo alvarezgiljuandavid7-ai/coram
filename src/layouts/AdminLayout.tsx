@@ -33,12 +33,12 @@ export function AdminLayout() {
   }, [open]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-[#f5f2e9] text-[#0B2545]">
       <motion.aside
         initial={false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-slate-800 bg-slate-950 px-4 py-5 shadow-xl transition-transform lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 border-r border-white/10 bg-[#0B2545] px-4 py-5 shadow-xl transition-transform lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -67,8 +67,8 @@ export function AdminLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition active:scale-[0.99] ${
                     isActive
-                      ? 'bg-[#D4AF37] text-slate-950'
-                      : 'text-slate-300 hover:bg-slate-900 hover:text-slate-50'
+                      ? 'bg-[#e4ba56] text-[#0B2545]'
+                      : 'text-slate-200 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -81,7 +81,7 @@ export function AdminLayout() {
 
         <NavLink
           to="/app"
-          className="mt-8 block rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm font-black text-slate-100"
+          className="mt-8 block rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-black text-white"
         >
           Volver a la app
         </NavLink>
@@ -99,7 +99,7 @@ export function AdminLayout() {
       )}
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-950/95 px-3 py-2 backdrop-blur md:px-6 md:py-3">
+        <header className="sticky top-0 z-30 border-b border-[#0B2545]/10 bg-[#fffdf8]/95 px-3 py-2 backdrop-blur md:px-6 md:py-3">
           <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <button type="button" onClick={() => setOpen(true)} className="rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-100 transition hover:-translate-y-0.5 active:scale-95 lg:hidden">
@@ -107,14 +107,14 @@ export function AdminLayout() {
               </button>
               <div>
                 <p className="hidden text-[10px] font-black uppercase tracking-widest text-[#D4AF37] sm:block">Administracion</p>
-                <h2 className="text-lg font-black tracking-tight text-slate-50 md:text-2xl">Panel CorAM</h2>
+                <h2 className="font-serif text-xl tracking-tight text-[#0B2545] md:text-2xl">Panel CorAM</h2>
               </div>
             </div>
             <AuthPanel auth={auth} compact />
           </div>
         </header>
 
-        <main className="px-4 py-5 md:px-6 md:py-7">
+        <main className="px-4 py-5 md:px-6 md:py-7 lg:px-8">
           <Outlet />
         </main>
         <LegalFooter />
