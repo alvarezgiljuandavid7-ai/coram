@@ -13,7 +13,6 @@ const LoginPage = lazy(() => import('../pages/LoginPage').then((m) => ({ default
 const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
-const LandingPage = lazy(() => import('../pages/public/LandingPage').then((m) => ({ default: m.LandingPage })));
 const AppHomePage = lazy(() => import('../pages/app/AppHomePage').then((m) => ({ default: m.AppHomePage })));
 const AppInicioPage = lazy(() => import('../pages/app/AppInicioPage').then((m) => ({ default: m.AppInicioPage })));
 const CorariosPage = lazy(() => import('../pages/app/CorariosPage').then((m) => ({ default: m.CorariosPage })));
@@ -55,12 +54,12 @@ export function AppRouter() {
       <RouteAnalytics />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/" element={<PublicLayout />}>
-            <Route index element={<LandingPage />} />
-            <Route path="legal/privacidad" element={<LegalPage type="privacidad" />} />
-            <Route path="legal/terminos" element={<LegalPage type="terminos" />} />
-            <Route path="legal/cookies" element={<LegalPage type="cookies" />} />
-            <Route path="legal/reembolsos" element={<LegalPage type="reembolsos" />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/legal" element={<PublicLayout />}>
+            <Route path="privacidad" element={<LegalPage type="privacidad" />} />
+            <Route path="terminos" element={<LegalPage type="terminos" />} />
+            <Route path="cookies" element={<LegalPage type="cookies" />} />
+            <Route path="reembolsos" element={<LegalPage type="reembolsos" />} />
           </Route>
 
           <Route path="/login" element={<AuthLayout />}>

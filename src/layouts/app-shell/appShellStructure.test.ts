@@ -31,4 +31,12 @@ describe('AppShellV2 structure', () => {
     expect(layout).not.toContain('PremiumSidebar');
     expect(layout).not.toContain('PremiumBottomNav');
   });
+
+  it('uses the approved light editorial navigation rail instead of the legacy navy and gold sidebar', () => {
+    const navigation = source('src/layouts/app-shell/DesktopNavigation.tsx');
+
+    expect(navigation).not.toContain('bg-[#061326]');
+    expect(navigation).not.toContain('from-[#E4BA56]');
+    expect(navigation).toContain('styles.navigationRail');
+  });
 });

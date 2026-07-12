@@ -5,28 +5,17 @@ import { describe, expect, it } from 'vitest';
 const source = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('experience separation', () => {
-  it('defines independent public, auth, app, and admin layouts in the router', () => {
+  it('sends the public root directly to Auth V2 while keeping legal pages public', () => {
     const router = source('src/routes/AppRouter.tsx');
 
-    expect(router).toContain("import { PublicLayout } from '../layouts/PublicLayout'");
     expect(router).toContain("import { AuthLayout } from '../layouts/AuthLayout'");
-    expect(router).toContain('path="/" element={<PublicLayout />}');
+    expect(router).toContain('<Route path="/" element={<Navigate to="/login" replace />} />');
     expect(router).toContain('path="/login" element={<AuthLayout />}');
     expect(router).toContain('path="/register" element={<AuthLayout />}');
     expect(router).toContain('path="/forgot-password" element={<AuthLayout />}');
     expect(router).toContain('path="/app" element={<AppLayout />}');
     expect(router).toContain('path="/admin" element={<AdminLayout />}');
     expect(router).not.toContain('path="/" element={<Navigate to="/app" replace />}');
-  });
-
-  it('keeps the landing independent from app and admin internals', () => {
-    expect(existsSync(join(process.cwd(), 'src/layouts/PublicLayout.tsx'))).toBe(true);
-    expect(existsSync(join(process.cwd(), 'src/pages/public/LandingPage.tsx'))).toBe(true);
-
-    const landing = source('src/pages/public/LandingPage.tsx');
-    expect(landing).not.toContain('PhoneSimulator');
-    expect(landing).not.toContain('AdminDashboard');
-    expect(landing).not.toContain('useCoramApp');
   });
 
   it('keeps the user app menu scoped to member navigation only', () => {
