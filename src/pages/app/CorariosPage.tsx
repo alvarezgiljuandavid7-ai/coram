@@ -5,7 +5,7 @@ import { buildCorariosViewModel } from './corarios/corariosViewModel';
 import type { Corario } from '../../types';
 
 export function CorariosPage() {
-  const { state, favorites, isFavorite, toggleFavorite, recordRecentActivity } = useCoramApp();
+  const { state, favorites, isFavorite, toggleFavorite, recordRecentActivity, corariosLoading, corariosError } = useCoramApp();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('Todos');
   const [key, setKey] = useState('Todos');
@@ -47,6 +47,8 @@ export function CorariosPage() {
       viewModel={viewModel}
       filters={{ query, category, key }}
       selected={selected}
+      loading={corariosLoading}
+      error={corariosError}
       isFavorite={(corarioId) => isFavorite('corario', corarioId)}
       onQueryChange={setQuery}
       onCategoryChange={setCategory}

@@ -57,14 +57,16 @@ export function MobileNavigationDrawer({ open, onClose }: { open: boolean; onClo
 
   return (
     <>
-      <button
-        type="button"
-        aria-label="Cerrar menu de CorAM"
-        aria-hidden={!open}
-        tabIndex={open ? 0 : -1}
-        onClick={onClose}
-        className={`${styles.overlay} fixed inset-0 z-50 transition-opacity lg:hidden ${open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
-      />
+      {open && (
+        <button
+          type="button"
+          aria-label="Cerrar menu de CorAM"
+          aria-hidden={!open}
+          tabIndex={open ? 0 : -1}
+          onClick={onClose}
+          className={`${styles.overlay} fixed inset-0 z-50 transition-opacity lg:hidden ${open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}
+        />
+      )}
       <aside
         ref={drawerRef}
         inert={!open}
@@ -72,7 +74,7 @@ export function MobileNavigationDrawer({ open, onClose }: { open: boolean; onClo
         aria-modal="true"
         aria-label="Menu principal de CorAM"
         aria-hidden={!open}
-        className={`${styles.drawerSurface} fixed inset-y-0 left-0 z-[60] flex w-[min(88vw,22rem)] flex-col overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] transition-transform duration-200 lg:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`${styles.drawerSurface} fixed inset-y-0 left-0 z-[60] flex w-[min(88vw,22rem)] flex-col overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] transition-transform duration-200 lg:hidden ${open ? 'translate-x-0' : '-translate-x-full pointer-events-none'}`}
       >
         <div className={styles.drawerHeader}>
           <Link to="/app/inicio" onClick={onClose} className="flex min-w-0 items-center gap-3" aria-label="Ir al inicio de CorAM">

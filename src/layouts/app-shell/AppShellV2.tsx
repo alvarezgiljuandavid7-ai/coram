@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import { CookieConsent } from '../../components/CookieConsent';
 import { LegalFooter } from '../../components/LegalFooter';
@@ -10,6 +11,14 @@ import { MobileNavigationDrawer } from './MobileNavigationDrawer';
 import { PageContainer } from './PageContainer';
 import { getActiveNavigationItem, getAppShellMode, getPageContainerMode } from './appNavigation';
 import styles from './AppShellV2.module.css';
+
+function RouteChunkFallback() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center text-[#0B2545]">
+      <Loader2 className="h-5 w-5 animate-spin" />
+    </div>
+  );
+}
 
 export function AppShellV2() {
   const { auth, internalNotifications } = useCoramApp();
@@ -55,7 +64,11 @@ export function AppShellV2() {
         />
         <main className={styles.main}>
           <PageContainer mode={getPageContainerMode(location.pathname)}>
-            <Outlet context={{ openAppNavigation: () => setNavigationOpen(true) }} />
+            <Suspense fallback={<RouteChunkFallback />}>
+              <div key={location.pathname} className="contents">
+                <Outlet context={{ openAppNavigation: () => setNavigationOpen(true) }} />
+              </div>
+            </Suspense>
           </PageContainer>
         </main>
         <LegalFooter />

@@ -1,5 +1,6 @@
 .canvas {
   min-height: 100%;
+  flex: 1 1 auto;
   color: #0b2545;
   background:
     radial-gradient(circle at 92% 3%, rgba(116, 157, 112, 0.12), transparent 25rem),

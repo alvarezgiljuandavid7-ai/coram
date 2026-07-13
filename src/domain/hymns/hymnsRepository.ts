@@ -83,6 +83,7 @@ export async function fetchManantialHymns(): Promise<HymnsRepositoryResult> {
     `,
     )
     .eq('status', 'published')
+    .eq('is_published', true)
     .eq('hymnal_collections.slug', MANANTIAL_SLUG)
     .order('hymn_number', { ascending: true });
 

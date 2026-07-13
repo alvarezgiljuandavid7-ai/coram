@@ -1,13 +1,14 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { PublicLayout } from '../layouts/PublicLayout';
-import { AuthLayout } from '../layouts/AuthLayout';
-import { AppLayout } from '../layouts/AppLayout';
-import { AdminLayout } from '../layouts/AdminLayout';
 import { AdminRoute } from './AdminRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RouteAnalytics } from './RouteAnalytics';
+
+const PublicLayout = lazy(() => import('../layouts/PublicLayout').then((m) => ({ default: m.PublicLayout })));
+const AuthLayout = lazy(() => import('../layouts/AuthLayout').then((m) => ({ default: m.AuthLayout })));
+const AppLayout = lazy(() => import('../layouts/AppLayout').then((m) => ({ default: m.AppLayout })));
+const AdminLayout = lazy(() => import('../layouts/AdminLayout').then((m) => ({ default: m.AdminLayout })));
 
 const LoginPage = lazy(() => import('../pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));

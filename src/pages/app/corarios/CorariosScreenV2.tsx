@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AddToCollectionControl } from '../../../components/app-premium/AddToCollectionControl';
-import { BackButton, BrandedIcon, EmptyStatePremium } from '../../../components/app-premium/PremiumApp';
+import { BackButton, BrandedIcon, EmptyStatePremium, LoadingStatePremium } from '../../../components/app-premium/PremiumApp';
 import type { Corario } from '../../../types';
 import type { CorariosFilters } from './corariosViewModel';
 import styles from './CorariosScreenV2.module.css';
@@ -23,6 +23,8 @@ interface CorariosScreenV2Props {
   viewModel: CorariosViewModel;
   filters: CorariosFilters;
   selected: Corario | null;
+  loading: boolean;
+  error: string | null;
   isFavorite: (corarioId: string) => boolean;
   onQueryChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
@@ -37,6 +39,8 @@ export function CorariosScreenV2({
   viewModel,
   filters,
   selected,
+  loading,
+  error,
   isFavorite,
   onQueryChange,
   onCategoryChange,
@@ -95,14 +99,18 @@ export function CorariosScreenV2({
           <MetricCard label="Resultados" detail="Búsqueda actual" value={viewModel.metrics.results} icon={Search} tone="lilac" />
         </section>
 
+        {error && <div className="rounded-[1.35rem] border border-rose-200 bg-rose-50 p-5 text-sm font-semibold text-rose-900">{error}</div>}
+
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
               <h2 className="font-serif text-[clamp(1.8rem,5vw,2.55rem)] leading-none text-[#0B2545]">Corarios destacados</h2>
               <span className="inline-flex items-center gap-2 rounded-full border border-[#0B2545]/10 bg-white px-4 py-2 text-sm font-semibold text-[#31425b]">Orden alfabético <ChevronDown className="h-4 w-4" /></span>
             </div>
-            {viewModel.items.length === 0 ? (
-              <EmptyStatePremium icon={BookOpenText} title="No encontramos corarios" body="Prueba con otro título, categoría, tono o fragmento de la letra." />
+            {loading ? (
+              <LoadingStatePremium label="Cargando corarios..." />
+            ) : viewModel.items.length === 0 ? (
+              <EmptyStatePremium icon={BookOpenText} title="No hay corarios publicados" body="Cuando el equipo de ministry publique corarios en Supabase aparecerán aquí. Mientras tanto, explora el himnario disponible." />
             ) : (
               <div className="overflow-hidden rounded-[1.5rem] border border-[#0B2545]/8 bg-white shadow-[0_16px_35px_rgba(19,38,63,0.08)]">
                 {viewModel.items.map((corario, index) => <CorarioRow key={corario.id} corario={corario} active={selected?.id === corario.id || index === 0} favorite={isFavorite(corario.id)} onOpen={() => onOpenCorario(corario)} onFavorite={() => onToggleFavorite(corario.id)} />)}

@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* --- LAYOUT STABILITY: prevent horizontal jumps when scrollbar appears/disappears
+     between routes with different content heights (e.g. short Perfil vs long Himnario). --- */
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 /* --- ACCENT & DESIGN STYLING OVERRIDES FOR DARK MODE SIMULATOR --- */
 
 /* App background */

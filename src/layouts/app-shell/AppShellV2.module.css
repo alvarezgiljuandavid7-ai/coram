@@ -1,13 +1,19 @@
 .shell {
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .contentColumn {
   min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .main {
   min-width: 0;
+  flex: 1 1 auto;
   padding-bottom: calc(7.75rem + env(safe-area-inset-bottom));
 }
 
@@ -28,6 +34,9 @@
 
 .edgeContainer {
   width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .desktopNavigation {

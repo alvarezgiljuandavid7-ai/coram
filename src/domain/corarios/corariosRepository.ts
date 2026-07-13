@@ -34,6 +34,7 @@ export async function fetchCorarios(): Promise<Corario[]> {
     .from('corarios')
     .select('id, titulo, categoria, tono, letra, premium, is_published, audio_url')
     .eq('status', 'published')
+    .eq('is_published', true)
     .order('titulo', { ascending: true });
 
   if (error) {

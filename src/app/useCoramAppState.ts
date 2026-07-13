@@ -39,7 +39,7 @@ export interface CoramPersistedState {
 const USE_DEMO_CONTENT = import.meta.env.DEV || import.meta.env.VITE_CORAM_ENABLE_DEMO === 'true';
 const seedState = createInitialCoramState({ useDemoContent: USE_DEMO_CONTENT });
 const CORAM_STATE_KEY = USE_DEMO_CONTENT ? 'coram.app.state.demo' : 'coram.app.state.production';
-const CORAM_STATE_VERSION = 3;
+const CORAM_STATE_VERSION = 4;
 
 type StateSetter<T> = T | ((prev: T) => T);
 

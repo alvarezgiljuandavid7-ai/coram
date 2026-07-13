@@ -51,6 +51,8 @@ interface CoramAppContextValue {
   hymns: Hymn[];
   hymnsLoading: boolean;
   hymnsError: string | null;
+  corariosLoading: boolean;
+  corariosError: string | null;
   monetizationSettings: MonetizationToolSetting[];
   setMonetizationSettings: Dispatch<SetStateAction<MonetizationToolSetting[]>>;
   mentorships: MentorshipSession[];
@@ -83,6 +85,8 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
   const [hymns, setHymns] = useState<Hymn[]>([]);
   const [hymnsLoading, setHymnsLoading] = useState(true);
   const [hymnsError, setHymnsError] = useState<string | null>(null);
+  const [corariosLoading, setCorariosLoading] = useState(true);
+  const [corariosError, setCorariosError] = useState<string | null>(null);
   const [mentorships, setMentorships] = useState<MentorshipSession[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivityItem[]>([]);
@@ -126,6 +130,24 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
 
     return () => {
       isMounted = false;
+    };
+  }, []);
+
+  // Expose corarios loading/error so CorariosPage can show a real loading state
+  // instead of falling back to the empty state while fetchCorarios() is in flight.
+  // The actual fetch lives in useCoramAppState; here we only track a sentinel
+  // timeout so the loading flag clears even if the fetch never resolves.
+  useEffect(() => {
+    let isMounted = true;
+    setCorariosLoading(state.corarios.length === 0);
+    const t = window.setTimeout(() => {
+      if (isMounted && state.corarios.length === 0) {
+        setCorariosLoading(false);
+      }
+    }, 1500);
+    return () => {
+      isMounted = false;
+      window.clearTimeout(t);
     };
   }, []);
 
@@ -294,6 +316,8 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
       hymns,
       hymnsLoading,
       hymnsError,
+      corariosLoading,
+      corariosError,
       monetizationSettings,
       setMonetizationSettings,
       mentorships,
@@ -319,6 +343,8 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
       hymns,
       hymnsLoading,
       hymnsError,
+      corariosLoading,
+      corariosError,
       monetizationSettings,
       mentorships,
       favorites,

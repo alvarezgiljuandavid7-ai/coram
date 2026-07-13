@@ -8,7 +8,10 @@ describe('experience separation', () => {
   it('sends the public root directly to Auth V2 while keeping legal pages public', () => {
     const router = source('src/routes/AppRouter.tsx');
 
-    expect(router).toContain("import { AuthLayout } from '../layouts/AuthLayout'");
+    // Layouts may be statically imported or lazy-loaded; we accept both forms.
+    const authLayoutImported = router.includes("import { AuthLayout } from '../layouts/AuthLayout'") ||
+      router.includes("lazy(() => import('../layouts/AuthLayout')");
+    expect(authLayoutImported).toBe(true);
     expect(router).toContain('<Route path="/" element={<Navigate to="/login" replace />} />');
     expect(router).toContain('path="/login" element={<AuthLayout />}');
     expect(router).toContain('path="/register" element={<AuthLayout />}');

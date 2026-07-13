@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styles from './ExperienceV2.module.css';
 
 export function ExperienceCanvas({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`${styles.canvas} ${className}`}><main className="mx-auto max-w-7xl space-y-7 px-5 pb-10 pt-7 sm:px-7 md:space-y-9 md:px-10 lg:px-12">{children}</main></div>;
+  return <div className={`${styles.canvas} ${className}`}><div className="mx-auto max-w-7xl space-y-7 px-5 pb-10 pt-7 sm:px-7 md:space-y-9 md:px-10 lg:px-12">{children}</div></div>;
 }
 
 export function EditorialHeading({ eyebrow, title, body, icon: Icon }: { eyebrow: string; title: string; body: string; icon?: ElementType }) {
