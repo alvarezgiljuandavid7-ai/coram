@@ -7,6 +7,12 @@ export interface HimnarioFilters {
   onlyFavorites: boolean;
 }
 
+export const HYMN_RENDER_BATCH_SIZE = 30;
+
+export function getNextHymnRenderCount(currentCount: number, totalCount: number) {
+  return Math.min(Math.max(totalCount, 0), Math.max(currentCount, 0) + HYMN_RENDER_BATCH_SIZE);
+}
+
 export function buildHimnarioViewModel(
   hymns: Hymn[],
   favoriteIds: ReadonlySet<string>,

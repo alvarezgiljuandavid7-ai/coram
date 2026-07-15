@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Hymn } from '../../../domain/hymns/types';
-import { buildHimnarioViewModel } from './himnarioViewModel';
+import { buildHimnarioViewModel, getNextHymnRenderCount } from './himnarioViewModel';
 
 const hymns: Hymn[] = [
   {
@@ -47,5 +47,12 @@ describe('buildHimnarioViewModel', () => {
 
     expect(result.items).toEqual([]);
     expect(result.metrics).toEqual({ available: 2, favorites: 1, results: 0 });
+  });
+
+  it('reveals hymns in bounded batches instead of mounting the entire catalogue', () => {
+    expect(getNextHymnRenderCount(0, 272)).toBe(30);
+    expect(getNextHymnRenderCount(30, 272)).toBe(60);
+    expect(getNextHymnRenderCount(270, 272)).toBe(272);
+    expect(getNextHymnRenderCount(272, 272)).toBe(272);
   });
 });

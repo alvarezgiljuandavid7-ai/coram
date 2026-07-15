@@ -1,9 +1,11 @@
 import { motion } from 'motion/react';
-import type { ElementType } from 'react';
+import { useState, type ElementType } from 'react';
 import {
   ArrowRight,
   BookOpenText,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Heart,
   Music2,
   Search,
@@ -15,6 +17,7 @@ import { AddToCollectionControl } from '../../../components/app-premium/AddToCol
 import { BackButton, BrandedIcon, EmptyStatePremium, LoadingStatePremium } from '../../../components/app-premium/PremiumApp';
 import type { Corario } from '../../../types';
 import type { CorariosFilters } from './corariosViewModel';
+import { corariosHeroSlides, getCorariosHeroSlideIndex } from './corariosHero';
 import styles from './CorariosScreenV2.module.css';
 
 type CorariosViewModel = ReturnType<typeof import('./corariosViewModel').buildCorariosViewModel>;
@@ -51,6 +54,12 @@ export function CorariosScreenV2({
   onToggleFavorite,
 }: CorariosScreenV2Props) {
   const hasFilters = filters.query || filters.category !== 'Todos' || filters.key !== 'Todos';
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const heroSlide = corariosHeroSlides[heroSlideIndex];
+
+  const moveHero = (direction: -1 | 1) => {
+    setHeroSlideIndex((current) => getCorariosHeroSlideIndex(current, direction, corariosHeroSlides.length));
+  };
 
   return (
     <div className={`${styles.screen} min-h-screen text-[#0B2545]`}>
@@ -68,15 +77,20 @@ export function CorariosScreenV2({
           </div>
         </section>
 
-        <section className={`${styles.heroImage} relative min-h-[20rem] overflow-hidden rounded-[1.7rem] border border-white/70 p-6 shadow-[0_18px_40px_rgba(43,49,55,0.13)] sm:min-h-[19rem] sm:p-8 md:p-10`}>
+        <section className={`${styles.heroImage} relative min-h-[20rem] overflow-hidden rounded-[1.7rem] border border-white/70 p-6 shadow-[0_18px_40px_rgba(43,49,55,0.13)] sm:min-h-[19rem] sm:p-8 md:p-10`} role="region" aria-roledescription="carrusel" aria-label="Colecciones y herramientas de CorAM">
+          <img key={heroSlide.image} src={heroSlide.image} alt="" className={styles.heroMedia} style={{ objectPosition: heroSlide.imagePosition }} />
           <div className="relative z-10 max-w-sm">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fff1c9] px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-[#a56b09]"><BookOpenText className="h-3.5 w-3.5 fill-current" /> Biblioteca activa</span>
-            <h2 className="mt-5 font-serif text-[clamp(2.1rem,7vw,3.6rem)] leading-[0.96] tracking-tight text-[#17305a]">Repertorio que inspira y edifica</h2>
-            <p className="mt-4 max-w-xs text-base leading-6 text-[#3f4b5f]">Accede a letras completas, acordes y tonos para cada momento.</p>
-            <Link to="/app/colecciones" className="mt-6 inline-flex min-h-12 items-center gap-3 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#477f50]/25 transition hover:bg-[#3d7948] active:scale-[0.98]">Explorar colección <ArrowRight className="h-4 w-4" /></Link>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fff1c9] px-3 py-1.5 text-[11px] font-black uppercase tracking-wide text-[#a56b09]"><BookOpenText className="h-3.5 w-3.5 fill-current" /> {heroSlide.badge}</span>
+            <h2 className="mt-5 font-serif text-[clamp(2.1rem,7vw,3.6rem)] leading-[0.96] tracking-tight text-[#17305a]">{heroSlide.title}</h2>
+            <p className="mt-4 max-w-xs text-base leading-6 text-[#3f4b5f]">{heroSlide.description}</p>
+            <Link to={heroSlide.to} className="mt-6 inline-flex min-h-12 items-center gap-3 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#477f50]/25 transition hover:bg-[#3d7948] active:scale-[0.98]">{heroSlide.action} <ArrowRight className="h-4 w-4" /></Link>
           </div>
-          <div aria-label="Carrusel de biblioteca, posicion uno de cinco" className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
-            {[0, 1, 2, 3, 4].map((dot) => <span key={dot} className={`h-2.5 rounded-full ${dot === 0 ? 'w-4 bg-[#F6BB18]' : 'w-2.5 bg-white/85'}`} />)}
+          <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#0B2545]/8 px-2 py-1.5 backdrop-blur-sm">
+            <button type="button" onClick={() => moveHero(-1)} className="grid h-8 w-8 place-items-center rounded-full bg-white/85 text-[#0B2545] shadow-sm transition hover:bg-white" aria-label="Ver campaña anterior"><ChevronLeft className="h-4 w-4" /></button>
+            <div className="flex gap-2" aria-label={`Carrusel de biblioteca, posición ${heroSlideIndex + 1} de ${corariosHeroSlides.length}`}>
+              {corariosHeroSlides.map((slide, index) => <button key={slide.title} type="button" onClick={() => setHeroSlideIndex(index)} className={`h-2.5 rounded-full transition ${index === heroSlideIndex ? 'w-4 bg-[#F6BB18]' : 'w-2.5 bg-white/85 hover:bg-white'}`} aria-label={`Ver ${slide.title}`} aria-current={index === heroSlideIndex ? 'true' : undefined} />)}
+            </div>
+            <button type="button" onClick={() => moveHero(1)} className="grid h-8 w-8 place-items-center rounded-full bg-white/85 text-[#0B2545] shadow-sm transition hover:bg-white" aria-label="Ver siguiente campaña"><ChevronRight className="h-4 w-4" /></button>
           </div>
         </section>
 

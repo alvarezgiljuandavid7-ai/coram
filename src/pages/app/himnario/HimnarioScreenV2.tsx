@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import type { Key } from 'react';
+import { useEffect, useRef, useState, type Key } from 'react';
 import {
   ArrowRight,
   BookMarked,
@@ -17,7 +17,7 @@ import { AddToCollectionControl } from '../../../components/app-premium/AddToCol
 import { EmptyStatePremium, LoadingStatePremium } from '../../../components/app-premium/PremiumApp';
 import { getHymnLyrics } from '../../../domain/hymns/hymnSearch';
 import type { Hymn } from '../../../domain/hymns/types';
-import type { HimnarioFilters } from './himnarioViewModel';
+import { getNextHymnRenderCount, HYMN_RENDER_BATCH_SIZE, type HimnarioFilters } from './himnarioViewModel';
 import styles from './HimnarioScreenV2.module.css';
 
 type HimnarioViewModel = ReturnType<typeof import('./himnarioViewModel').buildHimnarioViewModel>;
@@ -54,6 +54,35 @@ export function HimnarioScreenV2({
   onToggleFavorite,
 }: HimnarioScreenV2Props) {
   const hasFilters = Boolean(filters.query) || filters.key !== 'Todos' || filters.onlyFavorites;
+  const [renderedCount, setRenderedCount] = useState(HYMN_RENDER_BATCH_SIZE);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const visibleHymns = viewModel.items.slice(0, renderedCount);
+  const hasMoreHymns = visibleHymns.length < viewModel.items.length;
+
+  useEffect(() => {
+    setRenderedCount(Math.min(HYMN_RENDER_BATCH_SIZE, viewModel.items.length));
+  }, [filters.key, filters.onlyFavorites, filters.query, viewModel.items.length]);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+
+    if (!target || !hasMoreHymns || !('IntersectionObserver' in window)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setRenderedCount((current) => getNextHymnRenderCount(current, viewModel.items.length));
+      }
+    }, { rootMargin: '520px 0px' });
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMoreHymns, viewModel.items.length]);
+
+  const loadMoreHymns = () => {
+    setRenderedCount((current) => getNextHymnRenderCount(current, viewModel.items.length));
+  };
 
   return (
     <div className={`${styles.screen} min-h-screen text-[#0B2545]`}>
@@ -127,9 +156,13 @@ export function HimnarioScreenV2({
               <EmptyStatePremium icon={BookMarked} title="No encontramos himnos" body="Prueba con otro número, tono, título o fragmento de la letra." />
             ) : (
               <div className="overflow-hidden rounded-[1.5rem] border border-[#0B2545]/8 bg-white shadow-[0_16px_35px_rgba(19,38,63,0.08)]">
-                {viewModel.items.map((hymn, index) => (
+                {visibleHymns.map((hymn, index) => (
                   <HymnRow key={hymn.id} hymn={hymn} active={selected?.id === hymn.id || index === 0} favorite={isFavorite(hymn.id)} onOpen={() => onOpenHymn(hymn)} onFavorite={() => onToggleFavorite(hymn.id)} />
                 ))}
+                {hasMoreHymns && <div ref={loadMoreRef} className="flex flex-col items-center gap-2 border-t border-[#0B2545]/7 p-5 text-center">
+                  <p className="text-sm text-[#596576]" aria-live="polite">Mostrando {visibleHymns.length} de {viewModel.items.length} himnos</p>
+                  <button type="button" onClick={loadMoreHymns} className="min-h-11 rounded-full border border-[#0B2545]/12 bg-[#fffdf8] px-4 text-sm font-bold text-[#0B2545] transition hover:border-[#4a8a55] hover:text-[#3d7948] active:scale-[0.98]">Cargar {Math.min(HYMN_RENDER_BATCH_SIZE, viewModel.items.length - visibleHymns.length)} más</button>
+                </div>}
               </div>
             )}
           </div>
@@ -154,12 +187,12 @@ function MetricCard({ label, detail, value, icon: Icon, tone }: { label: string;
 }
 
 function HymnRow({ hymn, active, favorite, onOpen, onFavorite }: { key?: Key; hymn: Hymn; active: boolean; favorite: boolean; onOpen: () => void; onFavorite: () => void }) {
-  return <motion.article layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`${styles.hymnRow} ${active ? styles.rowActive : 'bg-white'} flex min-w-0 items-center gap-3 border-b border-[#0B2545]/7 p-3 last:border-b-0 sm:gap-4 sm:p-4`}>
+  return <article className={`${styles.hymnRow} ${active ? styles.rowActive : 'bg-white'} flex min-w-0 items-center gap-3 border-b border-[#0B2545]/7 p-3 last:border-b-0 sm:gap-4 sm:p-4`}>
     <button type="button" onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-3 text-left sm:gap-4"><span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(145deg,#17305a,#335b69)] text-xl font-black text-[#f1c967] shadow-md">{hymn.number || '–'}</span><span className="min-w-0"><span className="inline-flex rounded-full bg-[#e2efdf] px-2 py-1 text-[9px] font-black uppercase tracking-[0.13em] text-[#49704d]">Himno {hymn.number || 'sin número'}</span><span className="mt-1 block truncate font-serif text-[clamp(1.12rem,4vw,1.5rem)] leading-tight">{hymn.title}</span><span className="mt-1 block truncate text-sm text-[#596576]">♫ {getHymnLyrics(hymn).replace(/\s+/g, ' ')}</span></span></button>
     <span className="hidden h-9 min-w-9 place-items-center rounded-full bg-[#fff0cf] px-2 text-sm font-black text-[#a56b09] sm:grid">{hymn.key || 'C'}</span>
     <button type="button" onClick={onFavorite} className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white transition active:scale-95 ${favorite ? 'border-[#4a8a55] text-[#4a8a55]' : 'border-[#0B2545]/8'}`} aria-label={favorite ? `Quitar ${hymn.title} de favoritos` : `Guardar ${hymn.title} en favoritos`}><Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} /></button>
     <button type="button" onClick={onOpen} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white shadow-md shadow-[#0B2545]/10 transition active:scale-95" aria-label={`Abrir ${hymn.title}`}><ArrowRight className="h-5 w-5" /></button>
-  </motion.article>;
+  </article>;
 }
 
 function HymnPreview({ hymn, favorite, onFavorite }: { hymn: Hymn | null; favorite: boolean; onFavorite: () => void }) {
