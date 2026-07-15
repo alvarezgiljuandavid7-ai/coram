@@ -1,5 +1,46 @@
 @import "tailwindcss";
 
+:root {
+  --coram-action-primary: #2563EB;
+  --coram-action-hover: #1D4ED8;
+  --coram-action-active: #1E40AF;
+  --coram-action-soft: #EFF6FF;
+  --coram-focus-ring: rgba(37, 99, 235, 0.42);
+}
+
+/* Centralized action migration: legacy action utilities resolve to the CorAM blue
+   without turning semantic success, tuning-perfect, or completed-progress green. */
+:where(a, button, [role="button"]).bg-\[\#4a8a55\],
+:where(a, button, [role="button"]).bg-\[\#3d7948\],
+:where(a, button, [role="button"]).bg-\[\#3d7146\] {
+  background-color: var(--coram-action-primary) !important;
+}
+
+:where(a, button, [role="button"]).hover\:bg-\[\#3d7948\]:hover,
+:where(a, button, [role="button"]).hover\:bg-\[\#3d7146\]:hover {
+  background-color: var(--coram-action-hover) !important;
+}
+
+:where(a, button, [role="button"]).active\:bg-\[\#1e40af\]:active {
+  background-color: var(--coram-action-active) !important;
+}
+
+:where(a, button, [role="button"]).text-\[\#4a8a55\],
+:where(a, button, [role="button"]).text-\[\#367240\] {
+  color: var(--coram-action-primary) !important;
+}
+
+:where(a, button, [role="button"]).border-\[\#4a8a55\] {
+  border-color: var(--coram-action-primary) !important;
+}
+
+:where(a, button, [role="button"]).bg-\[\#e8f1e6\],
+:where(a, button, [role="button"]).bg-\[\#e2efdf\],
+:where(a, button, [role="button"]).bg-\[\#e6f0e2\] {
+  background-color: var(--coram-action-soft) !important;
+}
+
+
 /* --- LAYOUT STABILITY: prevent horizontal jumps when scrollbar appears/disappears
      between routes with different content heights (e.g. short Perfil vs long Himnario). --- */
 html {
@@ -162,7 +203,7 @@ body {
 }
 
 :where(a, button, input, select, textarea):focus-visible {
-  outline: 3px solid rgba(212, 175, 55, 0.72);
+  outline: 3px solid var(--coram-focus-ring);
   outline-offset: 3px;
 }
 

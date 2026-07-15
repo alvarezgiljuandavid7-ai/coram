@@ -9,6 +9,8 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchCorarios } from '../domain/corarios/corariosRepository';
 import { fetchManantialHymns } from '../domain/hymns/hymnsRepository';
 import type { Hymn } from '../domain/hymns/types';
 import { fetchMentorships } from '../domain/mentorships/mentorshipsRepository';
@@ -40,6 +42,7 @@ import type {
   UserCollectionItem,
 } from '../types';
 import { defaultMonetizationSettings } from './initialCoramState';
+import { clearCoramQueryCache, coramQueryKeys } from './queryClient';
 import { useCoramAppState } from './useCoramAppState';
 import { useSupabaseAuth, type CoramAuthState } from './useSupabaseAuth';
 
@@ -82,11 +85,16 @@ interface CoramAppProviderProps {
 export function CoramAppProvider({ children }: CoramAppProviderProps) {
   const state = useCoramAppState();
   const auth = useSupabaseAuth();
-  const [hymns, setHymns] = useState<Hymn[]>([]);
-  const [hymnsLoading, setHymnsLoading] = useState(true);
-  const [hymnsError, setHymnsError] = useState<string | null>(null);
-  const [corariosLoading, setCorariosLoading] = useState(true);
-  const [corariosError, setCorariosError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const corariosQuery = useQuery({
+    queryKey: coramQueryKeys.corarios,
+    queryFn: fetchCorarios,
+  });
+  const hymnsQuery = useQuery({
+    queryKey: coramQueryKeys.hymns,
+    queryFn: fetchManantialHymns,
+  });
+  const hymns = hymnsQuery.data?.hymns ?? [];
   const [mentorships, setMentorships] = useState<MentorshipSession[]>([]);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivityItem[]>([]);
@@ -111,45 +119,10 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
   }, [auth.profile]);
 
   useEffect(() => {
-    let isMounted = true;
-    setHymnsLoading(true);
-
-    fetchManantialHymns()
-      .then((result) => {
-        if (!isMounted) return;
-        setHymns(result.hymns);
-        setHymnsError(null);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setHymnsError('No se pudo cargar el himnario desde Supabase.');
-      })
-      .finally(() => {
-        if (isMounted) setHymnsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Expose corarios loading/error so CorariosPage can show a real loading state
-  // instead of falling back to the empty state while fetchCorarios() is in flight.
-  // The actual fetch lives in useCoramAppState; here we only track a sentinel
-  // timeout so the loading flag clears even if the fetch never resolves.
-  useEffect(() => {
-    let isMounted = true;
-    setCorariosLoading(state.corarios.length === 0);
-    const t = window.setTimeout(() => {
-      if (isMounted && state.corarios.length === 0) {
-        setCorariosLoading(false);
-      }
-    }, 1500);
-    return () => {
-      isMounted = false;
-      window.clearTimeout(t);
-    };
-  }, []);
+    if (corariosQuery.data) {
+      state.setCorarios(corariosQuery.data);
+    }
+  }, [corariosQuery.data]);
 
   useEffect(() => {
     let isMounted = true;
@@ -309,15 +282,28 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
     };
   }, []);
 
+  const signOut = useCallback(async () => {
+    try {
+      await auth.signOut();
+    } finally {
+      clearCoramQueryCache(queryClient);
+    }
+  }, [auth, queryClient]);
+
+  const authWithClearedCache = useMemo<CoramAuthState>(
+    () => ({ ...auth, signOut }),
+    [auth, signOut],
+  );
+
   const value = useMemo<CoramAppContextValue>(
     () => ({
       state,
-      auth,
+      auth: authWithClearedCache,
       hymns,
-      hymnsLoading,
-      hymnsError,
-      corariosLoading,
-      corariosError,
+      hymnsLoading: hymnsQuery.isPending,
+      hymnsError: hymnsQuery.isError ? 'No se pudo cargar el himnario. Inténtalo de nuevo.' : null,
+      corariosLoading: corariosQuery.isPending,
+      corariosError: corariosQuery.isError ? 'No se pudieron cargar los corarios. Inténtalo de nuevo.' : null,
       monetizationSettings,
       setMonetizationSettings,
       mentorships,
@@ -341,10 +327,10 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
       state,
       auth,
       hymns,
-      hymnsLoading,
-      hymnsError,
-      corariosLoading,
-      corariosError,
+      hymnsQuery.isPending,
+      hymnsQuery.isError,
+      corariosQuery.isPending,
+      corariosQuery.isError,
       monetizationSettings,
       mentorships,
       favorites,

@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { fetchCorarios } from '../domain/corarios/corariosRepository';
+import { useEffect, useState } from 'react';
 import { fetchCourses } from '../domain/courses/coursesRepository';
 import { fetchResources } from '../domain/resources/resourcesRepository';
 import { fetchAdvertisements, fetchSponsors } from '../domain/sponsors/sponsorsRepository';
 import { fetchPublishedCampaigns } from '../domain/campaigns/campaignsRepository';
 import { fetchPublishedFeaturedVideos } from '../domain/videos/featuredVideosRepository';
 import { fetchPublishedHomeBanners } from '../domain/banners/bannersRepository';
-import { createPersistentStateStore } from '../shared/storage/persistentState';
 import { createInitialCoramState } from './initialCoramState';
 import type {
   Advertisement,
@@ -38,8 +36,6 @@ export interface CoramPersistedState {
 
 const USE_DEMO_CONTENT = import.meta.env.DEV || import.meta.env.VITE_CORAM_ENABLE_DEMO === 'true';
 const seedState = createInitialCoramState({ useDemoContent: USE_DEMO_CONTENT });
-const CORAM_STATE_KEY = USE_DEMO_CONTENT ? 'coram.app.state.demo' : 'coram.app.state.production';
-const CORAM_STATE_VERSION = 4;
 
 type StateSetter<T> = T | ((prev: T) => T);
 
@@ -48,28 +44,12 @@ function resolveSetter<T>(next: StateSetter<T>, previous: T): T {
 }
 
 export function useCoramAppState() {
-  const store = useMemo(
-    () => createPersistentStateStore<CoramPersistedState>(CORAM_STATE_KEY, CORAM_STATE_VERSION, seedState),
-    [],
-  );
-  const [state, setState] = useState<CoramPersistedState>(() => store.load());
-
-  useEffect(() => {
-    store.save(state);
-  }, [state, store]);
+  // Public resources are refreshed from Supabase/TanStack Query; private state stays in memory.
+  // Do not hydrate a prior account or stale catalogue from localStorage.
+  const [state, setState] = useState<CoramPersistedState>(seedState);
 
   useEffect(() => {
     let isMounted = true;
-
-    fetchCorarios()
-      .then((corarios) => {
-        if (isMounted) {
-          setState((prev) => ({ ...prev, corarios }));
-        }
-      })
-      .catch((error) => {
-        console.error('Unable to load Supabase corarios', error);
-      });
 
     fetchCourses()
       .then((courses) => {

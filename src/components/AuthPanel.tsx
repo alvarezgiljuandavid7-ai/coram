@@ -141,10 +141,10 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
 
   return (
     <form onSubmit={submit} className={`w-full rounded-[1.65rem] border border-white bg-white/95 p-5 shadow-[0_18px_40px_rgba(24,45,71,0.09)] sm:p-7 ${compact ? 'max-w-md' : 'mx-auto max-w-md'}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      <div className="flex min-w-0 items-start justify-between gap-3 max-[390px]:flex-wrap">
+        <div className="min-w-0 max-[390px]:w-full">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#a56b09]">Acceso CorAM</p>
-          <h2 className="mt-2 font-serif text-[clamp(2rem,5vw,2.6rem)] leading-none text-[#17305a]">{modeLabel}</h2>
+          <h2 className="mt-2 break-words font-serif text-[clamp(2rem,5vw,2.6rem)] leading-none text-[#17305a]">{modeLabel}</h2>
           <p className="mt-3 max-w-sm text-sm leading-6 text-[#596576]">{modeDescription}</p>
         </div>
         {!auth.recoveryMode && mode !== 'reset' && (

@@ -1,13 +1,20 @@
+import { useState } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { CoramAppProvider } from './app/CoramAppContext';
+import { createCoramQueryClient } from './app/queryClient';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AppRouter } from './routes/AppRouter';
 
 export default function App() {
+  const [queryClient] = useState(createCoramQueryClient);
+
   return (
     <ErrorBoundary>
-      <CoramAppProvider>
-        <AppRouter />
-      </CoramAppProvider>
+      <QueryClientProvider client={queryClient}>
+        <CoramAppProvider>
+          <AppRouter />
+        </CoramAppProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

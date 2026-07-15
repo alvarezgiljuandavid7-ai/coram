@@ -2,7 +2,7 @@
   min-height: 100dvh;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 94% 7%, rgba(229, 240, 223, 0.86), transparent 24rem),
+    radial-gradient(circle at 94% 7%, rgba(219, 234, 254, 0.86), transparent 24rem),
     radial-gradient(circle at 8% 92%, rgba(255, 239, 204, 0.7), transparent 20rem),
     #f8f3e9;
   color: #0b2545;
@@ -11,6 +11,7 @@
 .frame {
   display: grid;
   width: 100%;
+  grid-template-columns: minmax(0, 1fr);
   max-width: 76rem;
   min-height: min(46rem, calc(100dvh - 2rem));
   margin: 0 auto;
@@ -40,7 +41,7 @@
   height: 28rem;
   border: 1px solid rgba(181, 129, 31, 0.18);
   border-radius: 50%;
-  box-shadow: 0 0 0 2.8rem rgba(74, 138, 85, 0.05), 0 0 0 5.7rem rgba(181, 129, 31, 0.04);
+  box-shadow: 0 0 0 2.8rem rgba(37, 99, 235, 0.05), 0 0 0 5.7rem rgba(181, 129, 31, 0.04);
   content: '';
 }
 
@@ -132,11 +133,12 @@
 
 .editorialNotes svg {
   width: 1.1rem;
-  color: #4a8a55;
+  color: var(--coram-action-primary);
 }
 
 .formPanel {
   display: flex;
+  width: 100%;
   min-width: 0;
   align-items: center;
   padding: 1.25rem;
@@ -150,8 +152,9 @@
 }
 
 .formContent {
-  width: 100%;
-  max-width: 29rem;
+  width: min(100%, 29rem);
+  min-width: 0;
+  max-width: none;
   margin: 6rem auto 0;
 }
 
