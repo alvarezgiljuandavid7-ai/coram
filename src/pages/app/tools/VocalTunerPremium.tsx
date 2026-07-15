@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Mic2, SlidersHorizontal, Volume2, Zap } from 'lucide-react';
 import {
   BackButton,
@@ -9,6 +9,7 @@ import { ExperienceCanvas } from '../../../components/experience-v2/ExperienceV2
 import { createReusableAudioContext, getBrowserAudioContextClass } from '../../../domain/audio/reusableAudioContext';
 import { getHeldPitchState } from '../../../domain/audio/pitchHold';
 import { getTunerMatchScore } from '../../../domain/audio/tunerMatch';
+import { createActivationGate } from '../../../domain/audio/activationGate';
 import { useHerramientasVocalesModule } from '../../../components/phone/modules/HerramientasVocales';
 
 type ReusableAudioContext = ReturnType<typeof createReusableAudioContext>;
@@ -159,6 +160,10 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
   const micStreamRef = useRef<MediaStream | null>(null);
   const tunerAudioContextRef = useRef<AudioContext | null>(null);
   const tunerAnimationFrameIdRef = useRef<number | null>(null);
+  const tunerActivationGateRef = useRef<ReturnType<typeof createActivationGate> | null>(null);
+  const lastAnalysisAtRef = useRef(0);
+  const [tunerStarting, setTunerStarting] = useState(false);
+  const [audioError, setAudioError] = useState(false);
   // Lazy init: avoids re-evaluating createReusableAudioContext on every render.
   const pianoAudioRef = useRef<ReusableAudioContext | null>(null);
   const selectedChordRef = useRef(tools.tunerSelectedChord);
@@ -184,10 +189,15 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
     return pianoAudioRef.current;
   };
 
+  if (!tunerActivationGateRef.current) {
+    tunerActivationGateRef.current = createActivationGate();
+  }
+
   selectedChordRef.current = tools.tunerSelectedChord;
   voiceTypeRef.current = tools.tunerVoiceType;
 
   const cleanupTunerInstance = () => {
+    tunerActivationGateRef.current?.release();
     if (tunerAnimationFrameIdRef.current) {
       cancelAnimationFrame(tunerAnimationFrameIdRef.current);
       tunerAnimationFrameIdRef.current = null;
@@ -204,6 +214,8 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
     tools.setTunerMatchScore('idle');
     lastDetectedPitchRef.current = { note: null, frequency: null, detectedAt: 0 };
     lastPushedTunerRef.current = { freq: null, note: null, deviation: Number.NaN, score: '' };
+    lastAnalysisAtRef.current = 0;
+    setTunerStarting(false);
   };
 
   useEffect(() => {
@@ -256,6 +268,15 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
     hammerOsc.stop(now + 0.05);
   }
 
+  async function runAudioAction(action: () => Promise<void>) {
+    setAudioError(false);
+    try {
+      await action();
+    } catch {
+      setAudioError(true);
+    }
+  }
+
   async function playChordRef(root: string, type: 'mayor' | 'menor', voiceType: 'grave' | 'aguda') {
     const audioCtx = await getPianoAudio().get();
     const now = audioCtx.currentTime;
@@ -296,13 +317,21 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
       cleanupTunerInstance();
       return;
     }
+    const activationGate = tunerActivationGateRef.current;
+    if (!activationGate?.tryAcquire()) return;
+    setTunerStarting(true);
 
     try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!activationGate.isActive()) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      micStreamRef.current = stream;
       const AudioContextClass = getBrowserAudioContextClass();
       const audioCtx = new AudioContextClass();
       tunerAudioContextRef.current = audioCtx;
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      micStreamRef.current = stream;
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 2048;
@@ -314,6 +343,12 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
       const dataArray = new Float32Array(analyser.fftSize);
       const updatePitch = () => {
         if (!tunerAudioContextRef.current || audioCtx.state === 'closed') return;
+        const analysisNow = performance.now();
+        if (analysisNow - lastAnalysisAtRef.current < 50) {
+          tunerAnimationFrameIdRef.current = requestAnimationFrame(updatePitch);
+          return;
+        }
+        lastAnalysisAtRef.current = analysisNow;
         analyser.getFloatTimeDomainData(dataArray);
         const freq = autoCorrelateFrequency(dataArray, audioCtx.sampleRate);
 
@@ -381,11 +416,13 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
     } catch {
       tools.setTunerMicError(true);
       cleanupTunerInstance();
+    } finally {
+      activationGate.release();
+      setTunerStarting(false);
     }
   }
 
   function simulateTunerVoiceNote(note: string) {
-    tools.setTunerActive(true);
     const voiceFreq = getChordRootFreq(note, voiceTypeRef.current);
     tools.setTunerDetectedFreq(Math.round(voiceFreq * 10) / 10);
     tools.setTunerDetectedNote(note);
@@ -475,7 +512,7 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
                   type="button"
                   onClick={() => {
                     tools.setTunerSelectedChord(note);
-                    void playPianoSingleNote(note);
+                    void runAudioAction(() => playPianoSingleNote(note));
                   }}
                   className={`flex flex-1 flex-col items-center justify-end rounded-b-xl border-r border-slate-200 pb-3 text-xs font-black transition active:scale-[0.99] ${
                     tools.tunerSelectedChord === note ? 'border-b-[7px] border-b-[#D4AF37] bg-amber-50 text-[#0B2545]' : 'bg-white text-slate-600'
@@ -498,7 +535,7 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
                   type="button"
                   onClick={() => {
                     tools.setTunerSelectedChord(blackKey.note);
-                    void playPianoSingleNote(blackKey.note);
+                    void runAudioAction(() => playPianoSingleNote(blackKey.note));
                   }}
                   style={{ left: blackKey.left }}
                   className={`absolute z-10 flex h-[58%] w-[10%] flex-col items-center justify-end rounded-b-xl border border-slate-950 pb-2 text-[10px] font-black shadow-md transition active:scale-[0.98] ${
@@ -510,13 +547,14 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
               ))}
             </div>
             <div className="mt-3 grid gap-2 min-[430px]:grid-cols-2">
-              <button type="button" id="btn-keyboard-play-unison" onClick={() => void playPianoSingleNote(tools.tunerSelectedChord)} className="min-h-12 rounded-2xl border border-slate-200 bg-white px-3 text-xs font-black text-[#0B2545] active:scale-[0.99]">
+              <button type="button" id="btn-keyboard-play-unison" onClick={() => void runAudioAction(() => playPianoSingleNote(tools.tunerSelectedChord))} className="min-h-12 rounded-2xl border border-slate-200 bg-white px-3 text-xs font-black text-[#0B2545] active:scale-[0.99]">
                 Escuchar nota ({noteSpanish[tools.tunerSelectedChord]})
               </button>
-              <button type="button" id="btn-keyboard-play-chord" onClick={() => void playChordRef(tools.tunerSelectedChord, tools.tunerChordType, tools.tunerVoiceType)} className="min-h-12 rounded-2xl bg-[#0B2545] px-3 text-xs font-black text-white active:scale-[0.99]">
+              <button type="button" id="btn-keyboard-play-chord" onClick={() => void runAudioAction(() => playChordRef(tools.tunerSelectedChord, tools.tunerChordType, tools.tunerVoiceType))} className="min-h-12 rounded-2xl bg-[#0B2545] px-3 text-xs font-black text-white active:scale-[0.99]">
                 Escuchar acorde {tools.tunerSelectedChord}{tools.tunerChordType === 'menor' ? 'm' : ''}
               </button>
             </div>
+            {audioError && <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">No fue posible iniciar el audio. Revisa el volumen del dispositivo e inténtalo de nuevo.</p>}
           </PremiumCard>
 
           {/* Vocal meter — order-2 on mobile (immediately after piano), order-2 on xl (right column, sticky).
@@ -593,12 +631,13 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
                 type="button"
                 id="btn-toggle-tuner-active-action"
                 onClick={() => void startLiveTuner()}
+                disabled={tunerStarting}
                 className={`mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-wider transition active:scale-[0.99] ${
                   tools.tunerActive ? 'bg-red-600 text-white' : 'bg-[#D4AF37] text-slate-950'
                 }`}
               >
                 <Mic2 className="h-4 w-4" />
-                {tools.tunerActive ? 'Detener afinador' : 'Activar afinador'}
+                {tunerStarting ? 'Solicitando permiso...' : tools.tunerActive ? 'Detener afinador' : 'Activar afinador'}
               </button>
             </div>
           </PremiumCard>

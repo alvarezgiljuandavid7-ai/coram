@@ -107,7 +107,7 @@ export function AuthPanel({ auth, compact = false, initialMode = 'signin' }: Aut
     );
   }
 
-  if (auth.user) {
+  if (auth.user && !auth.recoveryMode) {
     return (
       <div className={`rounded-[1.5rem] border border-[#0B2545]/8 bg-white p-4 shadow-[0_14px_34px_rgba(24,45,71,0.07)] ${compact ? '' : 'mx-auto max-w-md'}`}>
         <div className="flex min-w-0 items-center gap-3">

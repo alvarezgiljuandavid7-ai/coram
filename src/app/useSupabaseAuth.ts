@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../shared/supabase/client';
 import {
   getCurrentCoramSession,
@@ -39,34 +39,42 @@ export function useSupabaseAuth(): CoramAuthState {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CoramAuthProfile | null>(null);
   const [role, setRole] = useState('guest');
+  const refreshGenerationRef = useRef(0);
 
   const refresh = useCallback(async () => {
+    const generation = ++refreshGenerationRef.current;
     setLoading(true);
     try {
       const session = await getCurrentCoramSession();
+      if (generation !== refreshGenerationRef.current) return;
       setUser(session.user);
       setProfile(session.profile);
       setRole(session.role);
     } catch (error) {
+      if (generation !== refreshGenerationRef.current) return;
       console.error('Unable to refresh Supabase auth session', error);
       setUser(null);
       setProfile(null);
       setRole('guest');
     } finally {
-      setLoading(false);
+      if (generation === refreshGenerationRef.current) setLoading(false);
     }
   }, []);
 
   const handleSignOut = useCallback(async () => {
-    try {
-      await signOutFromSupabase();
-    } finally {
-      setRecoveryMode(false);
-      setUser(null);
-      setProfile(null);
-      setRole('guest');
-      setLoading(false);
-    }
+    ++refreshGenerationRef.current;
+    await signOutFromSupabase();
+    ++refreshGenerationRef.current;
+    setRecoveryMode(false);
+    setUser(null);
+    setProfile(null);
+    setRole('guest');
+    setLoading(false);
+  }, []);
+
+  const handleUpdateCurrentPassword = useCallback(async (password: string) => {
+    await updateCurrentPassword(password);
+    setRecoveryMode(false);
   }, []);
 
   useEffect(() => {
@@ -96,7 +104,7 @@ export function useSupabaseAuth(): CoramAuthState {
     signInWithEmail,
     signUpWithEmail,
     sendPasswordReset,
-    updateCurrentPassword,
+    updateCurrentPassword: handleUpdateCurrentPassword,
     signOut: handleSignOut,
   };
 }

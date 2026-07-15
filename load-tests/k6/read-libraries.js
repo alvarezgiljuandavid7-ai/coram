@@ -40,8 +40,6 @@ export const options = {
         { duration: '120s', target: 100 },
         { duration: '90s', target: 250 },
         { duration: '180s', target: 250 },
-        { duration: '120s', target: 500 },
-        { duration: '300s', target: 500 },
         { duration: '60s', target: 0 },
       ],
       gracefulRampDown: '30s',

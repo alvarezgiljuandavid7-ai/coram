@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -45,6 +46,11 @@ import { defaultMonetizationSettings } from './initialCoramState';
 import { clearCoramQueryCache, coramQueryKeys } from './queryClient';
 import { useCoramAppState } from './useCoramAppState';
 import { useSupabaseAuth, type CoramAuthState } from './useSupabaseAuth';
+import {
+  createAnonymousProfile,
+  mapAuthenticatedProfile,
+  preserveAccountState,
+} from '../domain/auth/authSessionState';
 
 type CoramState = ReturnType<typeof useCoramAppState>;
 
@@ -104,18 +110,20 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
   const [monetizationSettings, setMonetizationSettings] = useState<MonetizationToolSetting[]>(
     defaultMonetizationSettings,
   );
+  const activeProfileIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!auth.profile) return;
 
-    state.setProfile((current) => ({
-      ...current,
-      name: auth.profile?.fullName || auth.profile?.email || current.name,
-      email: auth.profile?.email || current.email,
-      avatarUrl: auth.profile?.avatarUrl || current.avatarUrl,
-      authProvider: auth.profile?.authProvider === 'google' ? 'Google' : 'Email',
-      isPremium: auth.profile?.role === 'premium' || auth.profile?.isPremium || current.isPremium,
-    }));
+    const nextProfile = auth.profile;
+    const previousProfileId = activeProfileIdRef.current;
+    activeProfileIdRef.current = auth.profile.id;
+    state.setProfile((current) =>
+      mapAuthenticatedProfile(
+        nextProfile,
+        preserveAccountState(previousProfileId, nextProfile.id, current),
+      ),
+    );
   }, [auth.profile]);
 
   useEffect(() => {
@@ -283,11 +291,15 @@ export function CoramAppProvider({ children }: CoramAppProviderProps) {
   }, []);
 
   const signOut = useCallback(async () => {
-    try {
-      await auth.signOut();
-    } finally {
-      clearCoramQueryCache(queryClient);
-    }
+    await auth.signOut();
+    clearCoramQueryCache(queryClient);
+    activeProfileIdRef.current = null;
+    state.setProfile(createAnonymousProfile());
+    setFavorites([]);
+    setRecentActivity([]);
+    setInternalNotifications([]);
+    setCollections([]);
+    setReadingPreferences(null);
   }, [auth, queryClient]);
 
   const authWithClearedCache = useMemo<CoramAuthState>(
