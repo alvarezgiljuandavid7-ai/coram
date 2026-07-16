@@ -1,0 +1,13 @@
+.screen > div {
+  row-gap: 1.25rem;
+  padding-top: 1.25rem;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .screen > div {
+    row-gap: 2.25rem;
+    padding-top: 1.75rem;
+    padding-bottom: 2.5rem;
+  }
+}

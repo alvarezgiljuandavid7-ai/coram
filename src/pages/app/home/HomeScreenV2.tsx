@@ -13,7 +13,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Key } from 'react';
+import { useEffect, useState, type Key } from 'react';
 import { useCoramApp } from '../../../app/CoramAppContext';
 import {
   EditorialCard,
@@ -22,6 +22,8 @@ import {
   SectionHeading,
   StatePanel,
 } from '../../../components/experience-v2/ExperienceV2';
+import { getGreetingForHour, getInspirationForDate, millisecondsUntilNextHomeContentChange } from './homeTemporalContent';
+import styles from './HomeScreenV2.module.css';
 
 const quickAccess = [
   { label: 'Corarios', detail: 'Letras y tonos', to: '/app/corarios', icon: Music2, tone: 'green' as const },
@@ -43,11 +45,20 @@ export function HomeScreenV2() {
   const displayName = profile.name?.trim() || profile.email?.split('@')[0] || 'ministro';
   const firstName = displayName.split(/\s+/)[0] || 'ministro';
   const heroContent = homeBanners[0] ?? campaigns[0];
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setNow(new Date()), millisecondsUntilNextHomeContentChange(now) + 1000);
+    return () => window.clearTimeout(timer);
+  }, [now]);
+
+  const greeting = getGreetingForHour(now.getHours());
+  const inspiration = getInspirationForDate(now);
 
   return (
-    <ExperienceCanvas className="home-screen-v2">
+    <ExperienceCanvas className={`${styles.screen} home-screen-v2`}>
       <section className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.04fr)_minmax(330px,0.96fr)] xl:gap-6">
-        <HomeGreetingHero firstName={firstName} />
+        <HomeGreetingHero firstName={firstName} greeting={greeting} />
         <HomeCampaignCard content={heroContent} />
       </section>
 
@@ -113,13 +124,13 @@ export function HomeScreenV2() {
         </div>
       </section>
 
-      <HomeInspirationCard />
+      <HomeInspirationCard text={inspiration.text} reference={inspiration.reference} />
     </ExperienceCanvas>
   );
 }
 
-function HomeGreetingHero({ firstName }: { firstName: string }) {
-  return <div className="min-w-0 rounded-[1.8rem] border border-white/90 bg-[linear-gradient(135deg,#fffdf8_0%,#f8f1df_55%,#edf3e8_100%)] p-6 shadow-[0_16px_38px_rgba(24,45,71,0.08)] sm:p-8 md:p-10"><p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#a56b09]">CorAM · musica, alabanza y formacion</p><h1 className="mt-4 max-w-3xl break-words font-serif text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.9] text-[#0B2545]">Buenos dias, <span className="text-[#4a8a55]">{firstName}</span>.</h1><p className="mt-5 max-w-xl text-[clamp(1rem,2.2vw,1.2rem)] leading-7 text-[#46546a]">Todo lo que necesitas para preparar, servir y crecer con tu ministerio.</p><div className="mt-7 flex flex-col gap-3 min-[430px]:flex-row"><Link to="/app/herramientas" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#4a8a55]/20 transition hover:bg-[#3d7146] active:scale-[0.98]">Explorar herramientas <ArrowRight className="h-4 w-4" /></Link><Link to="/app/academia" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B2545]/12 bg-white/75 px-5 text-sm font-bold text-[#17305a] transition hover:bg-white active:scale-[0.98]">Ver academia</Link></div></div>;
+function HomeGreetingHero({ firstName, greeting }: { firstName: string; greeting: string }) {
+  return <div className="min-w-0 rounded-[1.8rem] border border-white/90 bg-[linear-gradient(135deg,#fffdf8_0%,#f8f1df_55%,#edf3e8_100%)] p-5 shadow-[0_16px_38px_rgba(24,45,71,0.08)] sm:p-8 md:p-10"><p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#a56b09]">CorAM · musica, alabanza y formacion</p><h1 className="mt-3 max-w-3xl break-words font-serif text-[clamp(2.25rem,9vw,5.6rem)] leading-[0.92] text-[#0B2545]">{greeting}, <span className="text-[#4a8a55]">{firstName}</span>.</h1><p className="mt-4 max-w-xl text-[clamp(0.98rem,2.2vw,1.2rem)] leading-6 text-[#46546a]">Todo lo que necesitas para preparar, servir y crecer con tu ministerio.</p><div className="mt-6 flex flex-col gap-3 min-[430px]:flex-row"><Link to="/app/herramientas" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#4a8a55] px-5 text-sm font-bold text-white shadow-lg shadow-[#4a8a55]/20 transition hover:bg-[#3d7146] active:scale-[0.98]">Explorar herramientas <ArrowRight className="h-4 w-4" /></Link><Link to="/app/academia" className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B2545]/12 bg-white/75 px-5 text-sm font-bold text-[#17305a] transition hover:bg-white active:scale-[0.98]">Ver academia</Link></div></div>;
 }
 
 function HomeCampaignCard({ content }: { content: { title: string; body?: string; subtitle?: string; ctaUrl?: string; ctaLabel?: string; imageUrl?: string } | undefined }) {
@@ -128,7 +139,7 @@ function HomeCampaignCard({ content }: { content: { title: string; body?: string
 
 function HomeToolCard(props: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) { return <HomeLinkCard {...props} />; }
 function HomeAcademyCard(props: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) { return <HomeLinkCard {...props} />; }
-function HomeInspirationCard() { return <EditorialCard className="overflow-hidden bg-[linear-gradient(135deg,#eef4ea,#fffaf0)] p-6 sm:p-8"><p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a56b09]">Inspiracion</p><p className="mt-3 max-w-3xl font-serif text-[clamp(1.8rem,4vw,3rem)] leading-tight text-[#17305a]">"Servid a Jehova con alegria; venid ante su presencia con regocijo."</p><p className="mt-3 text-sm font-bold text-[#4a8a55]">Salmo 100:2</p></EditorialCard>; }
+function HomeInspirationCard({ text, reference }: { text: string; reference: string }) { return <EditorialCard className="overflow-hidden bg-[linear-gradient(135deg,#eef4ea,#fffaf0)] p-5 sm:p-8"><p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#a56b09]">Inspiracion</p><p className="mt-3 max-w-3xl font-serif text-[clamp(1.45rem,4vw,3rem)] leading-[1.16] text-[#17305a]">&quot;{text}&quot;</p><p className="mt-3 text-sm font-bold text-[#4a8a55]">{reference}</p></EditorialCard>; }
 
 function HomeLinkCard({ title, detail, to, icon: Icon }: { key?: Key; title: string; detail: string; to: string; icon: LucideIcon }) {
   return (

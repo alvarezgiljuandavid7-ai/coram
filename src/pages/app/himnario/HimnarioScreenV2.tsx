@@ -86,13 +86,13 @@ export function HimnarioScreenV2({
 
   return (
     <div className={`${styles.screen} min-h-screen text-[#0B2545]`}>
-      <main className="mx-auto max-w-7xl space-y-7 px-5 pb-8 pt-7 sm:px-7 md:space-y-9 md:px-10 md:pb-10 lg:px-12">
-        <section className={`${styles.heading} relative min-h-48 py-4 md:min-h-52 md:py-7`}>
+      <main className="mx-auto max-w-7xl space-y-5 px-5 pb-8 pt-5 sm:px-7 md:space-y-9 md:px-10 md:pb-10 lg:px-12">
+        <section className={`${styles.heading} relative min-h-0 py-2 md:min-h-52 md:py-7`}>
           <div className="relative z-10 max-w-xl">
             <p className="text-[11px] font-black uppercase tracking-[0.32em] text-[#B5811F]">Biblioteca congregacional</p>
-            <h1 className="mt-2 font-serif text-[clamp(3.15rem,10vw,5.8rem)] leading-[0.9] tracking-tight">Himnario</h1>
-            <span className="mt-5 block h-1 w-10 rounded-full bg-[#F6BB18]" />
-            <p className="mt-4 max-w-md text-[clamp(1rem,3vw,1.18rem)] leading-7 text-[#31425b]">
+            <h1 className="mt-2 font-serif text-[clamp(2.45rem,9vw,5.8rem)] leading-[0.92] tracking-tight">Himnario</h1>
+            <span className="mt-4 block h-1 w-10 rounded-full bg-[#F6BB18]" />
+            <p className="mt-3 max-w-md text-[clamp(0.96rem,3vw,1.18rem)] leading-6 text-[#31425b]">
               Himnos, letras y memoria para cantar juntos con propósito.
             </p>
           </div>
@@ -136,7 +136,7 @@ export function HimnarioScreenV2({
           </div>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-3">
+        <section className="grid grid-cols-3 gap-2 sm:gap-3">
           <MetricCard label="Himnos" detail="Disponibles" value={viewModel.metrics.available} icon={BookMarked} tone="green" />
           <MetricCard label="Favoritos" detail="Guardados" value={viewModel.metrics.favorites} icon={Heart} tone="gold" />
           <MetricCard label="Resultados" detail="Búsqueda actual" value={viewModel.metrics.results} icon={Search} tone="lilac" />
@@ -146,8 +146,8 @@ export function HimnarioScreenV2({
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-serif text-[clamp(1.8rem,5vw,2.55rem)] leading-none">Himnos disponibles</h2>
+            <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+              <div><h2 className="font-serif text-[clamp(1.85rem,8vw,2.55rem)] leading-none">Himnos disponibles</h2>{filters.query && <p className="mt-2 text-sm font-semibold text-[#3d7146]" aria-live="polite">{viewModel.metrics.results} resultado{viewModel.metrics.results === 1 ? '' : 's'} para &quot;{filters.query}&quot;</p>}</div>
               <span className="inline-flex items-center gap-2 rounded-full border border-[#0B2545]/10 bg-white px-4 py-2 text-sm font-semibold text-[#31425b]">Por número <ChevronDown className="h-4 w-4" /></span>
             </div>
             {loading ? (
@@ -183,12 +183,12 @@ function FilterChip({ active, label, onClick }: { key?: Key; active: boolean; la
 
 function MetricCard({ label, detail, value, icon: Icon, tone }: { label: string; detail: string; value: number; icon: typeof BookMarked; tone: 'green' | 'gold' | 'lilac' }) {
   const tones = { green: 'from-[#edf3e8] to-[#f8faf3] text-[#4a8a55]', gold: 'from-[#fff2d7] to-[#fffaf0] text-[#bb7c12]', lilac: 'from-[#f2ecf9] to-[#fbf8ff] text-[#9063aa]' };
-  return <div className={`flex min-w-0 items-center gap-3 rounded-[1.35rem] border border-white bg-gradient-to-br p-4 shadow-[0_10px_22px_rgba(34,49,64,0.06)] ${tones[tone]}`}><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/80 shadow-sm"><Icon className={`h-5 w-5 ${label === 'Favoritos' ? 'fill-current' : ''}`} /></div><div className="min-w-0"><p className="text-2xl font-black leading-none text-[#0B2545]">{value}</p><p className="mt-1 text-sm font-bold text-[#0B2545]">{label}</p><p className="text-xs text-[#4e5a6d]">{detail}</p></div></div>;
+  return <div className={`flex min-w-0 flex-col items-start gap-2 rounded-[1.2rem] border border-white bg-gradient-to-br p-3 shadow-[0_10px_22px_rgba(34,49,64,0.06)] sm:flex-row sm:items-center sm:gap-3 sm:rounded-[1.35rem] sm:p-4 ${tones[tone]}`}><div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/80 shadow-sm sm:h-11 sm:w-11"><Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${label === 'Favoritos' ? 'fill-current' : ''}`} /></div><div className="min-w-0"><p className="text-xl font-black leading-none text-[#0B2545] sm:text-2xl">{value}</p><p className="mt-1 text-[11px] font-bold leading-tight text-[#0B2545] sm:text-sm">{label}</p><p className="hidden text-xs text-[#4e5a6d] sm:block">{detail}</p></div></div>;
 }
 
 function HymnRow({ hymn, active, favorite, onOpen, onFavorite }: { key?: Key; hymn: Hymn; active: boolean; favorite: boolean; onOpen: () => void; onFavorite: () => void }) {
-  return <article className={`${styles.hymnRow} ${active ? styles.rowActive : 'bg-white'} flex min-w-0 items-center gap-3 border-b border-[#0B2545]/7 p-3 last:border-b-0 sm:gap-4 sm:p-4`}>
-    <button type="button" onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-3 text-left sm:gap-4"><span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(145deg,#17305a,#335b69)] text-xl font-black text-[#f1c967] shadow-md">{hymn.number || '–'}</span><span className="min-w-0"><span className="inline-flex rounded-full bg-[#e2efdf] px-2 py-1 text-[9px] font-black uppercase tracking-[0.13em] text-[#49704d]">Himno {hymn.number || 'sin número'}</span><span className="mt-1 block truncate font-serif text-[clamp(1.12rem,4vw,1.5rem)] leading-tight">{hymn.title}</span><span className="mt-1 block truncate text-sm text-[#596576]">♫ {getHymnLyrics(hymn).replace(/\s+/g, ' ')}</span></span></button>
+  return <article className={`${styles.hymnRow} ${active ? styles.rowActive : 'bg-white'} flex min-w-0 items-center gap-2 border-b border-[#0B2545]/7 p-3 last:border-b-0 sm:gap-4 sm:p-4`}>
+    <button type="button" onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-2 text-left sm:gap-4"><span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(145deg,#17305a,#335b69)] text-lg font-black text-[#f1c967] shadow-md sm:h-16 sm:w-16 sm:text-xl">{hymn.number || '–'}</span><span className="min-w-0"><span className="inline-flex rounded-full bg-[#e2efdf] px-2 py-1 text-[9px] font-black uppercase tracking-[0.13em] text-[#49704d]">Himno {hymn.number || 'sin número'}</span><span className="mt-1 block line-clamp-2 break-words font-sans text-[0.98rem] font-bold leading-[1.15] text-[#0B2545] sm:font-serif sm:text-[clamp(1.12rem,4vw,1.5rem)]">{hymn.title}</span><span className="mt-1 block truncate text-xs text-[#596576] sm:text-sm">♫ {getHymnLyrics(hymn).replace(/\s+/g, ' ')}</span></span></button>
     <span className="hidden h-9 min-w-9 place-items-center rounded-full bg-[#fff0cf] px-2 text-sm font-black text-[#a56b09] sm:grid">{hymn.key || 'C'}</span>
     <button type="button" onClick={onFavorite} className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white transition active:scale-95 ${favorite ? 'border-[#4a8a55] text-[#4a8a55]' : 'border-[#0B2545]/8'}`} aria-label={favorite ? `Quitar ${hymn.title} de favoritos` : `Guardar ${hymn.title} en favoritos`}><Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} /></button>
     <button type="button" onClick={onOpen} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white shadow-md shadow-[#0B2545]/10 transition active:scale-95" aria-label={`Abrir ${hymn.title}`}><ArrowRight className="h-5 w-5" /></button>
