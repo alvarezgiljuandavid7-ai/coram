@@ -116,7 +116,13 @@ export function HimnarioScreenV2({
           </div>
         </section>
 
-        <section className="space-y-4">
+        {!filters.query && <section className="grid grid-cols-3 overflow-hidden rounded-[1.2rem] border border-white bg-white shadow-[0_10px_22px_rgba(34,49,64,0.06)] sm:rounded-[1.35rem]">
+          <MetricCard label="Himnos" detail="Disponibles" value={viewModel.metrics.available} icon={BookMarked} tone="green" />
+          <MetricCard label="Favoritos" detail="Guardados" value={viewModel.metrics.favorites} icon={Heart} tone="gold" />
+          <MetricCard label="Resultados" detail="Búsqueda actual" value={viewModel.metrics.results} icon={Search} tone="lilac" />
+        </section>}
+
+        <section className="space-y-3">
           <div className="flex min-h-14 items-center gap-3 rounded-[1.35rem] border border-[#0B2545]/10 bg-white px-5 shadow-[0_7px_22px_rgba(24,45,71,0.07)] focus-within:border-[#4a8a55] focus-within:ring-4 focus-within:ring-[#4a8a55]/10">
             <Search className="h-6 w-6 shrink-0" />
             <label className="sr-only" htmlFor="himnario-search">Buscar himnos</label>
@@ -136,18 +142,12 @@ export function HimnarioScreenV2({
           </div>
         </section>
 
-        <section className="grid grid-cols-3 gap-2 sm:gap-3">
-          <MetricCard label="Himnos" detail="Disponibles" value={viewModel.metrics.available} icon={BookMarked} tone="green" />
-          <MetricCard label="Favoritos" detail="Guardados" value={viewModel.metrics.favorites} icon={Heart} tone="gold" />
-          <MetricCard label="Resultados" detail="Búsqueda actual" value={viewModel.metrics.results} icon={Search} tone="lilac" />
-        </section>
-
         {error && <div className="rounded-[1.35rem] border border-rose-200 bg-rose-50 p-5 text-sm font-semibold text-rose-900">{error}</div>}
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-              <div><h2 className="font-serif text-[clamp(1.85rem,8vw,2.55rem)] leading-none">Himnos disponibles</h2>{filters.query && <p className="mt-2 text-sm font-semibold text-[#3d7146]" aria-live="polite">{viewModel.metrics.results} resultado{viewModel.metrics.results === 1 ? '' : 's'} para &quot;{filters.query}&quot;</p>}</div>
+              <div><h2 className="font-serif text-[clamp(1.85rem,8vw,2.55rem)] leading-none">{filters.query ? 'Resultados' : 'Himnos disponibles'}</h2>{filters.query && <p className="mt-2 text-sm font-semibold text-[#3d7146]" aria-live="polite">{viewModel.metrics.results} resultado{viewModel.metrics.results === 1 ? '' : 's'} para &quot;{filters.query}&quot;</p>}</div>
               <span className="inline-flex items-center gap-2 rounded-full border border-[#0B2545]/10 bg-white px-4 py-2 text-sm font-semibold text-[#31425b]">Por número <ChevronDown className="h-4 w-4" /></span>
             </div>
             {loading ? (
@@ -182,8 +182,8 @@ function FilterChip({ active, label, onClick }: { key?: Key; active: boolean; la
 }
 
 function MetricCard({ label, detail, value, icon: Icon, tone }: { label: string; detail: string; value: number; icon: typeof BookMarked; tone: 'green' | 'gold' | 'lilac' }) {
-  const tones = { green: 'from-[#edf3e8] to-[#f8faf3] text-[#4a8a55]', gold: 'from-[#fff2d7] to-[#fffaf0] text-[#bb7c12]', lilac: 'from-[#f2ecf9] to-[#fbf8ff] text-[#9063aa]' };
-  return <div className={`flex min-w-0 flex-col items-start gap-2 rounded-[1.2rem] border border-white bg-gradient-to-br p-3 shadow-[0_10px_22px_rgba(34,49,64,0.06)] sm:flex-row sm:items-center sm:gap-3 sm:rounded-[1.35rem] sm:p-4 ${tones[tone]}`}><div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/80 shadow-sm sm:h-11 sm:w-11"><Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${label === 'Favoritos' ? 'fill-current' : ''}`} /></div><div className="min-w-0"><p className="text-xl font-black leading-none text-[#0B2545] sm:text-2xl">{value}</p><p className="mt-1 text-[11px] font-bold leading-tight text-[#0B2545] sm:text-sm">{label}</p><p className="hidden text-xs text-[#4e5a6d] sm:block">{detail}</p></div></div>;
+  const tones = { green: 'bg-[#f0f6ed] text-[#4a8a55]', gold: 'bg-[#fff6e6] text-[#bb7c12]', lilac: 'bg-[#f6f0fb] text-[#9063aa]' };
+  return <div className={`flex min-w-0 flex-col items-center justify-center gap-1 border-r border-white/90 p-2 text-center last:border-r-0 sm:flex-row sm:justify-start sm:gap-2 sm:p-3 ${tones[tone]}`}><div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/85 shadow-sm sm:h-9 sm:w-9"><Icon className={`h-4 w-4 ${label === 'Favoritos' ? 'fill-current' : ''}`} /></div><div className="min-w-0"><p className="text-lg font-black leading-none text-[#0B2545] sm:text-xl">{value}</p><p className="mt-1 text-[10px] font-bold leading-tight text-[#0B2545] sm:text-xs">{label}</p><p className="hidden text-xs text-[#4e5a6d] lg:block">{detail}</p></div></div>;
 }
 
 function HymnRow({ hymn, active, favorite, onOpen, onFavorite }: { key?: Key; hymn: Hymn; active: boolean; favorite: boolean; onOpen: () => void; onFavorite: () => void }) {

@@ -455,19 +455,19 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
           The piano and meter come FIRST so the user sees both without scrolling.
           On xl+ we keep the original 2-column grid (piano+simulator on the left, meter sticky on the right).
           The section uses flex (not space-y) so Tailwind order-* utilities actually take effect. */}
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
-        <section className="flex flex-col gap-4">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_420px] xl:gap-4">
+        <section className="flex flex-col gap-3 xl:gap-4">
           {/* Setup cards — order-3 on mobile (after piano+meter), order-1 on xl (top of left column) */}
-          <div className="order-3 grid gap-3 min-[430px]:grid-cols-2 xl:order-1">
-            <PremiumCard className="p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B5811F]">1. Registro vocal</p>
-              <div className="mt-3 grid grid-cols-2 rounded-2xl border border-slate-200 bg-slate-100 p-1">
+          <div className="order-3 grid grid-cols-2 gap-2 xl:order-1">
+            <PremiumCard className="p-3 sm:p-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.16em] text-[#B5811F] sm:text-[10px] sm:tracking-[0.22em]">1. Registro vocal</p>
+              <div className="mt-2 grid grid-cols-2 rounded-xl border border-slate-200 bg-slate-100 p-1 sm:mt-3 sm:rounded-2xl">
                 {(['grave', 'aguda'] as const).map((voice) => (
                   <button
                     key={voice}
                     type="button"
                     onClick={() => tools.setTunerVoiceType(voice)}
-                    className={`min-h-11 rounded-xl text-xs font-black transition active:scale-[0.98] ${
+                    className={`min-h-10 rounded-lg text-xs font-black transition active:scale-[0.98] sm:min-h-11 sm:rounded-xl ${
                       tools.tunerVoiceType === voice ? 'bg-white text-[#0B2545] shadow-sm' : 'text-slate-500'
                     }`}
                   >
@@ -477,15 +477,15 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
               </div>
             </PremiumCard>
 
-            <PremiumCard className="p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B5811F]">2. Armonia acorde</p>
-              <div className="mt-3 grid grid-cols-2 rounded-2xl border border-slate-200 bg-slate-100 p-1">
+            <PremiumCard className="p-3 sm:p-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.16em] text-[#B5811F] sm:text-[10px] sm:tracking-[0.22em]">2. Armonia acorde</p>
+              <div className="mt-2 grid grid-cols-2 rounded-xl border border-slate-200 bg-slate-100 p-1 sm:mt-3 sm:rounded-2xl">
                 {(['mayor', 'menor'] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => tools.setTunerChordType(type)}
-                    className={`min-h-11 rounded-xl text-xs font-black transition active:scale-[0.98] ${
+                    className={`min-h-10 rounded-lg text-xs font-black transition active:scale-[0.98] sm:min-h-11 sm:rounded-xl ${
                       tools.tunerChordType === type ? 'bg-white text-[#0B2545] shadow-sm' : 'text-slate-500'
                     }`}
                   >
@@ -504,7 +504,7 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
                 {noteSpanish[tools.tunerSelectedChord]} ({tools.tunerSelectedChord})
               </span>
             </div>
-            <div className="relative mt-3 flex h-28 select-none overflow-hidden rounded-2xl border border-slate-950 bg-slate-950 p-1 shadow-inner sm:h-32">
+            <div className="relative mt-3 flex h-24 select-none overflow-hidden rounded-2xl border border-slate-950 bg-slate-950 p-1 shadow-inner sm:h-32">
               {['C', 'D', 'E', 'F', 'G', 'A', 'B'].map((note) => (
                 <button
                   key={note}
@@ -547,10 +547,10 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
               ))}
             </div>
             <div className="mt-3 grid gap-2 min-[430px]:grid-cols-2">
-              <button type="button" id="btn-keyboard-play-unison" onClick={() => void runAudioAction(() => playPianoSingleNote(tools.tunerSelectedChord))} className="min-h-12 rounded-2xl border border-slate-200 bg-white px-3 text-xs font-black text-[#0B2545] active:scale-[0.99]">
+              <button type="button" id="btn-keyboard-play-unison" onClick={() => void runAudioAction(() => playPianoSingleNote(tools.tunerSelectedChord))} className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-black text-[#0B2545] active:scale-[0.99] sm:min-h-12 sm:rounded-2xl">
                 Escuchar nota ({noteSpanish[tools.tunerSelectedChord]})
               </button>
-              <button type="button" id="btn-keyboard-play-chord" onClick={() => void runAudioAction(() => playChordRef(tools.tunerSelectedChord, tools.tunerChordType, tools.tunerVoiceType))} className="min-h-12 rounded-2xl bg-[#0B2545] px-3 text-xs font-black text-white active:scale-[0.99]">
+              <button type="button" id="btn-keyboard-play-chord" onClick={() => void runAudioAction(() => playChordRef(tools.tunerSelectedChord, tools.tunerChordType, tools.tunerVoiceType))} className="min-h-11 rounded-xl bg-[#0B2545] px-3 text-xs font-black text-white active:scale-[0.99] sm:min-h-12 sm:rounded-2xl">
                 Escuchar acorde {tools.tunerSelectedChord}{tools.tunerChordType === 'menor' ? 'm' : ''}
               </button>
             </div>
@@ -559,32 +559,32 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
 
           {/* Vocal meter — order-2 on mobile (immediately after piano), order-2 on xl (right column, sticky).
               This is the key fix: the meter is now visible right below the piano without long scroll. */}
-          <PremiumCard dark className="order-2 p-4 sm:p-5 xl:sticky xl:top-24 xl:h-fit">
+          <PremiumCard dark className="order-2 p-3 sm:p-5 xl:sticky xl:top-24 xl:h-fit">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.18),transparent_34%)]" />
             <div className="relative">
               <div className="flex items-center justify-between border-b border-white/10 pb-2 sm:pb-3">
                 <div className="flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${tools.tunerActive ? 'bg-emerald-400 shadow-[0_0_12px_#10B981]' : 'bg-slate-700'}`} />
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-300">Calibrador vocal directo</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-300 sm:text-[10px] sm:tracking-[0.2em]">Calibrador vocal directo</p>
                 </div>
                 <span className="rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/10 px-2 py-1 text-[10px] font-black text-[#D4AF37]">
                   Objetivo: {noteSpanish[tools.tunerSelectedChord]}
                 </span>
               </div>
 
-              <div className="py-4 text-center sm:py-6">
+              <div className="py-3 text-center sm:py-6">
                 {tools.tunerActive && tools.tunerDetectedNote ? (
                   <>
                     <p className="text-xs font-black uppercase tracking-wider text-slate-400">Cantando</p>
-                    <p className={`mt-2 text-5xl font-black ${tools.tunerMatchScore === 'perfect' ? 'text-emerald-400' : tools.tunerMatchScore === 'near' ? 'text-sky-400' : 'text-red-500'}`}>
+                    <p className={`mt-2 text-4xl font-black sm:text-5xl ${tools.tunerMatchScore === 'perfect' ? 'text-emerald-400' : tools.tunerMatchScore === 'near' ? 'text-sky-400' : 'text-red-500'}`}>
                       {noteSpanish[tools.tunerDetectedNote] || tools.tunerDetectedNote}
                     </p>
                     <p className="mt-2 font-mono text-xs font-bold text-slate-400">{tools.tunerDetectedFreq} Hz</p>
                   </>
                 ) : (
                   <>
-                    <Mic2 className={`mx-auto h-10 w-10 ${tools.tunerActive ? 'text-sky-400' : 'text-slate-600'}`} />
-                    <p className="mt-3 text-sm font-black text-slate-300">{tools.tunerActive ? 'Emite un sonido constante' : 'Afinador apagado'}</p>
+                    <Mic2 className={`mx-auto h-8 w-8 sm:h-10 sm:w-10 ${tools.tunerActive ? 'text-sky-400' : 'text-slate-600'}`} />
+                    <p className="mt-2 text-sm font-black text-slate-300">{tools.tunerActive ? 'Emite un sonido constante' : 'Afinador apagado'}</p>
                   </>
                 )}
               </div>
@@ -618,7 +618,7 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
               )}
 
               {!tools.tunerActive && (
-                <p className="rounded-2xl border border-sky-300/20 bg-sky-400/10 p-3 text-xs font-bold leading-6 text-sky-100">
+                <p className="rounded-xl border border-sky-300/20 bg-sky-400/10 p-2.5 text-xs font-bold leading-5 text-sky-100 sm:rounded-2xl sm:p-3 sm:leading-6">
                   Antes de activar el afinador, tu navegador pedira permiso para usar el microfono.
                 </p>
               )}
@@ -632,7 +632,7 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
                 id="btn-toggle-tuner-active-action"
                 onClick={() => void startLiveTuner()}
                 disabled={tunerStarting}
-                className={`mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-wider transition active:scale-[0.99] ${
+                className={`mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-xs font-black uppercase tracking-wider transition active:scale-[0.99] sm:mt-4 sm:min-h-12 sm:rounded-2xl ${
                   tools.tunerActive ? 'bg-red-600 text-white' : 'bg-[#D4AF37] text-slate-950'
                 }`}
               >
@@ -644,22 +644,22 @@ export function VocalTunerPremium({ mode = 'tuner' }: { mode?: 'tuner' | 'piano'
 
           {/* Voice simulator — order-4 on mobile (after the setup), order-4 on xl.
               Kept accessible but moved below the meter so it doesn't force scroll between piano and meter. */}
-          <PremiumCard className="order-4 p-4 xl:order-4">
-            <div className="flex items-center gap-3">
-              <SlidersHorizontal className="h-5 w-5 text-[#B5811F]" />
+          <PremiumCard className="order-4 p-3 sm:p-4 xl:order-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <SlidersHorizontal className="h-4 w-4 text-[#B5811F] sm:h-5 sm:w-5" />
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B5811F]">Entrenador vocal instructivo</p>
-                <h2 className="text-lg font-black text-[#0B2545]">Simula una nota de voz</h2>
+                <h2 className="text-base font-black text-[#0B2545] sm:text-lg">Simula una nota de voz</h2>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-4 gap-2">
+            <div className="mt-3 grid grid-cols-4 gap-1.5 sm:mt-4 sm:gap-2">
               {noteNames.map((note) => (
                 <button
                   key={note}
                   id={`btn-simulate-vocal-key-${note}`}
                   type="button"
                   onClick={() => simulateTunerVoiceNote(note)}
-                  className={`min-h-12 rounded-2xl border px-1 text-xs font-black transition active:scale-[0.98] ${
+                  className={`min-h-10 rounded-xl border px-1 text-xs font-black transition active:scale-[0.98] sm:min-h-12 sm:rounded-2xl ${
                     tools.tunerDetectedNote === note
                       ? tools.tunerMatchScore === 'perfect'
                         ? 'border-emerald-500 bg-emerald-500 text-white'

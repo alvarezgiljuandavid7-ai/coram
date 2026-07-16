@@ -82,6 +82,7 @@ describe('experience separation', () => {
     expect(tunerPage).toContain('getUserMedia');
     expect(tunerPage).toContain('AudioContext');
     expect(tunerPage).toContain('autoCorrelateFrequency');
+    expect(tunerPage).toContain('order-3 grid grid-cols-2 gap-2 xl:order-1');
     expect(afinadorPage).not.toContain('VocalToolsShell');
     expect(pianoPage).not.toContain('VocalToolsShell');
     expect(phoneSimulator).toContain('initialScreen = getInitialPhoneScreen()');
