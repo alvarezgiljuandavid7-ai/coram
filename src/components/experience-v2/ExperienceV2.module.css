@@ -34,6 +34,23 @@
   transform: translateY(0) scale(0.99);
 }
 
+/* Avoid expensive compositing while Android browsers repaint a long scrolling page. */
+@media (max-width: 767px) {
+  .canvas {
+    background: #fbf8ef;
+  }
+
+  .editorialCard {
+    box-shadow: 0 7px 16px rgba(18, 42, 68, 0.07);
+  }
+
+  .interactive,
+  .interactive:hover,
+  .interactive:active {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .interactive {
     transition: none;

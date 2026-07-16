@@ -12,6 +12,9 @@ describe('mobile tools layout', () => {
     expect(warmup).not.toContain('h-44 w-44');
     expect(warmup).toContain('createReusableAudioContext');
     expect(warmup).toContain('prepareFromUserGesture');
+    expect(warmup.indexOf('Respiración guiada')).toBeLessThan(warmup.indexOf('Ajusta tu registro'));
+    expect(warmup.indexOf('Escala con')).toBeLessThan(warmup.indexOf('Ajusta tu registro'));
+    expect(warmup.indexOf('Ajusta tu registro')).toBeLessThan(warmup.indexOf('grid-cols-9'));
   });
 
   it('does not duplicate the piano entry in the user tools catalogue', () => {

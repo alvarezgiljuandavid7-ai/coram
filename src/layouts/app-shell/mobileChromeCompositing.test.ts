@@ -14,4 +14,14 @@ describe('mobile Chrome compositing', () => {
     expect(bottomNavigation).not.toContain('backdrop-blur-xl');
     expect(bottomNavigation).toContain('bg-[#fffdf8]');
   });
+
+  it('uses a lower-cost paint treatment for mobile app canvases', () => {
+    const experienceStyles = source('src/components/experience-v2/ExperienceV2.module.css');
+    const hymnStyles = source('src/pages/app/himnario/HimnarioScreenV2.module.css');
+
+    expect(experienceStyles).toContain('@media (max-width: 767px)');
+    expect(experienceStyles).toContain('background: #fbf8ef');
+    expect(hymnStyles).toContain('@media (max-width: 767px)');
+    expect(hymnStyles).toContain('background: #fbf8ef');
+  });
 });
