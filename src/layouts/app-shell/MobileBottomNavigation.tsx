@@ -10,7 +10,7 @@ export function MobileBottomNavigation() {
   const rightItems = primaryItems.slice(2);
 
   return (
-    <nav data-shell-mobile-navigation className={`${styles.mobileBottomNavigation} fixed inset-x-2 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-40 rounded-[1.7rem] border border-white/70 bg-[#fffdf8]/95 px-1.5 py-2 backdrop-blur-xl md:hidden`} aria-label="Navegacion rapida de CorAM">
+    <nav data-shell-mobile-navigation className={`${styles.mobileBottomNavigation} fixed inset-x-2 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-40 rounded-[1.7rem] border border-white/70 bg-[#fffdf8] px-1.5 py-2 md:hidden`} aria-label="Navegacion rapida de CorAM">
       <div className="grid grid-cols-6 gap-0.5">
         {leftItems.map((item) => <BottomNavigationItem key={item.id} item={item} pathname={location.pathname} />)}
         <Link to={centralCoramAction.to} className="mx-[-0.25rem] -mt-6 flex h-20 min-w-0 flex-col items-center justify-center gap-1 rounded-full bg-[#4A8A55] px-1 text-[9px] font-black text-white shadow-xl shadow-[#4A8A55]/30 active:scale-95" aria-label={centralCoramAction.label}>

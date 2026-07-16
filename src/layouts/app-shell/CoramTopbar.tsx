@@ -12,7 +12,7 @@ interface CoramTopbarProps {
 
 export function CoramTopbar({ pageTitle, email, avatarUrl, notificationCount, onOpenNavigation }: CoramTopbarProps) {
   return (
-    <header data-shell-topbar className="sticky top-0 z-30 border-b border-[#0B2545]/8 bg-[#fffdf8]/92 backdrop-blur-xl">
+    <header data-shell-topbar className="sticky top-0 z-30 border-b border-[#0B2545]/8 bg-[#fffdf8] lg:bg-[#fffdf8]/92 lg:backdrop-blur-xl">
       <div className="mx-auto flex min-h-[4.5rem] max-w-[100rem] items-center justify-between gap-3 px-3 py-2 min-[390px]:px-4 md:px-6 lg:px-8 xl:px-10">
         <div className="flex min-w-0 items-center gap-3">
           <button
