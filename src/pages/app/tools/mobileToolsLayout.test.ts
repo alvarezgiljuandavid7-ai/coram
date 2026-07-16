@@ -11,6 +11,7 @@ describe('mobile tools layout', () => {
     expect(warmup).toContain('grid-cols-9');
     expect(warmup).not.toContain('h-44 w-44');
     expect(warmup).toContain('createReusableAudioContext');
+    expect(warmup).toContain('prepareFromUserGesture');
   });
 
   it('does not duplicate the piano entry in the user tools catalogue', () => {

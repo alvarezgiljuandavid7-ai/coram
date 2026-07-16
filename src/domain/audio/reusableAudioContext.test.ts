@@ -25,4 +25,18 @@ describe('createReusableAudioContext', () => {
     expect(instanceCount).toBe(1);
     expect(close).toHaveBeenCalledTimes(1);
   });
+
+  it('requests an immediate resume from a user gesture when iOS starts suspended', () => {
+    const resume = vi.fn().mockResolvedValue(undefined);
+    class SuspendedAudioContext {
+      state = 'suspended' as AudioContextState;
+      close = vi.fn().mockResolvedValue(undefined);
+      resume = resume;
+    }
+    const audio = createReusableAudioContext(SuspendedAudioContext as unknown as typeof AudioContext);
+
+    audio.prepareFromUserGesture();
+
+    expect(resume).toHaveBeenCalledTimes(1);
+  });
 });
