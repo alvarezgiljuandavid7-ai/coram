@@ -11,3 +11,8 @@ ios/
 .env*
 !.env.example
 !.env.production
+.tmp/
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
