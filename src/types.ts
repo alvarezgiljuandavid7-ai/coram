@@ -1,3 +1,7 @@
+import type { ContentStatus as SharedContentStatus } from '@coram/domain';
+
+export type ContentStatus = SharedContentStatus;
+
 export interface Corario {
   id: string;
   title: string;
@@ -128,8 +132,6 @@ export interface Advertisement {
   viewsCount: number;
   clicksCount: number;
 }
-
-export type ContentStatus = 'draft' | 'published' | 'archived';
 
 export interface Campaign {
   id: string;

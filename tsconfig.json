@@ -25,6 +25,7 @@
   },
   "include": [
     "src",
+    "packages",
     "capacitor.config.ts",
     "vite.config.ts"
   ],
