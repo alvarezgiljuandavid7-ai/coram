@@ -7,20 +7,33 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
 };
 
 describe('CorAM native workspace', () => {
-  it('registers the Expo app and shared packages without replacing web commands', () => {
+  it('registers Expo without replacing web or Capacitor commands', () => {
     expect(packageJson.workspaces).toEqual(['mobile', 'packages/*']);
     expect(packageJson.scripts?.dev).toBe('vite --port=3000 --host=0.0.0.0');
     expect(packageJson.scripts?.build).toBe('vite build');
-    expect(packageJson.scripts?.['mobile:start']).toBe(
+    expect(packageJson.scripts?.['mobile:sync']).toBe('npm run build && cap sync');
+    expect(packageJson.scripts?.['mobile:android']).toBe(
+      'npm run mobile:sync && cap open android',
+    );
+    expect(packageJson.scripts?.['mobile:ios']).toBe(
+      'npm run mobile:sync && cap open ios',
+    );
+    expect(packageJson.scripts?.['expo:start']).toBe(
       'npm run start --workspace=@coram/mobile',
     );
-    expect(packageJson.scripts?.['mobile:typecheck']).toBe(
+    expect(packageJson.scripts?.['expo:android']).toBe(
+      'npm run android --workspace=@coram/mobile',
+    );
+    expect(packageJson.scripts?.['expo:ios']).toBe(
+      'npm run ios --workspace=@coram/mobile',
+    );
+    expect(packageJson.scripts?.['expo:typecheck']).toBe(
       'npm run typecheck --workspace=@coram/mobile',
     );
-    expect(packageJson.scripts?.['mobile:config']).toBe(
+    expect(packageJson.scripts?.['expo:config']).toBe(
       'npm run config:check --workspace=@coram/mobile',
     );
-    expect(packageJson.scripts?.['mobile:export:android']).toBe(
+    expect(packageJson.scripts?.['expo:export:android']).toBe(
       'npm run export:android --workspace=@coram/mobile',
     );
   });
