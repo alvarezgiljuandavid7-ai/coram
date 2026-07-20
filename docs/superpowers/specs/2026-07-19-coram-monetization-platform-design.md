@@ -254,4 +254,3 @@ The foundation is complete only when:
 - Monetization is a later, sandbox-first delivery.
 - The foundation release does not require Apple Developer, Google Play Console, RevenueCat, or AdMob credentials.
 - No production deployment or branch merge occurs without a separate explicit request.
-
