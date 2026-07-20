@@ -1,4 +1,5 @@
 node_modules/
+.worktrees/
 build/
 dist/
 coverage/
@@ -9,4 +10,9 @@ ios/
 *.log
 .env*
 !.env.example
-!.env.production
+!/.env.production
+.tmp/
+mobile/.expo/
+mobile/dist/
+mobile/android/
+mobile/ios/
