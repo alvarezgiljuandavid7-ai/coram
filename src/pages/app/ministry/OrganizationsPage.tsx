@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { Building2, Copy, MailPlus, ShieldCheck, UsersRound } from 'lucide-react';
 import { CORAM_PLANS } from '@coram/shared-domain';
+import { Link } from 'react-router-dom';
 import { useCoramApp } from '../../../app/CoramAppContext';
 import { EditorialCard, EditorialHeading, ExperienceCanvas, MetricTile, StatePanel } from '../../../components/experience-v2/ExperienceV2';
 import {
@@ -83,6 +84,7 @@ export function OrganizationsPage() {
       </EditorialCard>
     ) : <>
       <section className={styles.metrics}><MetricTile label="Plan" value={selected?.planId.replace('_', ' ') ?? 'Free'} detail="Activo" icon={ShieldCheck} /><MetricTile label="Equipo" value={members.length} detail={limit === null ? 'Sin límite' : `de ${limit}`} icon={UsersRound} tone="gold" /><MetricTile label="Organizaciones" value={organizations.length} detail="Máximo 1" icon={Building2} tone="lilac" /></section>
+      <Link to="/app/ministerio/servicios" className="inline-flex min-h-12 w-fit items-center rounded-full bg-[#2563eb] px-6 font-bold text-white">Planificar servicios</Link>
       <div className={styles.grid}>
         <EditorialCard className={styles.formCard}><h2>Invita a tu equipo</h2><form onSubmit={invite} className={styles.stack}><label>Correo<input name="email" type="email" required autoComplete="email" /></label><label>Rol<select name="role"><option value="member">Miembro</option><option value="leader">Líder</option><option value="admin">Administrador</option></select></label><label>Instrumento<input name="instrument" placeholder="Piano, voz, guitarra..." /></label><label>Registro vocal<input name="vocalPart" placeholder="Soprano, alto, tenor, bajo" /></label><button type="submit"><MailPlus size={18} /> Crear invitación</button></form>{inviteLink && <div className={styles.invite}><span>{inviteLink}</span><button type="button" aria-label="Copiar invitación" onClick={() => void navigator.clipboard.writeText(inviteLink)}><Copy size={17} /></button></div>}</EditorialCard>
         <EditorialCard className={styles.formCard}><h2>Integrantes</h2><div className={styles.memberList}>{members.map((member) => <article key={member.id}><span className={styles.avatar}>{member.role.slice(0,1).toUpperCase()}</span><div><strong>{member.role}</strong><small>{[member.instrument, member.vocalPart].filter(Boolean).join(' · ') || 'Sin asignación musical'}</small></div></article>)}</div></EditorialCard>

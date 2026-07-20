@@ -1,0 +1,17 @@
+.formCard { padding: clamp(1rem, 3vw, 1.5rem); }
+.serviceForm { align-items: end; display: grid; gap: .75rem; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
+.serviceForm label, .stack label { color: #0b2545; display: grid; font-size: .75rem; font-weight: 800; gap: .35rem; }
+.serviceForm input, .serviceForm select, .stack input { background: #fbfaf6; border: 1px solid rgb(11 37 69 / 12%); border-radius: .8rem; min-height: 2.85rem; padding: 0 .75rem; }
+.serviceForm button, .stack button { align-items: center; background: #2563eb; border-radius: 999px; color: white; display: inline-flex; font-weight: 800; gap: .45rem; justify-content: center; min-height: 2.85rem; padding: 0 1rem; }
+.error { background: #fff1f2; border-radius: 1rem; color: #be123c; padding: 1rem; }
+.serviceGrid { display: grid; gap: .8rem; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.serviceCard { align-items: center; background: white; border: 1px solid rgb(11 37 69 / 8%); border-radius: 1.25rem; display: flex; gap: .85rem; padding: 1rem; box-shadow: 0 10px 25px rgb(24 45 71 / 6%); }
+.serviceCard > span { background: #edf3e8; border-radius: .9rem; color: #4a8a55; display: grid; flex: 0 0 3rem; height: 3rem; place-items: center; }
+.serviceCard div { flex: 1; min-width: 0; } .serviceCard strong { display: block; } .serviceCard p { align-items: center; color: #667085; display: flex; font-size: .78rem; gap: .3rem; margin-top: .2rem; }
+.serviceCard small { background: #fff0d1; border-radius: 999px; padding: .35rem .55rem; text-transform: capitalize; }
+.back { color: #3d7146; font-size: .85rem; font-weight: 800; }
+.detailGrid { display: grid; gap: 1rem; grid-template-columns: .8fr 1.2fr; }
+.formCard h2 { font-family: Georgia, serif; font-size: 1.75rem; } .stack { display: grid; gap: .7rem; margin-top: 1rem; }
+.assignmentList { display: grid; gap: .55rem; margin-top: 1rem; }.assignmentList article { align-items: center; background: #fbfaf6; border-radius: 1rem; display: flex; gap: .7rem; padding: .8rem; }.assignmentList article > div:first-child { flex: 1; }.assignmentList small { color: #667085; display: block; }.assignmentList span { border-radius: 999px; font-size: .7rem; font-weight: 900; padding: .35rem .55rem; text-transform: uppercase; }.assignmentList span[data-status='confirmed'] { background: #e5f0df; color: #3d7146; }.assignmentList span[data-status='pending'] { background: #fff0d1; color: #9a6813; }.assignmentList span[data-status='declined'] { background: #fff1f2; color: #be123c; }
+.actions { display: flex; gap: .25rem; }.actions button { background: white; border-radius: 50%; display: grid; height: 2.25rem; place-items: center; width: 2.25rem; }.actions svg { height: 1rem; width: 1rem; }
+@media(max-width:900px){.serviceForm{grid-template-columns:1fr 1fr}.serviceForm button{grid-column:1/-1}.detailGrid{grid-template-columns:1fr}}@media(max-width:560px){.serviceForm,.serviceGrid{grid-template-columns:1fr}}

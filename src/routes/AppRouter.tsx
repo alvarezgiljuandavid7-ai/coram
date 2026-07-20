@@ -26,6 +26,8 @@ const FavoritosPage = lazy(() => import('../pages/app/FavoritosPage').then((m) =
 const ProfilePage = lazy(() => import('../pages/app/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const OrganizationsPage = lazy(() => import('../pages/app/ministry/OrganizationsPage').then((m) => ({ default: m.OrganizationsPage })));
 const OrganizationInvitationPage = lazy(() => import('../pages/app/ministry/OrganizationInvitationPage').then((m) => ({ default: m.OrganizationInvitationPage })));
+const ServicesPage = lazy(() => import('../pages/app/ministry/ServicesPage').then((m) => ({ default: m.ServicesPage })));
+const ServiceDetailPage = lazy(() => import('../pages/app/ministry/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })));
 const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
 const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
 const PianoPage = lazy(() => import('../pages/app/tools/PianoPage').then((m) => ({ default: m.PianoPage })));
@@ -95,6 +97,8 @@ export function AppRouter() {
               <Route path="perfil" element={<ProfilePage />} />
               <Route path="ministerio" element={<OrganizationsPage />} />
               <Route path="ministerio/invitacion" element={<OrganizationInvitationPage />} />
+              <Route path="ministerio/servicios" element={<ServicesPage />} />
+              <Route path="ministerio/servicios/:serviceId" element={<ServiceDetailPage />} />
             </Route>
           </Route>
 

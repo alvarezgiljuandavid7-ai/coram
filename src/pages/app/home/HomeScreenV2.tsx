@@ -24,6 +24,7 @@ import {
 } from '../../../components/experience-v2/ExperienceV2';
 import { getGreetingForHour, getInspirationForDate, millisecondsUntilNextHomeContentChange } from './homeTemporalContent';
 import styles from './HomeScreenV2.module.css';
+import { NextServiceSummary } from '../../../components/home/NextServiceSummary';
 
 const quickAccess = [
   { label: 'Corarios', detail: 'Letras y tonos', to: '/app/corarios', icon: Music2, tone: 'green' as const },
@@ -61,6 +62,8 @@ export function HomeScreenV2() {
         <HomeGreetingHero firstName={firstName} greeting={greeting} />
         <HomeCampaignCard content={heroContent} />
       </section>
+
+      <NextServiceSummary />
 
       <section>
         <SectionHeading eyebrow="Continua donde ibas" title="Tu ministerio reciente" action={<Link to="/app/favoritos" className="text-sm font-bold text-[#3d7146]">Ver guardados</Link>} />
