@@ -7,7 +7,7 @@ export const foundationStyles = StyleSheet.create({
     backgroundColor: coramTheme.colors.canvas,
   },
   screen: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: coramTheme.spacing.lg,
     paddingVertical: coramTheme.spacing.xl,
@@ -29,7 +29,10 @@ export const foundationStyles = StyleSheet.create({
     borderRadius: coramTheme.radii.md,
   },
   eyebrow: {
-    color: coramTheme.colors.gold,
+    color: coramTheme.colors.ink,
+    borderLeftWidth: 3,
+    borderLeftColor: coramTheme.colors.gold,
+    paddingLeft: coramTheme.spacing.sm,
     fontSize: 12,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -52,7 +55,7 @@ export const foundationStyles = StyleSheet.create({
     backgroundColor: coramTheme.colors.botanicalSoft,
   },
   statusText: {
-    color: coramTheme.colors.botanical,
+    color: coramTheme.colors.ink,
     fontSize: 15,
     fontWeight: '700',
   },

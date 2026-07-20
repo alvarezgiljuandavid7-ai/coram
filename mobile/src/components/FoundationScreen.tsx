@@ -1,4 +1,4 @@
-import { Image, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { foundationStyles as styles } from './FoundationScreen.styles';
 
@@ -17,7 +17,7 @@ export function FoundationScreen({
 }: FoundationScreenProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.screen}>
         <View style={styles.card}>
           <Image
             source={require('../../assets/icon.png')}
@@ -25,13 +25,15 @@ export function FoundationScreen({
             accessibilityLabel="Logo de CorAM"
           />
           <Text style={styles.eyebrow}>{eyebrow}</Text>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title} accessibilityRole="header">
+            {title}
+          </Text>
           <Text style={styles.body}>{description}</Text>
           <View style={styles.status} accessibilityRole="summary">
             <Text style={styles.statusText}>{status}</Text>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
