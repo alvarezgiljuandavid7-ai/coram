@@ -1,6 +1,7 @@
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMobileAuth } from '../../src/auth/AuthProvider';
+import { CoramBannerAd } from '../../src/ads/CoramBannerAd';
 
 export default function AppHomeRoute() {
   const { session, signOut } = useMobileAuth();
@@ -12,6 +13,7 @@ export default function AppHomeRoute() {
         <Text style={styles.title}>Tu sesión está protegida</Text>
         <Text style={styles.copy}>{session?.user.email ?? 'Cuenta CorAM activa'}</Text>
         <Text style={styles.note}>La fundación móvil comparte usuarios con Supabase sin reutilizar almacenamiento del navegador.</Text>
+        <CoramBannerAd placement="home" />
         <Pressable accessibilityRole="button" onPress={() => router.push('/plans')} style={styles.planButton}>
           <Text style={styles.planButtonText}>Ver mi plan</Text>
         </Pressable>
