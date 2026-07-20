@@ -8,7 +8,7 @@ import {
   canShowAds,
   resolveStrongestPlan,
 } from '@coram/shared-domain';
-import { assertAllowedAffiliateDestination } from '../../../api/affiliate/course/redirectPolicy';
+import { assertAllowedAffiliateDestination } from '../../server/affiliate/redirectPolicy';
 import { canRenderSponsor } from '../../features/sponsors/sponsorPolicy';
 import { normalizeRevenueCatEvent } from '../../../supabase/functions/revenuecat-webhook/eventPolicy';
 
