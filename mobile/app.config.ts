@@ -1,6 +1,18 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-export default ({ config }: ConfigContext): ExpoConfig => {
+type Sdk57ExpoConfig = ExpoConfig & {
+  android?: NonNullable<ExpoConfig['android']> & {
+    edgeToEdgeEnabled?: boolean;
+  };
+  newArchEnabled?: boolean;
+  splash?: {
+    image?: string;
+    resizeMode?: 'contain' | 'cover' | 'native';
+    backgroundColor?: string;
+  };
+};
+
+export default ({ config }: ConfigContext): Sdk57ExpoConfig => {
   const appVariant = process.env.CORAM_APP_VARIANT ?? 'development';
   const isProduction = appVariant === 'production';
 
