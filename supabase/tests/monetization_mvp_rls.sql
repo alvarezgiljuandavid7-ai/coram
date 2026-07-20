@@ -14,7 +14,7 @@ $$;
 
 insert into public.organizations (id, owner_user_id, name, slug, plan_id)
 values
-  ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Ministerio Uno', 'mvp-ministerio-uno', 'ministry_starter'),
+  ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Ministerio Uno', 'mvp-ministerio-uno', 'free'),
   ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000003', 'Ministerio Dos', 'mvp-ministerio-dos', 'ministry_starter');
 
 insert into public.organization_members (organization_id, user_id, role)
@@ -124,9 +124,82 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
 do $$
 begin
-  if exists (select 1 from public.billing_events) then
+  begin
+    perform 1 from public.billing_events limit 1;
     raise exception 'billing_events_visible_to_frontend';
-  end if;
+  exception
+    when insufficient_privilege then null;
+  end;
+end;
+$$;
+reset role;
+
+-- free organizations cap memberships at five total members
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password)
+select
+  ('10000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid,
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'limit-member-' || n || '@coram.test',
+  ''
+from generate_series(10, 14) as n
+on conflict (id) do nothing;
+
+insert into public.organization_members (organization_id, user_id, role)
+select
+  '20000000-0000-0000-0000-000000000001',
+  ('10000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid,
+  'member'
+from generate_series(10, 12) as n;
+
+do $$
+begin
+  begin
+    insert into public.organization_members (organization_id, user_id, role)
+    values (
+      '20000000-0000-0000-0000-000000000001',
+      '10000000-0000-0000-0000-000000000013',
+      'member'
+    );
+    raise exception 'free_member_limit_not_enforced';
+  exception
+    when sqlstate 'P0001' then
+      if sqlerrm <> 'organization_member_limit_reached' then raise; end if;
+  end;
+end;
+$$;
+
+-- free organizations cap active services at two
+insert into public.services (organization_id, title, starts_at, created_by)
+values
+  ('20000000-0000-0000-0000-000000000001', 'Servicio uno', now(), '10000000-0000-0000-0000-000000000001'),
+  ('20000000-0000-0000-0000-000000000001', 'Servicio dos', now(), '10000000-0000-0000-0000-000000000001');
+
+do $$
+begin
+  begin
+    insert into public.services (organization_id, title, starts_at, created_by)
+    values ('20000000-0000-0000-0000-000000000001', 'Servicio tres', now(), '10000000-0000-0000-0000-000000000001');
+    raise exception 'free_service_limit_not_enforced';
+  exception
+    when sqlstate 'P0001' then
+      if sqlerrm <> 'active_service_limit_reached' then raise; end if;
+  end;
+end;
+$$;
+
+-- authenticated users cannot inspect another user's entitlement
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
+do $$
+begin
+  begin
+    perform public.resolve_effective_entitlement('10000000-0000-0000-0000-000000000002');
+    raise exception 'cross_user_entitlement_read_should_be_denied';
+  exception
+    when insufficient_privilege then null;
+  end;
 end;
 $$;
 reset role;
