@@ -9,10 +9,14 @@ Shared, platform-neutral code lives in the workspace packages under `packages/`.
 - Node.js 24
 - npm 11
 - Android Studio for a local Android emulator, or Expo-supported device tooling
-- macOS and Xcode for a local iOS Simulator
+- Expo-compatible device tooling to test on a physical iPhone from macOS,
+  Windows, or Linux
+- macOS and Xcode for the iOS Simulator and local iOS builds
 
-Local iOS development is only available on macOS with Xcode installed. Android
-development can use an Android Studio emulator or a supported physical device.
+Windows and Linux can test the app on a physical iPhone with compatible Expo
+tooling. Running the iOS Simulator or creating iOS builds locally requires macOS
+with Xcode installed. Android development can use an Android Studio emulator or
+a supported physical device.
 
 ## Install
 
