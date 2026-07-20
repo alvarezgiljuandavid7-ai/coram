@@ -1,18 +1,6 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-type Sdk57ExpoConfig = ExpoConfig & {
-  android?: NonNullable<ExpoConfig['android']> & {
-    edgeToEdgeEnabled?: boolean;
-  };
-  newArchEnabled?: boolean;
-  splash?: {
-    image?: string;
-    resizeMode?: 'contain' | 'cover' | 'native';
-    backgroundColor?: string;
-  };
-};
-
-export default ({ config }: ConfigContext): Sdk57ExpoConfig => {
+export default ({ config }: ConfigContext): ExpoConfig => {
   const appVariant = process.env.CORAM_APP_VARIANT ?? 'development';
   const isProduction = appVariant === 'production';
 
@@ -25,12 +13,6 @@ export default ({ config }: ConfigContext): Sdk57ExpoConfig => {
     icon: './assets/icon.png',
     scheme: 'coram',
     userInterfaceStyle: 'light',
-    newArchEnabled: true,
-    splash: {
-      image: './assets/splash-icon.png',
-      resizeMode: 'contain',
-      backgroundColor: '#F8F3E7',
-    },
     ios: {
       supportsTablet: true,
     },
@@ -39,9 +21,18 @@ export default ({ config }: ConfigContext): Sdk57ExpoConfig => {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#F8F3E7',
       },
-      edgeToEdgeEnabled: true,
     },
-    plugins: ['expo-router'],
+    plugins: [
+      'expo-router',
+      [
+        'expo-splash-screen',
+        {
+          image: './assets/splash-icon.png',
+          resizeMode: 'contain',
+          backgroundColor: '#F8F3E7',
+        },
+      ],
+    ],
     experiments: {
       typedRoutes: true,
     },
