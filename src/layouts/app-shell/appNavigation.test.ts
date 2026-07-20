@@ -40,7 +40,7 @@ describe('AppShellV2 navigation', () => {
   });
 
   it('gives every V2 user experience the edge-to-edge canvas', () => {
-    for (const path of ['/app/corarios', '/app/himnario', '/app/herramientas', '/app/herramientas/afinador', '/app/academia', '/app/recursos', '/app/colecciones', '/app/favoritos', '/app/ministerio', '/app/perfil']) {
+    for (const path of ['/app/corarios', '/app/himnario', '/app/herramientas', '/app/herramientas/afinador', '/app/academia', '/app/recursos', '/app/colecciones', '/app/favoritos', '/app/repertorio', '/app/ministerio', '/app/perfil']) {
       expect(getPageContainerMode(path)).toBe('edge-to-edge');
     }
   });
@@ -56,6 +56,7 @@ describe('AppShellV2 navigation', () => {
       '/app/recursos',
       '/app/colecciones',
       '/app/favoritos',
+      '/app/repertorio',
       '/app/ministerio',
       '/app/perfil',
     ]);

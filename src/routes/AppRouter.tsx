@@ -28,6 +28,8 @@ const OrganizationsPage = lazy(() => import('../pages/app/ministry/Organizations
 const OrganizationInvitationPage = lazy(() => import('../pages/app/ministry/OrganizationInvitationPage').then((m) => ({ default: m.OrganizationInvitationPage })));
 const ServicesPage = lazy(() => import('../pages/app/ministry/ServicesPage').then((m) => ({ default: m.ServicesPage })));
 const ServiceDetailPage = lazy(() => import('../pages/app/ministry/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })));
+const RepertoirePage = lazy(() => import('../pages/app/repertoire/RepertoirePage').then((m) => ({ default: m.RepertoirePage })));
+const SongEditorPage = lazy(() => import('../pages/app/repertoire/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
 const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
 const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
 const PianoPage = lazy(() => import('../pages/app/tools/PianoPage').then((m) => ({ default: m.PianoPage })));
@@ -99,6 +101,9 @@ export function AppRouter() {
               <Route path="ministerio/invitacion" element={<OrganizationInvitationPage />} />
               <Route path="ministerio/servicios" element={<ServicesPage />} />
               <Route path="ministerio/servicios/:serviceId" element={<ServiceDetailPage />} />
+              <Route path="repertorio" element={<RepertoirePage />} />
+              <Route path="repertorio/nueva" element={<SongEditorPage />} />
+              <Route path="repertorio/:songId" element={<SongEditorPage />} />
             </Route>
           </Route>
 
