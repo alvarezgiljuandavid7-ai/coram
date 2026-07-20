@@ -103,4 +103,32 @@ begin
 end;
 $$;
 
+-- frontend entitlement writes are denied
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated","email":"user-a@coram.test"}', true);
+do $$
+begin
+  begin
+    insert into public.user_entitlements (user_id, plan_id, source, status)
+    values ('10000000-0000-0000-0000-000000000001', 'pro', 'admin', 'active');
+    raise exception 'frontend_entitlement_write_should_be_denied';
+  exception
+    when insufficient_privilege then null;
+  end;
+end;
+$$;
+reset role;
+
+-- billing event history is server-only
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
+do $$
+begin
+  if exists (select 1 from public.billing_events) then
+    raise exception 'billing_events_visible_to_frontend';
+  end if;
+end;
+$$;
+reset role;
+
 rollback;
