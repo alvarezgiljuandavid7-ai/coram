@@ -24,6 +24,8 @@ const ColeccionesPage = lazy(() => import('../pages/app/ColeccionesPage').then((
 const ReadingModePage = lazy(() => import('../pages/app/ReadingModePage').then((m) => ({ default: m.ReadingModePage })));
 const FavoritosPage = lazy(() => import('../pages/app/FavoritosPage').then((m) => ({ default: m.FavoritosPage })));
 const ProfilePage = lazy(() => import('../pages/app/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const OrganizationsPage = lazy(() => import('../pages/app/ministry/OrganizationsPage').then((m) => ({ default: m.OrganizationsPage })));
+const OrganizationInvitationPage = lazy(() => import('../pages/app/ministry/OrganizationInvitationPage').then((m) => ({ default: m.OrganizationInvitationPage })));
 const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
 const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
 const PianoPage = lazy(() => import('../pages/app/tools/PianoPage').then((m) => ({ default: m.PianoPage })));
@@ -39,6 +41,7 @@ const AdminVideosPage = lazy(() => import('../pages/admin/AdminVideosPage').then
 const AdminBannersPage = lazy(() => import('../pages/admin/AdminBannersPage').then((m) => ({ default: m.AdminBannersPage })));
 const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
+const AdminOrganizationsPage = lazy(() => import('../pages/admin/AdminOrganizationsPage').then((m) => ({ default: m.AdminOrganizationsPage })));
 const LegalPage = lazy(() => import('../pages/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
 
 function RouteFallback() {
@@ -90,6 +93,8 @@ export function AppRouter() {
               <Route path="herramientas/calentamiento" element={<CalentamientoPage />} />
               <Route path="herramientas/warmup" element={<Navigate to="/app/herramientas/calentamiento" replace />} />
               <Route path="perfil" element={<ProfilePage />} />
+              <Route path="ministerio" element={<OrganizationsPage />} />
+              <Route path="ministerio/invitacion" element={<OrganizationInvitationPage />} />
             </Route>
           </Route>
 
@@ -109,6 +114,7 @@ export function AppRouter() {
               <Route path="videos" element={<AdminVideosPage />} />
               <Route path="banners" element={<AdminBannersPage />} />
               <Route path="usuarios" element={<AdminUsersPage />} />
+              <Route path="organizaciones" element={<AdminOrganizationsPage />} />
               <Route path="configuracion" element={<AdminSettingsPage />} />
             </Route>
           </Route>

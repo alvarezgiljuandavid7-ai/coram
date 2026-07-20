@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   BookMarked,
+  Building2,
   FolderHeart,
   FolderOpen,
   GraduationCap,
@@ -122,6 +123,17 @@ export const appNavigationItems: AppNavigationItem[] = [
     to: '/app/favoritos',
     label: 'Favoritos',
     icon: Heart,
+    match: 'prefix',
+    desktop: true,
+    drawer: true,
+    bottom: false,
+    container: 'edge-to-edge',
+  },
+  {
+    id: 'ministerio',
+    to: '/app/ministerio',
+    label: 'Ministerio',
+    icon: Building2,
     match: 'prefix',
     desktop: true,
     drawer: true,
