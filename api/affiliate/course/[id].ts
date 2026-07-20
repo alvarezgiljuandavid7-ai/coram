@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
-import { assertAllowedAffiliateDestination } from '../../../src/server/affiliate/redirectPolicy';
+import { assertAllowedAffiliateDestination } from '../../../src/server/affiliate/redirectPolicy.js';
 
 type RequestLike={method?:string;query:Record<string,string|string[]|undefined>;headers:Record<string,string|string[]|undefined>};
 type ResponseLike={status:(code:number)=>ResponseLike;json:(body:unknown)=>void;setHeader:(name:string,value:string)=>void;end:()=>void};
