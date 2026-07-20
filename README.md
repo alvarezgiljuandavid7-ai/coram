@@ -47,10 +47,11 @@ existing `mobile:*` scripts are the Capacitor workflow for the Vite web app, not
 aliases for the Expo workspace.
 
 Only public `EXPO_PUBLIC_*` client configuration belongs in the mobile
-environment; never provide a Supabase service-role key. This native foundation
-does not include production Auth, SQL or production database changes, or
-production payments. See [`mobile/README.md`](mobile/README.md) for setup,
-environment details, current limits, and platform commands.
+environment; never provide a Supabase service-role key. The mobile MVP includes
+Supabase Auth guards, encrypted session persistence, RevenueCat purchase/restore
+infrastructure, and consent-gated AdMob test infrastructure. All payment and ad
+features remain disabled until their public flags and sandbox credentials are
+configured. See [`SETUP_REQUIRED.md`](SETUP_REQUIRED.md) before any native build.
 
 ## Deploy
 
@@ -88,10 +89,23 @@ VITE_CORAM_PUBLIC_URL
 
 ## Still Pending
 
-- Payments with Stripe.
-- Full persisted CRUD for courses, resources, sponsors, ads, and mentorships.
-- Stripe webhooks and premium entitlement sync.
+- Staging execution of the Monetization MVP migrations and RLS assertions.
+- RevenueCat sandbox/store product configuration and device validation.
+- AdMob UMP and test-ad validation in Expo development builds.
 - Final legal review for privacy, terms, cookies, refunds, and content rights.
+
+## Monetization MVP
+
+The current branch adds typed plans and limits, private personal repertoire,
+organization-scoped ministry repertoire, organizations, services and assignments,
+affiliate courses, sponsored placements, native Auth, RevenueCat billing, and
+AdMob test infrastructure. Persistent data is designed for Supabase and RLS;
+the migrations are versioned but are not applied automatically.
+
+The web app displays the active plan and limits but intentionally does not offer
+checkout. Native purchases use StoreKit or Google Play Billing through
+RevenueCat after sandbox configuration. No production purchase or ad request is
+enabled by default.
 
 ## Important Folders
 

@@ -49,6 +49,13 @@ Copy the variable names from `mobile/.env.example` into an ignored
 EXPO_PUBLIC_SUPABASE_URL
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 CORAM_APP_VARIANT
+EXPO_PUBLIC_CORAM_ENABLE_REVENUECAT
+EXPO_PUBLIC_REVENUECAT_IOS_API_KEY
+EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY
+EXPO_PUBLIC_CORAM_ENABLE_ADMOB
+EXPO_PUBLIC_CORAM_ADS_ENV
+EXPO_PUBLIC_ADMOB_IOS_BANNER_ID
+EXPO_PUBLIC_ADMOB_ANDROID_BANNER_ID
 ```
 
 Variables prefixed with `EXPO_PUBLIC_` are included in the client bundle. Never
@@ -71,7 +78,9 @@ npm run expo:export:android
 
 ## Current Limits
 
-This foundation provides native navigation, safe-area handling, CorAM styling,
-and shared workspace packages. It does not connect to production Supabase Auth,
-execute SQL or change production data, or enable production payments. Publishing,
-store submission, signing, and production credentials are outside this base.
+The mobile MVP provides protected navigation, Supabase Auth with encrypted
+session persistence, RevenueCat subscription infrastructure, and consent-gated
+Google Mobile Ads test infrastructure. It does not execute SQL, modify production
+data, perform real purchases, request real ads, sign binaries, or submit stores.
+RevenueCat and AdMob require an Expo development build; their native behavior is
+not fully available in Expo Go. See the repository `SETUP_REQUIRED.md`.

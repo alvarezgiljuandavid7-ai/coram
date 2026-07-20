@@ -16,3 +16,15 @@ mobile/.expo/
 mobile/dist/
 mobile/android/
 mobile/ios/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.pem
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+*.apk
+*.aab
+*.ipa
+.testsprite/
