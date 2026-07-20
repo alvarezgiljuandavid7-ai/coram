@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@coram/design-tokens": "*",
     "@coram/domain": "*",
     "expo": "~57.0.7",
     "expo-status-bar": "~57.0.1",
