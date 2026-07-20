@@ -204,4 +204,46 @@ end;
 $$;
 reset role;
 
+-- anonymous affiliate redirects can read published rows without admin helpers
+insert into public.affiliate_partners (id, name, slug, allowed_domains, disclosure, status)
+values (
+  '50000000-0000-0000-0000-000000000001',
+  'Partner publico',
+  'partner-publico',
+  array['partner.test'],
+  'CorAM puede recibir una comision.',
+  'published'
+);
+
+insert into public.affiliate_courses (id, partner_id, title, destination_url, status)
+values
+  (
+    '60000000-0000-0000-0000-000000000001',
+    '50000000-0000-0000-0000-000000000001',
+    'Curso publicado',
+    'https://partner.test/curso',
+    'published'
+  ),
+  (
+    '60000000-0000-0000-0000-000000000002',
+    '50000000-0000-0000-0000-000000000001',
+    'Curso borrador',
+    'https://partner.test/borrador',
+    'draft'
+  );
+
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+do $$
+begin
+  if (select count(*) from public.affiliate_courses where id in (
+    '60000000-0000-0000-0000-000000000001',
+    '60000000-0000-0000-0000-000000000002'
+  )) <> 1 then
+    raise exception 'anonymous_affiliate_visibility_is_incorrect';
+  end if;
+end;
+$$;
+reset role;
+
 rollback;
