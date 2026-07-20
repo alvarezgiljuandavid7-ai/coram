@@ -528,5 +528,12 @@ function normalizePayload(config: AdminCrudConfig, record: AdminRecord): AdminRe
   if (config.kind === 'hymns' && payload.slug === '') {
     payload.slug = String(payload.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
+  if (config.kind === 'affiliate_partners' && typeof payload.allowed_domains === 'string') {
+    payload.allowed_domains = payload.allowed_domains
+      .replace(/[{}]/g, '')
+      .split(',')
+      .map((domain) => domain.trim().toLowerCase())
+      .filter(Boolean);
+  }
   return payload;
 }

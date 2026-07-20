@@ -11,7 +11,9 @@ export type AdminContentKind =
   | 'campaigns'
   | 'advertisements'
   | 'featured_videos'
-  | 'home_banners';
+  | 'home_banners'
+  | 'affiliate_partners'
+  | 'affiliate_courses';
 
 export type AdminFieldKind = 'text' | 'textarea' | 'number' | 'boolean' | 'select' | 'datetime-local' | 'file';
 
@@ -422,6 +424,45 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'placement', label: 'Ubicacion', kind: 'text' },
       { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
       { name: 'sort_order', label: 'Orden', kind: 'number' },
+    ],
+  },
+  affiliate_partners: {
+    kind: 'affiliate_partners', title: 'Partners afiliados', eyebrow: 'Alianzas',
+    description: 'Configura aliados, dominios permitidos y disclosure obligatorio.',
+    table: 'affiliate_partners', orderBy: 'name',
+    select: 'id, name, slug, allowed_domains, disclosure, status, created_at',
+    displayTitle: (row) => String(row.name || 'Partner sin nombre'),
+    displayMeta: (row) => `${row.status || 'draft'} / ${Array.isArray(row.allowed_domains) ? row.allowed_domains.join(', ') : ''}`,
+    createDefaults: { name: '', slug: '', allowed_domains: [], disclosure: 'CorAM puede recibir una comisión si compras mediante este enlace.', status: 'draft' },
+    deactivate: () => ({ status: 'archived' }), searchableFields: ['name', 'slug'], filterField: 'status', filterOptions: statusOptions,
+    fields: [
+      { name: 'name', label: 'Nombre', kind: 'text', required: true },
+      { name: 'slug', label: 'Slug', kind: 'text', required: true },
+      { name: 'allowed_domains', label: 'Dominios (formato {dominio.com})', kind: 'text', required: true },
+      { name: 'disclosure', label: 'Disclosure de afiliado', kind: 'textarea', required: true },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+    ],
+  },
+  affiliate_courses: {
+    kind: 'affiliate_courses', title: 'Cursos afiliados', eyebrow: 'Alianzas',
+    description: 'Publica recomendaciones verificadas; el destino se valida en el servidor.',
+    table: 'affiliate_courses', orderBy: 'position',
+    select: 'id, partner_id, title, description, thumbnail_url, video_url, destination_url, coupon_code, featured, position, status, published_at',
+    displayTitle: (row) => String(row.title || 'Curso sin título'), displayMeta: (row) => `${row.status || 'draft'} / Orden ${row.position ?? 0}`,
+    createDefaults: { partner_id: '', title: '', description: '', thumbnail_url: '', video_url: '', destination_url: '', coupon_code: '', featured: false, position: 0, status: 'draft', published_at: '' },
+    deactivate: () => ({ status: 'archived' }), searchableFields: ['title', 'description'], filterField: 'status', filterOptions: statusOptions,
+    fields: [
+      { name: 'partner_id', label: 'ID del partner', kind: 'text', required: true },
+      { name: 'title', label: 'Título', kind: 'text', required: true },
+      { name: 'description', label: 'Descripción', kind: 'textarea' },
+      { name: 'thumbnail_url', label: 'URL miniatura', kind: 'text' },
+      { name: 'video_url', label: 'URL video', kind: 'text' },
+      { name: 'destination_url', label: 'URL destino HTTPS', kind: 'text', required: true },
+      { name: 'coupon_code', label: 'Cupón', kind: 'text' },
+      { name: 'featured', label: 'Destacado', kind: 'boolean' },
+      { name: 'position', label: 'Orden', kind: 'number' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+      { name: 'published_at', label: 'Publicado', kind: 'datetime-local' },
     ],
   },
   profiles: {
