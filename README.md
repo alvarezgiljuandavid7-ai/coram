@@ -23,6 +23,33 @@ npm run test
 npm run build
 ```
 
+## Native Application Foundation
+
+CorAM also contains a native Expo application in `mobile/`. It is a separate
+React Native client; the existing Vite application remains the web product and
+is not embedded in the native shell. Both clients can consume platform-neutral
+workspace packages from `packages/`.
+
+Native development requires Node.js 24 and npm 11. Install dependencies from the
+repository root with `npm install`, then use the Expo aliases:
+
+```bash
+npm run expo:start
+npm run expo:typecheck
+npm run expo:config
+npm run expo:export:android
+```
+
+Android emulation requires Android Studio or supported device tooling. Local iOS
+development requires macOS and Xcode. The existing `mobile:*` scripts are the
+Capacitor workflow for the Vite web app, not aliases for the Expo workspace.
+
+Only public `EXPO_PUBLIC_*` client configuration belongs in the mobile
+environment; never provide a Supabase service-role key. This native foundation
+does not include production Auth, SQL or production database changes, or
+production payments. See [`mobile/README.md`](mobile/README.md) for setup,
+environment details, current limits, and platform commands.
+
 ## Deploy
 
 CorAM is configured for Vercel:
