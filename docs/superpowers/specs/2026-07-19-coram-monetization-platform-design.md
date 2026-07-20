@@ -1,8 +1,8 @@
 # CorAM Monetization Platform Design
 
-**Date:** 2026-07-19  
-**Status:** Proposed for implementation  
-**Branch:** `feature/coram-monetization-platform`  
+**Date:** 2026-07-19
+**Status:** Proposed for implementation
+**Branch:** `feature/coram-monetization-platform`
 **Base:** `fix/mobile-tools-data-performance`
 
 ## 1. Objective
