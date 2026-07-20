@@ -5,17 +5,42 @@ services and production infrastructure are intentionally not activated by this
 branch. Native production remains **NO-GO** until every applicable unchecked
 item below is completed with sandbox and physical-device evidence.
 
-## Supabase staging first
+## LISTO
 
-- Review and apply migrations `202607200001` through `202607200008` to a
-  disposable or staging Supabase project before any production database.
-- Run `supabase/tests/monetization_mvp_rls.sql` against that disposable project.
-  The current workstation has no Supabase CLI or Docker, so SQL execution was
-  not performed here; deterministic migration and RLS structure tests do pass.
-- Verify with separate users that private personal songs remain private,
-  organization members see only their organization repertoire, and clients
-  cannot write `user_entitlements` or `billing_events`.
-- Deploy the `revenuecat-webhook` Edge Function only after staging validation.
+- Web Vite y navegación CorAM V2.
+- Supabase staging `zcizkqqhxecfrjuqwaej` en `us-east-2`.
+- Baseline y migraciones Monetization MVP aplicadas en staging.
+- RLS y aislamiento owner/member/external probados en staging.
+- Preview Vercel conectada solo a credenciales públicas de staging.
+- Expo native foundation, typecheck, Doctor y exports JS Android/iOS.
+- Infraestructura RevenueCat y webhook desplegado, desactivados sin secreto real.
+- Infraestructura AdMob/UMP con IDs de prueba, desactivada por feature flag.
+- Himnario público de staging con 272 himnos; Corarios permanece vacío.
+
+## PENDIENTE HUMANO
+
+- Apple Developer y App Store Connect.
+- Google Play Console.
+- Cuenta, offering, productos y entitlements reales de RevenueCat.
+- Apps y ad units reales de AdMob.
+- Inicio de sesión y projectId de EAS.
+- Application ID, bundle ID y firma Android/iOS.
+- Compras sandbox y restore en dispositivos físicos.
+- QA real en Android y iPhone.
+- Política de privacidad, términos y derechos de contenido.
+- Correo y URL de soporte.
+
+## Supabase staging
+
+- Migrations `202607200001` through `202607200009` and the affiliate public
+  read fix are applied only to staging.
+- `supabase/tests/monetization_mvp_rls.sql` passed in staging inside a
+  transaction with rollback.
+- Separate owner, member, and external QA users verified personal and
+  organization isolation. Clients cannot write `user_entitlements` or
+  `billing_events`.
+- The `revenuecat-webhook` Edge Function is deployed only in staging and stays
+  inert until its real sandbox secret is configured.
 - Configure its server-only secrets in Supabase Function secrets:
   `REVENUECAT_WEBHOOK_AUTHORIZATION` and `SUPABASE_SERVICE_ROLE_KEY`.
 - Never expose the service-role key through Vite, Expo, Vercel client variables,
@@ -105,7 +130,7 @@ are resolved by the server endpoint from stored course IDs and HTTPS allowlists.
 - [x] Expo typecheck and Expo Doctor 20/20 pass.
 - [x] Android and iOS JavaScript exports pass.
 - [x] Public keys and feature flags are separated from server secrets.
-- [ ] Migrations and SQL RLS tests executed in staging.
+- [x] Migrations and SQL RLS tests executed in staging.
 - [ ] EAS project, identifiers, signing, and development builds configured.
 - [ ] Android and iOS physical-device Auth QA complete.
 - [ ] RevenueCat sandbox lifecycle and webhook replay complete.
