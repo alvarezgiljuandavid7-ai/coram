@@ -40,9 +40,11 @@ npm run expo:config
 npm run expo:export:android
 ```
 
-Android emulation requires Android Studio or supported device tooling. Local iOS
-development requires macOS and Xcode. The existing `mobile:*` scripts are the
-Capacitor workflow for the Vite web app, not aliases for the Expo workspace.
+Android emulation requires Android Studio or supported device tooling. Windows
+and Linux can test on a physical iPhone with compatible Expo tooling; running
+the iOS Simulator or creating iOS builds locally requires macOS and Xcode. The
+existing `mobile:*` scripts are the Capacitor workflow for the Vite web app, not
+aliases for the Expo workspace.
 
 Only public `EXPO_PUBLIC_*` client configuration belongs in the mobile
 environment; never provide a Supabase service-role key. This native foundation
