@@ -4,6 +4,7 @@ import { useCoramApp } from '../../app/CoramAppContext';
 import { EditorialCard, EditorialHeading, EditorialHero, ExperienceCanvas, FilterChip, MetricTile, SearchField, SectionHeading, StatePanel } from '../../components/experience-v2/ExperienceV2';
 import type { Course } from '../../types';
 import { PartnerCourseHighlights } from '../../components/home/PartnerCourseHighlights';
+import { SponsoredPlacement } from '../../features/sponsors/SponsoredPlacement';
 
 type CourseFilter = 'todos' | 'inscritos' | 'favoritos';
 
@@ -41,6 +42,7 @@ export function AcademiaPage() {
     <EditorialHeading eyebrow="Formación ministerial" title="Academia" body="Cursos publicados para voces, músicos, directores y equipos que quieren crecer con estructura." icon={GraduationCap} />
     <EditorialHero badge="Aprendizaje continuo" title="Forma tu talento para servir mejor" body="Retoma tus cursos, revisa cada módulo y construye una práctica constante desde cualquier dispositivo." icon={Sparkles} imageUrl={courses[0]?.imageUrl || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1500&q=82'} />
     <PartnerCourseHighlights />
+    <SponsoredPlacement placement="academia" />
     <section className="grid gap-3 sm:grid-cols-3"><MetricTile label="Cursos" value={courses.length} detail="Publicados" icon={GraduationCap} /><MetricTile label="En progreso" value={profile.enrolledCourses.length} detail="Inscritos" icon={PlayCircle} tone="gold" /><MetricTile label="Favoritos" value={favorites} detail="Guardados" icon={Heart} tone="lilac" /></section>
     <section className="space-y-4"><SectionHeading eyebrow="Explorar" title="Encuentra tu siguiente clase" /><SearchField value={query} onChange={setQuery} placeholder="Buscar por título, instructor o tema..." /><div className="flex gap-2 overflow-x-auto pb-1">{([['todos','Todos'],['inscritos','En progreso'],['favoritos','Favoritos']] as const).map(([value,label]) => <FilterChip key={value} active={filter === value} label={label} onClick={() => setFilter(value)} />)}</div></section>
     <section className="space-y-4"><SectionHeading eyebrow="Cursos publicados" title="Aprende a tu ritmo" />{courses.length === 0 ? <StatePanel icon={BookOpenCheck} title="Aún no hay cursos publicados" body="Los cursos aparecerán aquí cuando el administrador los publique desde Supabase." /> : filtered.length === 0 ? <StatePanel icon={Search} title="No encontramos cursos" body="Prueba con otro término o filtro." /> : <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filtered.map((course) => <CourseTile key={course.id} course={course} enrolled={profile.enrolledCourses.includes(course.id)} favorite={isFavorite('course', course.id)} onOpen={() => openCourse(course)} onEnroll={() => toggleEnrollment(course.id)} onFavorite={() => void toggleFavorite('course', course.id)} />)}</div>}</section>

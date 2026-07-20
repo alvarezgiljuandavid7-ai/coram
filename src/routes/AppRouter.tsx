@@ -50,6 +50,8 @@ const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage').
 const AdminOrganizationsPage = lazy(() => import('../pages/admin/AdminOrganizationsPage').then((m) => ({ default: m.AdminOrganizationsPage })));
 const AdminAffiliatePartnersPage = lazy(() => import('../pages/admin/AdminAffiliatePartnersPage').then((m) => ({ default: m.AdminAffiliatePartnersPage })));
 const AdminAffiliateCoursesPage = lazy(() => import('../pages/admin/AdminAffiliateCoursesPage').then((m) => ({ default: m.AdminAffiliateCoursesPage })));
+const AdminSponsorCampaignsPage = lazy(() => import('../pages/admin/AdminSponsorCampaignsPage').then((m) => ({ default: m.AdminSponsorCampaignsPage })));
+const AdminSponsorPlacementsPage = lazy(() => import('../pages/admin/AdminSponsorPlacementsPage').then((m) => ({ default: m.AdminSponsorPlacementsPage })));
 const LegalPage = lazy(() => import('../pages/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
 
 function RouteFallback() {
@@ -132,6 +134,8 @@ export function AppRouter() {
               <Route path="organizaciones" element={<AdminOrganizationsPage />} />
               <Route path="afiliados/partners" element={<AdminAffiliatePartnersPage />} />
               <Route path="afiliados/cursos" element={<AdminAffiliateCoursesPage />} />
+              <Route path="patrocinios/campanas" element={<AdminSponsorCampaignsPage />} />
+              <Route path="patrocinios/ubicaciones" element={<AdminSponsorPlacementsPage />} />
               <Route path="configuracion" element={<AdminSettingsPage />} />
             </Route>
           </Route>

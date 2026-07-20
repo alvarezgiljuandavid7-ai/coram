@@ -13,7 +13,9 @@ export type AdminContentKind =
   | 'featured_videos'
   | 'home_banners'
   | 'affiliate_partners'
-  | 'affiliate_courses';
+  | 'affiliate_courses'
+  | 'sponsor_campaigns'
+  | 'sponsor_placements';
 
 export type AdminFieldKind = 'text' | 'textarea' | 'number' | 'boolean' | 'select' | 'datetime-local' | 'file';
 
@@ -425,6 +427,18 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
       { name: 'sort_order', label: 'Orden', kind: 'number' },
     ],
+  },
+  sponsor_campaigns: {
+    kind:'sponsor_campaigns',title:'Campañas patrocinadas',eyebrow:'Monetización',description:'Gestiona campañas rotuladas, vigencia, prioridad y frecuencia.',table:'sponsor_campaigns',orderBy:'priority',orderAscending:false,
+    select:'id, sponsor_name, label, title, body, image_url, destination_url, status, starts_at, ends_at, priority, frequency_cap_per_day',displayTitle:(row)=>String(row.title||'Campaña sin título'),displayMeta:(row)=>`${row.sponsor_name||'Sponsor'} / ${row.status||'draft'}`,
+    createDefaults:{sponsor_name:'',label:'Contenido patrocinado',title:'',body:'',image_url:'',destination_url:'',status:'draft',starts_at:'',ends_at:'',priority:0,frequency_cap_per_day:3},deactivate:()=>({status:'archived'}),searchableFields:['sponsor_name','title','body'],filterField:'status',filterOptions:['draft','active','paused','archived'],
+    fields:[{name:'sponsor_name',label:'Patrocinador',kind:'text',required:true},{name:'label',label:'Rótulo',kind:'text',required:true},{name:'title',label:'Título',kind:'text',required:true},{name:'body',label:'Descripción',kind:'textarea'},{name:'image_url',label:'URL imagen',kind:'text'},{name:'destination_url',label:'URL destino',kind:'text',required:true},{name:'status',label:'Estado',kind:'select',options:['draft','active','paused','archived'],required:true},{name:'starts_at',label:'Inicio',kind:'datetime-local'},{name:'ends_at',label:'Fin',kind:'datetime-local'},{name:'priority',label:'Prioridad',kind:'number'},{name:'frequency_cap_per_day',label:'Frecuencia diaria',kind:'number',required:true}],
+  },
+  sponsor_placements: {
+    kind:'sponsor_placements',title:'Ubicaciones patrocinadas',eyebrow:'Monetización',description:'Asigna campañas únicamente a Home, Academia o Recursos.',table:'sponsor_placements',orderBy:'created_at',orderAscending:false,
+    select:'id, campaign_id, placement, enabled, created_at',displayTitle:(row)=>String(row.placement||'Placement'),displayMeta:(row)=>`${row.campaign_id||''} / ${row.enabled?'activo':'inactivo'}`,
+    createDefaults:{campaign_id:'',placement:'home',enabled:true},searchableFields:['campaign_id','placement'],filterField:'placement',filterOptions:['home','academia','recursos'],
+    fields:[{name:'campaign_id',label:'ID campaña',kind:'text',required:true},{name:'placement',label:'Ubicación',kind:'select',options:['home','academia','recursos'],required:true},{name:'enabled',label:'Activo',kind:'boolean'}],
   },
   affiliate_partners: {
     kind: 'affiliate_partners', title: 'Partners afiliados', eyebrow: 'Alianzas',

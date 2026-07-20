@@ -21,6 +21,8 @@ export const adminNav = [
   { to: '/admin/organizaciones', label: 'Organizaciones', icon: Building2 },
   { to: '/admin/afiliados/partners', label: 'Partners', icon: Handshake },
   { to: '/admin/afiliados/cursos', label: 'Cursos afiliados', icon: Handshake },
+  { to: '/admin/patrocinios/campanas', label: 'Patrocinios', icon: Megaphone },
+  { to: '/admin/patrocinios/ubicaciones', label: 'Ubicaciones sponsor', icon: Megaphone },
   { to: '/admin/configuracion', label: 'Configuracion', icon: Settings },
 ];
 

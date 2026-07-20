@@ -26,6 +26,7 @@ import { getGreetingForHour, getInspirationForDate, millisecondsUntilNextHomeCon
 import styles from './HomeScreenV2.module.css';
 import { NextServiceSummary } from '../../../components/home/NextServiceSummary';
 import { PartnerCourseHighlights } from '../../../components/home/PartnerCourseHighlights';
+import { SponsoredPlacement } from '../../../features/sponsors/SponsoredPlacement';
 
 const quickAccess = [
   { label: 'Corarios', detail: 'Letras y tonos', to: '/app/corarios', icon: Music2, tone: 'green' as const },
@@ -65,6 +66,7 @@ export function HomeScreenV2() {
       </section>
 
       <NextServiceSummary />
+      <SponsoredPlacement placement="home" />
 
       <section>
         <SectionHeading eyebrow="Continua donde ibas" title="Tu ministerio reciente" action={<Link to="/app/favoritos" className="text-sm font-bold text-[#3d7146]">Ver guardados</Link>} />

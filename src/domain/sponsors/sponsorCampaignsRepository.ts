@@ -1,0 +1,10 @@
+import { supabase } from '../../shared/supabase/client';
+import type { SponsorPlacement } from '../../features/sponsors/sponsorPolicy';
+export interface SponsorCampaign{id:string;sponsorName:string;label:string;title:string;body:string|null;imageUrl:string|null;destinationUrl:string;priority:number;frequencyCapPerDay:number;}
+type ClientLike={from:(table:string)=>any;rpc:(name:string,args?:Record<string,unknown>)=>any};
+function map(row:any):SponsorCampaign{const c=Array.isArray(row.sponsor_campaigns)?row.sponsor_campaigns[0]:row.sponsor_campaigns;return{id:c.id,sponsorName:c.sponsor_name,label:c.label,title:c.title,body:c.body,imageUrl:c.image_url,destinationUrl:c.destination_url,priority:c.priority,frequencyCapPerDay:c.frequency_cap_per_day};}
+export function createSponsorCampaignsRepository(client:ClientLike|null){return{
+ async listActive(placement:SponsorPlacement):Promise<SponsorCampaign[]>{if(!client)return[];const now=new Date().toISOString();const{data,error}=await client.from('sponsor_placements').select('placement, enabled, sponsor_campaigns!inner(id,sponsor_name,label,title,body,image_url,destination_url,status,starts_at,ends_at,priority,frequency_cap_per_day)').eq('placement',placement).eq('enabled',true).eq('sponsor_campaigns.status','active').or(`starts_at.is.null,starts_at.lte.${now}`,{referencedTable:'sponsor_campaigns'}).or(`ends_at.is.null,ends_at.gt.${now}`,{referencedTable:'sponsor_campaigns'}).order('priority',{referencedTable:'sponsor_campaigns',ascending:false});if(error)throw error;return(data??[]).map(map);},
+ async recordEvent(campaignId:string,placement:SponsorPlacement,eventType:'impression'|'click',sessionHash:string):Promise<boolean>{if(!client)return false;const{data,error}=await client.rpc('record_sponsor_event',{p_campaign_id:campaignId,p_placement:placement,p_event_type:eventType,p_session_hash:sessionHash});if(error)throw error;return Boolean(data);},
+};}
+export const sponsorCampaignsRepository=createSponsorCampaignsRepository(supabase);
