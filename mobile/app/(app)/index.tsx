@@ -1,8 +1,10 @@
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useMobileAuth } from '../../src/auth/AuthProvider';
 
 export default function AppHomeRoute() {
   const { session, signOut } = useMobileAuth();
+  const router = useRouter();
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.card}>
@@ -10,6 +12,9 @@ export default function AppHomeRoute() {
         <Text style={styles.title}>Tu sesión está protegida</Text>
         <Text style={styles.copy}>{session?.user.email ?? 'Cuenta CorAM activa'}</Text>
         <Text style={styles.note}>La fundación móvil comparte usuarios con Supabase sin reutilizar almacenamiento del navegador.</Text>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/plans')} style={styles.planButton}>
+          <Text style={styles.planButtonText}>Ver mi plan</Text>
+        </Pressable>
         <Pressable accessibilityRole="button" onPress={() => void signOut()} style={styles.button}>
           <Text style={styles.buttonText}>Cerrar sesión</Text>
         </Pressable>
@@ -27,4 +32,6 @@ const styles = StyleSheet.create({
   note: { color: '#536171', fontSize: 16, lineHeight: 24 },
   button: { minHeight: 50, borderRadius: 14, backgroundColor: '#082B4C', alignItems: 'center', justifyContent: 'center' },
   buttonText: { color: '#fff', fontWeight: '800' },
+  planButton: { minHeight: 50, borderRadius: 14, backgroundColor: '#2468E8', alignItems: 'center', justifyContent: 'center' },
+  planButtonText: { color: '#fff', fontWeight: '800' },
 });

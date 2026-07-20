@@ -124,4 +124,16 @@ describe('monetization MVP migrations', () => {
     expect(sql).toContain('ministry access is scoped by organization')
     expect(sql).toContain('rollback')
   })
+
+  it('processes RevenueCat events idempotently and server-side only', () => {
+    const sql = migration('202607200008_revenuecat_billing.sql')
+
+    expect(sql).toContain('create table if not exists public.billing_events')
+    expect(sql).toContain('external_event_id text not null unique')
+    expect(sql).toContain('function public.process_revenuecat_event')
+    expect(sql).toContain("auth.role() <> 'service_role'")
+    expect(sql).toContain('on conflict (external_event_id) do nothing')
+    expect(sql).toContain('grant execute on function public.process_revenuecat_event')
+    expect(sql).toContain('to service_role')
+  })
 })
