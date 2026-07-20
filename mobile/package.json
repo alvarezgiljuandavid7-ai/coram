@@ -28,7 +28,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "config:check": "expo config --type public",
-    "export:android": "expo export --platform android --output-dir ../.tmp/expo-android"
+    "export:android": "expo export --platform android --output-dir ../.tmp/expo-android",
+    "export:ios": "expo export --platform ios --output-dir ../.tmp/expo-ios"
   },
   "private": true
 }

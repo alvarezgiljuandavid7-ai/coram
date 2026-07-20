@@ -10,7 +10,7 @@ ios/
 *.log
 .env*
 !.env.example
-!.env.production
+!/.env.production
 .tmp/
 mobile/.expo/
 mobile/dist/

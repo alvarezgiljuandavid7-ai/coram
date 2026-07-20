@@ -21,8 +21,24 @@ in later, separately reviewed deliveries before native preview or store release.
 - This branch adds no Supabase migration and changes no RLS policy.
 - Native Auth, session persistence, deep links, and repository adapters require a
   dedicated implementation and review.
+- The current root redirect to `/(app)` is a visual-foundation placeholder. Replace
+  it with a real session guard before connecting protected data or shipping a
+  native preview to external testers.
 - Any future migration must be versioned, reversible where practical, and tested
   with separate member and admin identities before deployment.
+
+## Dependency security
+
+- The current Expo dependency audit has a documented temporary risk acceptance in
+  [`docs/security/expo-dependency-risk-acceptance.md`](docs/security/expo-dependency-risk-acceptance.md).
+- Reassess that acceptance before the first production EAS Build and whenever Expo
+  SDK or its compatible dependency set changes.
+
+## Expo configuration ownership
+
+- `mobile/app.config.ts` is the single source of truth for Expo application
+  configuration. The redundant scaffold `mobile/app.json` was removed to prevent
+  configuration drift.
 
 ## Plans and monetization
 
