@@ -1,16 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
-const fallbackSupabaseUrl = 'https://qbjcqnhgijsotmdzccmi.supabase.co';
-const fallbackSupabasePublishableKey = 'sb_publishable_WDddK-0ooIp5Zrv-gXuOOA_6tQy3-I4';
+type SupabaseBrowserEnvironment = Readonly<{
+  VITE_SUPABASE_URL?: string;
+  VITE_SUPABASE_PUBLISHABLE_KEY?: string;
+}>;
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined) || fallbackSupabaseUrl;
-const supabasePublishableKey =
-  (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined) || fallbackSupabasePublishableKey;
+export function resolveSupabaseBrowserConfig(environment: SupabaseBrowserEnvironment) {
+  const url = environment.VITE_SUPABASE_URL?.trim();
+  const publishableKey = environment.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
+  return url && publishableKey ? { url, publishableKey } : null;
+}
+
+const config = resolveSupabaseBrowserConfig(import.meta.env as SupabaseBrowserEnvironment);
+
+export const isSupabaseConfigured = Boolean(config);
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabasePublishableKey!, {
+  ? createClient(config!.url, config!.publishableKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,

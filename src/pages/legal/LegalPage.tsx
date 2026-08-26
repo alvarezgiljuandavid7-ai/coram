@@ -5,7 +5,7 @@ const legalContent = {
     title: 'Politica de privacidad',
     body: [
       'CorAM trata datos de cuenta como nombre, correo, rol de usuario, progreso y actividad basica necesaria para operar la plataforma.',
-      'Los archivos, cursos, recursos y pagos se procesan mediante proveedores externos configurados para produccion, como Supabase y Stripe.',
+      'Los archivos, cursos y recursos se procesan mediante proveedores externos configurados para produccion, como Supabase. Si se habilitan pagos, CorAM identificara el proveedor aplicable antes de procesarlos.',
       'No se deben almacenar claves privadas, contrasenas ni datos completos de tarjetas en el frontend.',
       'Puedes solicitar revision o eliminacion de datos escribiendo al administrador de CorAM.',
     ],
@@ -31,7 +31,7 @@ const legalContent = {
   reembolsos: {
     title: 'Politica de reembolsos',
     body: [
-      'Los pagos premium deben procesarse mediante Stripe u otro proveedor real habilitado.',
+      'Los pagos premium solo pueden procesarse mediante un proveedor real que CorAM haya habilitado e identificado previamente.',
       'Las solicitudes de reembolso se revisan segun el estado del pago, consumo del servicio y normativa aplicable.',
       'Si un cobro fue duplicado o no se activo el acceso, el usuario debe contactar al administrador con el comprobante.',
       'Los reembolsos aprobados se ejecutan desde el proveedor de pago, no desde el frontend.',
