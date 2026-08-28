@@ -535,5 +535,8 @@ function normalizePayload(config: AdminCrudConfig, record: AdminRecord): AdminRe
       .map((domain) => domain.trim().toLowerCase())
       .filter(Boolean);
   }
+  if (config.kind === 'feed_posts' && payload.status === 'published' && !payload.published_at) {
+    payload.published_at = new Date().toISOString();
+  }
   return payload;
 }

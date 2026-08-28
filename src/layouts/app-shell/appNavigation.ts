@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   ListMusic,
   Music2,
+  PanelsTopLeft,
   SlidersHorizontal,
   UserRound,
 } from 'lucide-react';
@@ -51,6 +52,17 @@ export const appNavigationItems: AppNavigationItem[] = [
     desktop: true,
     drawer: true,
     bottom: true,
+    container: 'edge-to-edge',
+  },
+  {
+    id: 'feed',
+    to: '/app/feed',
+    label: 'Feed',
+    icon: PanelsTopLeft,
+    match: 'exact',
+    desktop: true,
+    drawer: true,
+    bottom: false,
     container: 'edge-to-edge',
   },
   {
@@ -184,7 +196,7 @@ export function isNavigationItemActive(item: AppNavigationItem, pathname: string
 
 export function getAppShellMode(pathname: string): AppShellMode {
   const currentPath = normalizePath(pathname);
-  return currentPath.startsWith('/app/ensayo/') ? 'immersive' : 'standard';
+  return currentPath.startsWith('/app/ensayo/') || currentPath === '/app/feed' ? 'immersive' : 'standard';
 }
 
 export function getActiveNavigationItem(pathname: string): AppNavigationItem | undefined {

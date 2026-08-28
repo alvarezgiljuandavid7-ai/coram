@@ -15,7 +15,8 @@ export type AdminContentKind =
   | 'affiliate_partners'
   | 'affiliate_courses'
   | 'sponsor_campaigns'
-  | 'sponsor_placements';
+  | 'sponsor_placements'
+  | 'feed_posts';
 
 export type AdminFieldKind = 'text' | 'textarea' | 'number' | 'boolean' | 'select' | 'datetime-local' | 'file';
 
@@ -439,6 +440,45 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     select:'id, campaign_id, placement, enabled, created_at',displayTitle:(row)=>String(row.placement||'Placement'),displayMeta:(row)=>`${row.campaign_id||''} / ${row.enabled?'activo':'inactivo'}`,
     createDefaults:{campaign_id:'',placement:'home',enabled:true},searchableFields:['campaign_id','placement'],filterField:'placement',filterOptions:['home','academia','recursos'],
     fields:[{name:'campaign_id',label:'ID campaña',kind:'text',required:true},{name:'placement',label:'Ubicación',kind:'select',options:['home','academia','recursos'],required:true},{name:'enabled',label:'Activo',kind:'boolean'}],
+  },
+  feed_posts: {
+    kind: 'feed_posts',
+    title: 'Feed curado',
+    eyebrow: 'Experiencia inmersiva',
+    description: 'Publica historias, anuncios y recursos en el feed inmersivo de CorAM.',
+    table: 'feed_posts',
+    orderBy: 'sort_order',
+    select: 'id, title, body, media_url, media_type, cta_label, cta_url, author_name, status, sort_order, published_at',
+    displayTitle: (row) => String(row.title || 'Publicacion sin titulo'),
+    displayMeta: (row) => `${row.status || 'draft'} / Orden ${row.sort_order ?? 0}`,
+    createDefaults: {
+      title: '',
+      body: '',
+      media_url: '',
+      media_type: 'image',
+      cta_label: 'Abrir',
+      cta_url: '',
+      author_name: 'CorAM',
+      status: 'draft',
+      sort_order: 0,
+      published_at: '',
+    },
+    deactivate: () => ({ status: 'archived' }),
+    searchableFields: ['title', 'body', 'author_name'],
+    filterField: 'status',
+    filterOptions: statusOptions,
+    fields: [
+      { name: 'title', label: 'Titulo', kind: 'text', required: true },
+      { name: 'body', label: 'Texto', kind: 'textarea' },
+      { name: 'media_url', label: 'URL de imagen o video', kind: 'text' },
+      { name: 'media_type', label: 'Tipo de medio', kind: 'select', options: ['image', 'video'], required: true },
+      { name: 'cta_label', label: 'Texto del boton', kind: 'text' },
+      { name: 'cta_url', label: 'Ruta interna o URL HTTPS', kind: 'text' },
+      { name: 'author_name', label: 'Autor', kind: 'text', required: true },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+      { name: 'published_at', label: 'Publicar desde', kind: 'datetime-local' },
+      { name: 'sort_order', label: 'Orden', kind: 'number' },
+    ],
   },
   affiliate_partners: {
     kind: 'affiliate_partners', title: 'Partners afiliados', eyebrow: 'Alianzas',

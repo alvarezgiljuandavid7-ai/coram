@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { BookMarked, Building2, FolderOpen, GraduationCap, Handshake, Images, LayoutDashboard, Megaphone, Menu, Music2, Settings, UsersRound, Video, X } from 'lucide-react';
+import { BookMarked, Building2, FolderOpen, GraduationCap, Handshake, Images, LayoutDashboard, Megaphone, Menu, Music2, PanelsTopLeft, Settings, UsersRound, Video, X } from 'lucide-react';
 import { AuthPanel } from '../components/AuthPanel';
 import { CoramLogo } from '../components/CoramLogo';
 import { LegalFooter } from '../components/LegalFooter';
@@ -14,6 +14,7 @@ export const adminNav = [
   { to: '/admin/himnarios', label: 'Himnarios', icon: BookMarked },
   { to: '/admin/recursos', label: 'Recursos', icon: FolderOpen },
   { to: '/admin/campanas', label: 'Campanas', icon: Megaphone },
+  { to: '/admin/feed', label: 'Feed', icon: PanelsTopLeft },
   { to: '/admin/publicidad', label: 'Publicidad', icon: Megaphone },
   { to: '/admin/videos', label: 'Videos', icon: Video },
   { to: '/admin/banners', label: 'Banners', icon: Images },

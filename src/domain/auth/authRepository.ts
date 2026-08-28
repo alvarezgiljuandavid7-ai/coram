@@ -33,14 +33,25 @@ export const appleOAuthEnabled = (import.meta.env.VITE_CORAM_ENABLE_APPLE_AUTH a
 export function buildAuthRedirectUrl(
   path: string,
   currentOrigin = window.location.origin,
-  _configuredOrigin?: string,
+  configuredOrigin = import.meta.env.VITE_CORAM_AUTH_REDIRECT_ORIGIN as string | undefined,
 ): string {
-  // Browser auth must return to the origin that initiated the flow. This keeps
-  // localhost and Vercel Preview deployments isolated from production.
-  const origin = currentOrigin.replace(/\/+$/, '');
+  const origin = resolveAuthRedirectOrigin(currentOrigin, configuredOrigin);
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
   return `${origin}${normalizedPath}`;
+}
+
+function resolveAuthRedirectOrigin(currentOrigin: string, configuredOrigin?: string): string {
+  const fallbackOrigin = currentOrigin.replace(/\/+$/, '');
+  const configuredValue = configuredOrigin?.trim();
+  if (!configuredValue) return fallbackOrigin;
+
+  try {
+    const url = new URL(configuredValue);
+    return url.protocol === 'https:' ? url.origin : fallbackOrigin;
+  } catch {
+    return fallbackOrigin;
+  }
 }
 
 function normalizeRole(role: string | null | undefined): 'admin' | 'premium' | 'member' {

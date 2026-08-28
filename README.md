@@ -70,7 +70,12 @@ Required production environment variables:
 VITE_SUPABASE_URL
 VITE_SUPABASE_PUBLISHABLE_KEY
 VITE_CORAM_PUBLIC_URL
+VITE_CORAM_AUTH_REDIRECT_ORIGIN
 ```
+
+Set `VITE_CORAM_AUTH_REDIRECT_ORIGIN` in Preview and Production to the stable
+HTTPS web domain so OAuth and email callbacks never return to an ephemeral
+Preview deployment. Do not commit environment files or credentials.
 
 ## Current Capabilities
 
