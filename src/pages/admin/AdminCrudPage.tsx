@@ -14,6 +14,7 @@ import {
   type AdminRecord,
 } from '../../domain/admin/adminCrudRepository';
 import { uploadMediaAsset } from '../../domain/media/mediaAssets';
+import { assertAffiliateUrlShape } from '../../server/affiliate/redirectPolicy';
 
 interface AdminCrudPageProps {
   kind: AdminContentKind;
@@ -326,7 +327,11 @@ function AdminCrudEditor({
       return;
     }
     setValidationError('');
-    onSave(normalizePayload(config, record));
+    try {
+      onSave(normalizePayload(config, record));
+    } catch (caughtError) {
+      setValidationError(caughtError instanceof Error ? caughtError.message : 'Revisa los campos antes de guardar.');
+    }
   };
 
   return (
@@ -519,6 +524,19 @@ function stripId(record: AdminRecord): AdminRecord {
   return payload;
 }
 
+function normalizeAffiliateDomain(value: string): string {
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed) return '';
+  if (trimmed.includes('://')) {
+    try {
+      return new URL(trimmed).hostname.toLowerCase().replace(/^\.+|\.$/g, '');
+    } catch {
+      return trimmed.replace(/^\.+|\.$/g, '');
+    }
+  }
+  return trimmed.replace(/^\.+|\.$/g, '').split('/')[0];
+}
+
 function normalizePayload(config: AdminCrudConfig, record: AdminRecord): AdminRecord {
   const payload = record.id ? stripId(record) : stripId(record);
   config.fields.forEach((field) => {
@@ -532,8 +550,17 @@ function normalizePayload(config: AdminCrudConfig, record: AdminRecord): AdminRe
     payload.allowed_domains = payload.allowed_domains
       .replace(/[{}]/g, '')
       .split(',')
-      .map((domain) => domain.trim().toLowerCase())
+      .map((domain) => normalizeAffiliateDomain(domain))
       .filter(Boolean);
+  }
+  if (config.kind === 'affiliate_courses' && typeof payload.destination_url === 'string') {
+    const destination = payload.destination_url.trim();
+    payload.destination_url = destination;
+    try {
+      assertAffiliateUrlShape(destination);
+    } catch {
+      throw new Error('La URL destino debe ser HTTPS, sin credenciales ni puertos personalizados.');
+    }
   }
   if (config.kind === 'feed_posts' && payload.status === 'published' && !payload.published_at) {
     payload.published_at = new Date().toISOString();

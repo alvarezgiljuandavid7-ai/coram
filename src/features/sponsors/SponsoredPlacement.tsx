@@ -4,4 +4,66 @@ import { sponsorCampaignsRepository, type SponsorCampaign } from '../../domain/s
 import { getSafeSponsorDestination, type SponsorPlacement } from './sponsorPolicy';
 import { useSponsorContext } from './SponsorProvider';
 import styles from './SponsoredPlacement.module.css';
-export function SponsoredPlacement({placement}:{placement:SponsorPlacement}){const{canShow,sessionHash}=useSponsorContext();const[campaign,setCampaign]=useState<SponsorCampaign|null>(null);const ref=useRef<HTMLElement>(null);const recorded=useRef(false);useEffect(()=>{if(!canShow){setCampaign(null);return;}sponsorCampaignsRepository.listActive(placement).then((items)=>setCampaign(items[0]??null)).catch(()=>setCampaign(null));},[canShow,placement]);useEffect(()=>{const node=ref.current;if(!node||!campaign||!sessionHash)return;const observer=new IntersectionObserver((entries)=>{if(entries[0]?.isIntersecting&&!recorded.current){recorded.current=true;void sponsorCampaignsRepository.recordEvent(campaign.id,placement,'impression',sessionHash);observer.disconnect();}},{threshold:.55});observer.observe(node);return()=>observer.disconnect();},[campaign,placement,sessionHash]);const destination=campaign?getSafeSponsorDestination(campaign.destinationUrl):null;if(!campaign||!destination)return null;return <article ref={ref} className={styles.card}>{campaign.imageUrl&&<img src={campaign.imageUrl} alt=""/>}<div><small>{campaign.label} · {campaign.sponsorName}</small><h2>{campaign.title}</h2>{campaign.body&&<p>{campaign.body}</p>}<a href={destination} target="_blank" rel="noopener noreferrer sponsored" onClick={()=>void sponsorCampaignsRepository.recordEvent(campaign.id,placement,'click',sessionHash)}>Conocer más <ExternalLink/></a></div></article>}
+export function SponsoredPlacement({ placement }: { placement: SponsorPlacement }) {
+  const { canShow, sessionHash } = useSponsorContext();
+  const [campaign, setCampaign] = useState<SponsorCampaign | null>(null);
+  const ref = useRef<HTMLElement>(null);
+  const recorded = useRef(false);
+
+  useEffect(() => {
+    if (!canShow) {
+      setCampaign(null);
+      return;
+    }
+    sponsorCampaignsRepository
+      .listActive(placement)
+      .then((items) => setCampaign(items[0] ?? null))
+      .catch(() => setCampaign(null));
+  }, [canShow, placement]);
+
+  useEffect(() => {
+    recorded.current = false;
+  }, [campaign?.id, placement]);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || !campaign || !sessionHash) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !recorded.current) {
+          recorded.current = true;
+          sponsorCampaignsRepository
+            .recordEvent(campaign.id, placement, 'impression', sessionHash)
+            .catch(() => undefined);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.55 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [campaign, placement, sessionHash]);
+
+  const destination = campaign ? getSafeSponsorDestination(campaign.destinationUrl) : null;
+  if (!campaign || !destination) return null;
+
+  const handleClick = () => {
+    sponsorCampaignsRepository.recordEvent(campaign.id, placement, 'click', sessionHash).catch(() => undefined);
+  };
+
+  return (
+    <article ref={ref} className={styles.card}>
+      {campaign.imageUrl && <img src={campaign.imageUrl} alt={campaign.title} />}
+      <div>
+        <small>
+          {campaign.label} · {campaign.sponsorName}
+        </small>
+        <h2>{campaign.title}</h2>
+        {campaign.body && <p>{campaign.body}</p>}
+        <a href={destination} target="_blank" rel="noopener noreferrer sponsored" onClick={handleClick}>
+          Conocer más <ExternalLink />
+        </a>
+      </div>
+    </article>
+  );
+}

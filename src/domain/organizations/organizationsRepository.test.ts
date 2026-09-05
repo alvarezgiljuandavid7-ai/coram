@@ -77,6 +77,8 @@ describe('mapOrganizationError', () => {
   it('maps hard server limits to stable application codes', () => {
     expect(mapOrganizationError({ message: 'organization_limit_reached' }).code).toBe('ORGANIZATION_LIMIT');
     expect(mapOrganizationError({ message: 'organization_member_limit_reached' }).code).toBe('MEMBER_LIMIT');
+    expect(mapOrganizationError({ message: 'personal_song_limit_reached' }).code).toBe('SONG_LIMIT');
+    expect(mapOrganizationError({ message: 'active_service_limit_reached' }).code).toBe('SERVICE_LIMIT');
     expect(mapOrganizationError({ message: 'anything else' }).code).toBe('UNKNOWN');
   });
 });

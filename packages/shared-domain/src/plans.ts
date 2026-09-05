@@ -141,6 +141,18 @@ export function canCreatePersonalSong(plan: PlanId, currentPersonalSongs: number
   return isBelowLimit(currentPersonalSongs, getPlanLimits(plan).personalSongs);
 }
 
+export function canCreateOrganization(plan: PlanId, currentOrganizations: number): boolean {
+  return isBelowLimit(currentOrganizations, getPlanLimits(plan).organizations);
+}
+
+export function canAddOrganizationMember(plan: PlanId, currentMembers: number): boolean {
+  return isBelowLimit(currentMembers, getPlanLimits(plan).organizationMembers);
+}
+
+export function canCreatePersonalRepertoire(plan: PlanId, currentPersonalRepertoires: number): boolean {
+  return isBelowLimit(currentPersonalRepertoires, getPlanLimits(plan).personalRepertoires);
+}
+
 export function resolveStrongestPlan(plans: readonly PlanId[]): PlanId {
   return plans.reduce<PlanId>(
     (strongest, candidate) => (planStrength[candidate] > planStrength[strongest] ? candidate : strongest),

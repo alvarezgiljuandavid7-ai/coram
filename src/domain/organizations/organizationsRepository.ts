@@ -24,7 +24,7 @@ export interface OrganizationMember {
 }
 
 export interface OrganizationRepositoryError extends Error {
-  code: 'ORGANIZATION_LIMIT' | 'MEMBER_LIMIT' | 'FORBIDDEN' | 'UNKNOWN';
+  code: 'ORGANIZATION_LIMIT' | 'MEMBER_LIMIT' | 'SONG_LIMIT' | 'SERVICE_LIMIT' | 'FORBIDDEN' | 'UNKNOWN';
 }
 
 type ClientLike = {
@@ -65,6 +65,8 @@ export function mapOrganizationError(error: { message?: string; code?: string })
   let code: OrganizationRepositoryError['code'] = 'UNKNOWN';
   if (message.includes('organization_limit_reached')) code = 'ORGANIZATION_LIMIT';
   if (message.includes('organization_member_limit_reached')) code = 'MEMBER_LIMIT';
+  if (message.includes('personal_song_limit_reached')) code = 'SONG_LIMIT';
+  if (message.includes('active_service_limit_reached')) code = 'SERVICE_LIMIT';
   if (error.code === '42501' || message.includes('permission')) code = 'FORBIDDEN';
   return Object.assign(new Error(message), { code });
 }

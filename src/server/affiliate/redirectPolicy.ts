@@ -6,12 +6,17 @@ export function isAllowedAffiliateHost(hostname: string, allowedDomains: readonl
   });
 }
 
-export function assertAllowedAffiliateDestination(destination: string, allowedDomains: readonly string[]): URL {
+export function assertAffiliateUrlShape(destination: string): URL {
   let url: URL;
-  try { url = new URL(destination); } catch { throw new Error('affiliate_destination_invalid'); }
+  try { url = new URL(destination.trim()); } catch { throw new Error('affiliate_destination_invalid'); }
   if (url.protocol !== 'https:') throw new Error('affiliate_https_required');
   if (url.username || url.password) throw new Error('affiliate_credentials_forbidden');
-  if (!isAllowedAffiliateHost(url.hostname, allowedDomains)) throw new Error('affiliate_domain_forbidden');
   if (url.port && url.port !== '443') throw new Error('affiliate_port_forbidden');
+  return url;
+}
+
+export function assertAllowedAffiliateDestination(destination: string, allowedDomains: readonly string[]): URL {
+  const url = assertAffiliateUrlShape(destination);
+  if (!isAllowedAffiliateHost(url.hostname, allowedDomains)) throw new Error('affiliate_domain_forbidden');
   return url;
 }

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   CORAM_PLANS,
+  canAddOrganizationMember,
   canCreateActiveService,
+  canCreateOrganization,
+  canCreatePersonalRepertoire,
   canCreatePersonalSong,
   canShowAds,
   getOrganizationMemberLimit,
@@ -37,6 +40,24 @@ describe('CorAM plans', () => {
     expect(canShowAds('pro')).toBe(false);
     expect(canShowAds('ministry_starter')).toBe(false);
     expect(canShowAds('ministry_pro')).toBe(false);
+  });
+
+  it('enforces organization creation and member limits per plan', () => {
+    expect(canCreateOrganization('free', 0)).toBe(true);
+    expect(canCreateOrganization('free', 1)).toBe(false);
+    expect(canCreateOrganization('ministry_pro', 1)).toBe(false);
+    expect(canAddOrganizationMember('free', 4)).toBe(true);
+    expect(canAddOrganizationMember('free', 5)).toBe(false);
+    expect(canAddOrganizationMember('ministry_starter', 14)).toBe(true);
+    expect(canAddOrganizationMember('ministry_starter', 15)).toBe(false);
+    expect(canAddOrganizationMember('ministry_pro', 49)).toBe(true);
+    expect(canAddOrganizationMember('ministry_pro', 50)).toBe(false);
+  });
+
+  it('enforces personal repertoire limits per plan', () => {
+    expect(canCreatePersonalRepertoire('free', 0)).toBe(true);
+    expect(canCreatePersonalRepertoire('free', 1)).toBe(false);
+    expect(canCreatePersonalRepertoire('pro', 5000)).toBe(true);
   });
 
   it('resolves the strongest active plan deterministically', () => {
