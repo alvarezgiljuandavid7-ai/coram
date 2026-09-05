@@ -1,14 +1,21 @@
 import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { CORAM_PLANS } from '@coram/shared-domain';
+import { CORAM_PLANS, getPlanLimits } from '@coram/shared-domain';
 import { useRevenueCat } from '../../src/billing/RevenueCatProvider';
 
 export default function PlansRoute() {
   const billing = useRevenueCat();
+  const limits = getPlanLimits(billing.plan);
+  const purchasesDisabled = billing.status === 'disabled' || billing.status === 'purchasing';
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.eyebrow}>PLAN CORAM</Text>
         <Text style={styles.title}>{CORAM_PLANS[billing.plan].label}</Text>
+        <Text style={styles.copy}>
+          {limits.activeServices === null ? 'Servicios ilimitados' : `${limits.activeServices} servicios activos`} ·{' '}
+          {limits.organizationMembers === null ? 'Miembros ilimitados' : `${limits.organizationMembers} miembros por ministerio`} ·{' '}
+          {limits.personalSongs === null ? 'Canciones personales ilimitadas' : `${limits.personalSongs} canciones personales`}
+        </Text>
         <Text style={styles.copy}>Las compras móviles usan StoreKit en iOS y Google Play Billing en Android.</Text>
         {billing.status === 'disabled' && <Text style={styles.notice}>Las suscripciones no están habilitadas en este build.</Text>}
         {billing.error && <Text style={styles.error}>{billing.error}</Text>}
@@ -16,7 +23,7 @@ export default function PlansRoute() {
           <View key={item.identifier} style={styles.card}>
             <Text style={styles.packageTitle}>{item.product.title}</Text>
             <Text style={styles.price}>{item.product.priceString}</Text>
-            <Pressable style={styles.button} onPress={() => void billing.purchase(item)} disabled={billing.status === 'purchasing'}>
+              <Pressable style={styles.button} onPress={() => void billing.purchase(item)} disabled={purchasesDisabled}>
               <Text style={styles.buttonText}>Elegir plan</Text>
             </Pressable>
           </View>

@@ -1,32 +1,10 @@
-import { useEffect, useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
-import { CORAM_PLANS, getPlanLimits, type PlanId } from '@coram/shared-domain';
-import { useCoramApp } from '../../app/CoramAppContext';
+import { CORAM_PLANS, getPlanLimits } from '@coram/shared-domain';
 import { EditorialCard } from '../../components/experience-v2/ExperienceV2';
-import { supabase } from '../../shared/supabase/client';
+import { useEffectivePlan } from '../../domain/monetization/useEffectivePlan';
 
 export function CurrentPlanCard() {
-  const { auth } = useCoramApp();
-  const [plan, setPlan] = useState<PlanId>('free');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!supabase || !auth.user?.id) {
-      setPlan('free');
-      setLoading(false);
-      return;
-    }
-    let active = true;
-    setLoading(true);
-    void supabase.rpc('resolve_effective_entitlement', { p_user_id: auth.user.id }).then(({ data, error }) => {
-      if (!active) return;
-      if (!error && ['free', 'pro', 'ministry_starter', 'ministry_pro'].includes(String(data))) {
-        setPlan(data as PlanId);
-      }
-      setLoading(false);
-    });
-    return () => { active = false; };
-  }, [auth.user?.id]);
+  const { plan, loading } = useEffectivePlan();
 
   const limits = getPlanLimits(plan);
   return (

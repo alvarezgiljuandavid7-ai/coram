@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { resolveStrongestPlan, type PlanId } from '@coram/shared-domain';
-import { useCoramApp } from '../../app/CoramAppContext';
-import { supabase } from '../../shared/supabase/client';
+import type { PlanId } from '@coram/shared-domain';
+import { useEffectivePlan } from '../../domain/monetization/useEffectivePlan';
 import { canRenderSponsor } from './sponsorPolicy';
 type SponsorContextValue={plan:PlanId;canShow:boolean;sessionHash:string};
 const SponsorContext=createContext<SponsorContextValue>({plan:'free',canShow:false,sessionHash:''});
@@ -17,8 +16,7 @@ function readConsent(): boolean {
 }
 
 export function SponsorProvider({ children }: { children: ReactNode }) {
-  const { auth } = useCoramApp();
-  const [plan, setPlan] = useState<PlanId>('free');
+  const { plan } = useEffectivePlan();
   const [hash, setHash] = useState('');
   const [consent, setConsent] = useState(readConsent);
 
@@ -35,29 +33,6 @@ export function SponsorProvider({ children }: { children: ReactNode }) {
       window.removeEventListener(SPONSOR_CONSENT_EVENT, syncConsent);
     };
   }, []);
-
-  useEffect(() => {
-    if (!supabase || !auth.profile?.id) {
-      setPlan('free');
-      return;
-    }
-    supabase
-      .from('user_entitlements')
-      .select('plan_id,status,expires_at')
-      .eq('user_id', auth.profile.id)
-      .in('status', ['active', 'grace_period'])
-      .then(
-        ({ data }) =>
-          setPlan(
-            resolveStrongestPlan(
-              (data ?? [])
-                .filter((row) => !row.expires_at || new Date(row.expires_at) > new Date())
-                .map((row) => row.plan_id as PlanId),
-            ),
-          ),
-        () => setPlan('free'),
-      );
-  }, [auth.profile?.id]);
 
   const value = useMemo(
     () => ({

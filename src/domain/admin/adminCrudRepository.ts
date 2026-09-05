@@ -318,7 +318,7 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     kind: 'advertisements',
     title: 'Publicidad',
     eyebrow: 'Anuncios',
-    description: 'Administra anuncios visibles cuando esten activos.',
+    description: 'LEGACY: usa Campañas patrocinadas y Ubicaciones sponsor. Administra anuncios visibles cuando esten activos.',
     table: 'advertisements',
     orderBy: 'created_at',
     orderAscending: false,

@@ -10,8 +10,17 @@ const referrerHost=(value:string|undefined)=>{if(!value)return null;try{return n
 
 const UUID_PATTERN=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function sendJson(res:ResponseLike,code:number,body:unknown){res.status(code);res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.json(body);}
+const RATE_LIMIT_WINDOW_MS=60_000;const RATE_LIMIT_MAX=60;
+const rateLimitHits=new Map<string,{count:number;resetAt:number}>();
+function isRateLimited(key:string):boolean{
+  const now=Date.now();const entry=rateLimitHits.get(key);
+  if(!entry||now>=entry.resetAt){rateLimitHits.set(key,{count:1,resetAt:now+RATE_LIMIT_WINDOW_MS});if(rateLimitHits.size>2000)for(const[k,v]of rateLimitHits)if(now>=v.resetAt)rateLimitHits.delete(k);return false;}
+  entry.count+=1;return entry.count>RATE_LIMIT_MAX;
+}
 export default async function handler(req:RequestLike,res:ResponseLike){
   if(req.method!=='GET'){sendJson(res,405,{error:'method_not_allowed'});return;}
+  const clientKey=first(req.headers['x-forwarded-for'])?.split(',')[0]?.trim()||'unknown';
+  if(isRateLimited(clientKey)){sendJson(res,429,{error:'affiliate_rate_limited'});return;}
   const url=process.env.VITE_SUPABASE_URL;const key=process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   if(!url||!key){sendJson(res,503,{error:'affiliate_service_unconfigured'});return;}
   const courseId=first(req.query.id);if(!courseId||!UUID_PATTERN.test(courseId)){sendJson(res,404,{error:'affiliate_course_unavailable'});return;}
