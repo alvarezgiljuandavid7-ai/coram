@@ -24,6 +24,14 @@ const ColeccionesPage = lazy(() => import('../pages/app/ColeccionesPage').then((
 const ReadingModePage = lazy(() => import('../pages/app/ReadingModePage').then((m) => ({ default: m.ReadingModePage })));
 const FavoritosPage = lazy(() => import('../pages/app/FavoritosPage').then((m) => ({ default: m.FavoritosPage })));
 const ProfilePage = lazy(() => import('../pages/app/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const OrganizationsPage = lazy(() => import('../pages/app/ministry/OrganizationsPage').then((m) => ({ default: m.OrganizationsPage })));
+const OrganizationInvitationPage = lazy(() => import('../pages/app/ministry/OrganizationInvitationPage').then((m) => ({ default: m.OrganizationInvitationPage })));
+const ServicesPage = lazy(() => import('../pages/app/ministry/ServicesPage').then((m) => ({ default: m.ServicesPage })));
+const ServiceDetailPage = lazy(() => import('../pages/app/ministry/ServiceDetailPage').then((m) => ({ default: m.ServiceDetailPage })));
+const RepertoirePage = lazy(() => import('../pages/app/repertoire/RepertoirePage').then((m) => ({ default: m.RepertoirePage })));
+const SongEditorPage = lazy(() => import('../pages/app/repertoire/SongEditorPage').then((m) => ({ default: m.SongEditorPage })));
+const PartnerCoursesPage = lazy(() => import('../pages/app/academia/PartnerCoursesPage').then((m) => ({ default: m.PartnerCoursesPage })));
+const PartnerCourseDetailPage = lazy(() => import('../pages/app/academia/PartnerCourseDetailPage').then((m) => ({ default: m.PartnerCourseDetailPage })));
 const HerramientasPage = lazy(() => import('../pages/app/tools/HerramientasPage').then((m) => ({ default: m.HerramientasPage })));
 const AfinadorPage = lazy(() => import('../pages/app/tools/AfinadorPage').then((m) => ({ default: m.AfinadorPage })));
 const PianoPage = lazy(() => import('../pages/app/tools/PianoPage').then((m) => ({ default: m.PianoPage })));
@@ -39,6 +47,13 @@ const AdminVideosPage = lazy(() => import('../pages/admin/AdminVideosPage').then
 const AdminBannersPage = lazy(() => import('../pages/admin/AdminBannersPage').then((m) => ({ default: m.AdminBannersPage })));
 const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })));
 const AdminSettingsPage = lazy(() => import('../pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
+const AdminOrganizationsPage = lazy(() => import('../pages/admin/AdminOrganizationsPage').then((m) => ({ default: m.AdminOrganizationsPage })));
+const AdminAffiliatePartnersPage = lazy(() => import('../pages/admin/AdminAffiliatePartnersPage').then((m) => ({ default: m.AdminAffiliatePartnersPage })));
+const AdminAffiliateCoursesPage = lazy(() => import('../pages/admin/AdminAffiliateCoursesPage').then((m) => ({ default: m.AdminAffiliateCoursesPage })));
+const AdminSponsorCampaignsPage = lazy(() => import('../pages/admin/AdminSponsorCampaignsPage').then((m) => ({ default: m.AdminSponsorCampaignsPage })));
+const AdminSponsorPlacementsPage = lazy(() => import('../pages/admin/AdminSponsorPlacementsPage').then((m) => ({ default: m.AdminSponsorPlacementsPage })));
+const AdminFeedPostsPage = lazy(() => import('../pages/admin/AdminFeedPostsPage').then((m) => ({ default: m.AdminFeedPostsPage })));
+const FeedPage = lazy(() => import('../pages/app/FeedPage').then((m) => ({ default: m.FeedPage })));
 const LegalPage = lazy(() => import('../pages/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
 
 function RouteFallback() {
@@ -90,6 +105,16 @@ export function AppRouter() {
               <Route path="herramientas/calentamiento" element={<CalentamientoPage />} />
               <Route path="herramientas/warmup" element={<Navigate to="/app/herramientas/calentamiento" replace />} />
               <Route path="perfil" element={<ProfilePage />} />
+              <Route path="ministerio" element={<OrganizationsPage />} />
+              <Route path="ministerio/invitacion" element={<OrganizationInvitationPage />} />
+              <Route path="ministerio/servicios" element={<ServicesPage />} />
+              <Route path="ministerio/servicios/:serviceId" element={<ServiceDetailPage />} />
+              <Route path="repertorio" element={<RepertoirePage />} />
+              <Route path="repertorio/nueva" element={<SongEditorPage />} />
+              <Route path="repertorio/:songId" element={<SongEditorPage />} />
+              <Route path="academia/aliados" element={<PartnerCoursesPage />} />
+              <Route path="academia/aliados/:id" element={<PartnerCourseDetailPage />} />
+              <Route path="feed" element={<FeedPage />} />
             </Route>
           </Route>
 
@@ -104,11 +129,17 @@ export function AppRouter() {
               <Route path="recursos" element={<AdminResourcesPage />} />
               <Route path="campanas" element={<AdminCampaignsPage />} />
               <Route path="campañas" element={<AdminCampaignsPage />} />
+              <Route path="feed" element={<AdminFeedPostsPage />} />
               <Route path="publicidad" element={<AdminAdvertisementsPage />} />
               <Route path="anuncios" element={<AdminAdvertisementsPage />} />
               <Route path="videos" element={<AdminVideosPage />} />
               <Route path="banners" element={<AdminBannersPage />} />
               <Route path="usuarios" element={<AdminUsersPage />} />
+              <Route path="organizaciones" element={<AdminOrganizationsPage />} />
+              <Route path="afiliados/partners" element={<AdminAffiliatePartnersPage />} />
+              <Route path="afiliados/cursos" element={<AdminAffiliateCoursesPage />} />
+              <Route path="patrocinios/campanas" element={<AdminSponsorCampaignsPage />} />
+              <Route path="patrocinios/ubicaciones" element={<AdminSponsorPlacementsPage />} />
               <Route path="configuracion" element={<AdminSettingsPage />} />
             </Route>
           </Route>

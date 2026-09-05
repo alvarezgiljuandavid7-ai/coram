@@ -11,7 +11,12 @@ export type AdminContentKind =
   | 'campaigns'
   | 'advertisements'
   | 'featured_videos'
-  | 'home_banners';
+  | 'home_banners'
+  | 'affiliate_partners'
+  | 'affiliate_courses'
+  | 'sponsor_campaigns'
+  | 'sponsor_placements'
+  | 'feed_posts';
 
 export type AdminFieldKind = 'text' | 'textarea' | 'number' | 'boolean' | 'select' | 'datetime-local' | 'file';
 
@@ -313,7 +318,7 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
     kind: 'advertisements',
     title: 'Publicidad',
     eyebrow: 'Anuncios',
-    description: 'Administra anuncios visibles cuando esten activos.',
+    description: 'LEGACY: usa Campañas patrocinadas y Ubicaciones sponsor. Administra anuncios visibles cuando esten activos.',
     table: 'advertisements',
     orderBy: 'created_at',
     orderAscending: false,
@@ -422,6 +427,96 @@ export const adminCrudConfigs: Record<AdminContentKind, AdminCrudConfig> = {
       { name: 'placement', label: 'Ubicacion', kind: 'text' },
       { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
       { name: 'sort_order', label: 'Orden', kind: 'number' },
+    ],
+  },
+  sponsor_campaigns: {
+    kind:'sponsor_campaigns',title:'Campañas patrocinadas',eyebrow:'Monetización',description:'Gestiona campañas rotuladas, vigencia, prioridad y frecuencia.',table:'sponsor_campaigns',orderBy:'priority',orderAscending:false,
+    select:'id, sponsor_name, label, title, body, image_url, destination_url, status, starts_at, ends_at, priority, frequency_cap_per_day',displayTitle:(row)=>String(row.title||'Campaña sin título'),displayMeta:(row)=>`${row.sponsor_name||'Sponsor'} / ${row.status||'draft'}`,
+    createDefaults:{sponsor_name:'',label:'Contenido patrocinado',title:'',body:'',image_url:'',destination_url:'',status:'draft',starts_at:'',ends_at:'',priority:0,frequency_cap_per_day:3},deactivate:()=>({status:'archived'}),searchableFields:['sponsor_name','title','body'],filterField:'status',filterOptions:['draft','active','paused','archived'],
+    fields:[{name:'sponsor_name',label:'Patrocinador',kind:'text',required:true},{name:'label',label:'Rótulo',kind:'text',required:true},{name:'title',label:'Título',kind:'text',required:true},{name:'body',label:'Descripción',kind:'textarea'},{name:'image_url',label:'URL imagen',kind:'text'},{name:'destination_url',label:'URL destino',kind:'text',required:true},{name:'status',label:'Estado',kind:'select',options:['draft','active','paused','archived'],required:true},{name:'starts_at',label:'Inicio',kind:'datetime-local'},{name:'ends_at',label:'Fin',kind:'datetime-local'},{name:'priority',label:'Prioridad',kind:'number'},{name:'frequency_cap_per_day',label:'Frecuencia diaria',kind:'number',required:true}],
+  },
+  sponsor_placements: {
+    kind:'sponsor_placements',title:'Ubicaciones patrocinadas',eyebrow:'Monetización',description:'Asigna campañas únicamente a Home, Academia o Recursos.',table:'sponsor_placements',orderBy:'created_at',orderAscending:false,
+    select:'id, campaign_id, placement, enabled, created_at',displayTitle:(row)=>String(row.placement||'Placement'),displayMeta:(row)=>`${row.campaign_id||''} / ${row.enabled?'activo':'inactivo'}`,
+    createDefaults:{campaign_id:'',placement:'home',enabled:true},searchableFields:['campaign_id','placement'],filterField:'placement',filterOptions:['home','academia','recursos'],
+    fields:[{name:'campaign_id',label:'ID campaña',kind:'text',required:true},{name:'placement',label:'Ubicación',kind:'select',options:['home','academia','recursos'],required:true},{name:'enabled',label:'Activo',kind:'boolean'}],
+  },
+  feed_posts: {
+    kind: 'feed_posts',
+    title: 'Feed curado',
+    eyebrow: 'Experiencia inmersiva',
+    description: 'Publica historias, anuncios y recursos en el feed inmersivo de CorAM.',
+    table: 'feed_posts',
+    orderBy: 'sort_order',
+    select: 'id, title, body, media_url, media_type, cta_label, cta_url, author_name, status, sort_order, published_at',
+    displayTitle: (row) => String(row.title || 'Publicacion sin titulo'),
+    displayMeta: (row) => `${row.status || 'draft'} / Orden ${row.sort_order ?? 0}`,
+    createDefaults: {
+      title: '',
+      body: '',
+      media_url: '',
+      media_type: 'image',
+      cta_label: 'Abrir',
+      cta_url: '',
+      author_name: 'CorAM',
+      status: 'draft',
+      sort_order: 0,
+      published_at: '',
+    },
+    deactivate: () => ({ status: 'archived' }),
+    searchableFields: ['title', 'body', 'author_name'],
+    filterField: 'status',
+    filterOptions: statusOptions,
+    fields: [
+      { name: 'title', label: 'Titulo', kind: 'text', required: true },
+      { name: 'body', label: 'Texto', kind: 'textarea' },
+      { name: 'media_url', label: 'URL de imagen o video', kind: 'text' },
+      { name: 'media_type', label: 'Tipo de medio', kind: 'select', options: ['image', 'video'], required: true },
+      { name: 'cta_label', label: 'Texto del boton', kind: 'text' },
+      { name: 'cta_url', label: 'Ruta interna o URL HTTPS', kind: 'text' },
+      { name: 'author_name', label: 'Autor', kind: 'text', required: true },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+      { name: 'published_at', label: 'Publicar desde', kind: 'datetime-local' },
+      { name: 'sort_order', label: 'Orden', kind: 'number' },
+    ],
+  },
+  affiliate_partners: {
+    kind: 'affiliate_partners', title: 'Partners afiliados', eyebrow: 'Alianzas',
+    description: 'Configura aliados, dominios permitidos y disclosure obligatorio.',
+    table: 'affiliate_partners', orderBy: 'name',
+    select: 'id, name, slug, allowed_domains, disclosure, status, created_at',
+    displayTitle: (row) => String(row.name || 'Partner sin nombre'),
+    displayMeta: (row) => `${row.status || 'draft'} / ${Array.isArray(row.allowed_domains) ? row.allowed_domains.join(', ') : ''}`,
+    createDefaults: { name: '', slug: '', allowed_domains: [], disclosure: 'CorAM puede recibir una comisión si compras mediante este enlace.', status: 'draft' },
+    deactivate: () => ({ status: 'archived' }), searchableFields: ['name', 'slug'], filterField: 'status', filterOptions: statusOptions,
+    fields: [
+      { name: 'name', label: 'Nombre', kind: 'text', required: true },
+      { name: 'slug', label: 'Slug', kind: 'text', required: true },
+      { name: 'allowed_domains', label: 'Dominios (formato {dominio.com})', kind: 'text', required: true },
+      { name: 'disclosure', label: 'Disclosure de afiliado', kind: 'textarea', required: true },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+    ],
+  },
+  affiliate_courses: {
+    kind: 'affiliate_courses', title: 'Cursos afiliados', eyebrow: 'Alianzas',
+    description: 'Publica recomendaciones verificadas; el destino se valida en el servidor.',
+    table: 'affiliate_courses', orderBy: 'position',
+    select: 'id, partner_id, title, description, thumbnail_url, video_url, destination_url, coupon_code, featured, position, status, published_at',
+    displayTitle: (row) => String(row.title || 'Curso sin título'), displayMeta: (row) => `${row.status || 'draft'} / Orden ${row.position ?? 0}`,
+    createDefaults: { partner_id: '', title: '', description: '', thumbnail_url: '', video_url: '', destination_url: '', coupon_code: '', featured: false, position: 0, status: 'draft', published_at: '' },
+    deactivate: () => ({ status: 'archived' }), searchableFields: ['title', 'description'], filterField: 'status', filterOptions: statusOptions,
+    fields: [
+      { name: 'partner_id', label: 'ID del partner', kind: 'text', required: true },
+      { name: 'title', label: 'Título', kind: 'text', required: true },
+      { name: 'description', label: 'Descripción', kind: 'textarea' },
+      { name: 'thumbnail_url', label: 'URL miniatura', kind: 'text' },
+      { name: 'video_url', label: 'URL video', kind: 'text' },
+      { name: 'destination_url', label: 'URL destino HTTPS', kind: 'text', required: true },
+      { name: 'coupon_code', label: 'Cupón', kind: 'text' },
+      { name: 'featured', label: 'Destacado', kind: 'boolean' },
+      { name: 'position', label: 'Orden', kind: 'number' },
+      { name: 'status', label: 'Estado', kind: 'select', options: statusOptions, required: true },
+      { name: 'published_at', label: 'Publicado', kind: 'datetime-local' },
     ],
   },
   profiles: {

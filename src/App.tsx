@@ -4,6 +4,7 @@ import { CoramAppProvider } from './app/CoramAppContext';
 import { createCoramQueryClient } from './app/queryClient';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AppRouter } from './routes/AppRouter';
+import { SponsorProvider } from './features/sponsors/SponsorProvider';
 
 export default function App() {
   const [queryClient] = useState(createCoramQueryClient);
@@ -12,7 +13,7 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <CoramAppProvider>
-          <AppRouter />
+          <SponsorProvider><AppRouter /></SponsorProvider>
         </CoramAppProvider>
       </QueryClientProvider>
     </ErrorBoundary>

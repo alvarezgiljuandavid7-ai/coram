@@ -1,13 +1,16 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   BookMarked,
+  Building2,
   FolderHeart,
   FolderOpen,
   GraduationCap,
   Heart,
   Home,
   LayoutDashboard,
+  ListMusic,
   Music2,
+  PanelsTopLeft,
   SlidersHorizontal,
   UserRound,
 } from 'lucide-react';
@@ -49,6 +52,17 @@ export const appNavigationItems: AppNavigationItem[] = [
     desktop: true,
     drawer: true,
     bottom: true,
+    container: 'edge-to-edge',
+  },
+  {
+    id: 'feed',
+    to: '/app/feed',
+    label: 'Feed',
+    icon: PanelsTopLeft,
+    match: 'exact',
+    desktop: true,
+    drawer: true,
+    bottom: false,
     container: 'edge-to-edge',
   },
   {
@@ -129,6 +143,28 @@ export const appNavigationItems: AppNavigationItem[] = [
     container: 'edge-to-edge',
   },
   {
+    id: 'repertorio',
+    to: '/app/repertorio',
+    label: 'Repertorio',
+    icon: ListMusic,
+    match: 'prefix',
+    desktop: true,
+    drawer: true,
+    bottom: false,
+    container: 'edge-to-edge',
+  },
+  {
+    id: 'ministerio',
+    to: '/app/ministerio',
+    label: 'Ministerio',
+    icon: Building2,
+    match: 'prefix',
+    desktop: true,
+    drawer: true,
+    bottom: false,
+    container: 'edge-to-edge',
+  },
+  {
     id: 'perfil',
     to: '/app/perfil',
     label: 'Perfil',
@@ -160,7 +196,7 @@ export function isNavigationItemActive(item: AppNavigationItem, pathname: string
 
 export function getAppShellMode(pathname: string): AppShellMode {
   const currentPath = normalizePath(pathname);
-  return currentPath.startsWith('/app/ensayo/') ? 'immersive' : 'standard';
+  return currentPath.startsWith('/app/ensayo/') || currentPath === '/app/feed' ? 'immersive' : 'standard';
 }
 
 export function getActiveNavigationItem(pathname: string): AppNavigationItem | undefined {

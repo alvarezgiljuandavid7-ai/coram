@@ -1,5 +1,8 @@
 import { Redirect } from 'expo-router';
+import { useMobileAuth } from '../src/auth/AuthProvider';
 
 export default function IndexRoute() {
-  return <Redirect href="/(app)" />;
+  const { status } = useMobileAuth();
+  if (status === 'loading') return null;
+  return <Redirect href={status === 'signedIn' ? '/(app)' : '/(auth)'} />;
 }

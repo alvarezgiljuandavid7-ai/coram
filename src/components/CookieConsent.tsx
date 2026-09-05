@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { trackAnalyticsEvent } from '../domain/observability/observabilityRepository';
+import { SPONSOR_CONSENT_EVENT } from '../features/sponsors/SponsorProvider';
 
 const COOKIE_KEY = 'coram_cookie_consent';
 
@@ -15,6 +16,7 @@ export function CookieConsent() {
   const accept = () => {
     localStorage.setItem(COOKIE_KEY, 'accepted');
     setVisible(false);
+    window.dispatchEvent(new Event(SPONSOR_CONSENT_EVENT));
     void trackAnalyticsEvent({ eventName: 'cookies_accepted' });
   };
 

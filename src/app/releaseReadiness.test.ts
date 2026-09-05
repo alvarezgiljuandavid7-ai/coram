@@ -43,6 +43,7 @@ describe('release readiness', () => {
       'vercel.json',
       'capacitor.config.ts',
       'public/manifest.webmanifest',
+      'public/sw.js',
       'public/icons/icon-192.png',
       'public/icons/icon-512.png',
       'public/icons/maskable-icon-512.png',

@@ -24,6 +24,9 @@ import {
 } from '../../../components/experience-v2/ExperienceV2';
 import { getGreetingForHour, getInspirationForDate, millisecondsUntilNextHomeContentChange } from './homeTemporalContent';
 import styles from './HomeScreenV2.module.css';
+import { NextServiceSummary } from '../../../components/home/NextServiceSummary';
+import { PartnerCourseHighlights } from '../../../components/home/PartnerCourseHighlights';
+import { SponsoredPlacement } from '../../../features/sponsors/SponsoredPlacement';
 
 const quickAccess = [
   { label: 'Corarios', detail: 'Letras y tonos', to: '/app/corarios', icon: Music2, tone: 'green' as const },
@@ -61,6 +64,9 @@ export function HomeScreenV2() {
         <HomeGreetingHero firstName={firstName} greeting={greeting} />
         <HomeCampaignCard content={heroContent} />
       </section>
+
+      <NextServiceSummary />
+      <SponsoredPlacement placement="home" />
 
       <section>
         <SectionHeading eyebrow="Continua donde ibas" title="Tu ministerio reciente" action={<Link to="/app/favoritos" className="text-sm font-bold text-[#3d7146]">Ver guardados</Link>} />
@@ -113,6 +119,8 @@ export function HomeScreenV2() {
           {resources.length === 0 ? <div className="mt-4"><StatePanel icon={FolderOpen} title="Sin recursos nuevos" body="Los materiales publicados estaran disponibles en esta seccion." /></div> : <div className="mt-4 grid gap-3">{resources.slice(0, 2).map((resource) => <HomeLinkCard key={resource.id} to="/app/recursos" title={resource.title} detail={resource.category} icon={FolderOpen} />)}</div>}
         </div>
       </section>
+
+      <PartnerCourseHighlights />
 
       <section>
         <SectionHeading eyebrow="Tu actividad" title="Un vistazo a tu camino" />

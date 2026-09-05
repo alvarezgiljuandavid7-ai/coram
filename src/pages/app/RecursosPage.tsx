@@ -3,6 +3,7 @@ import { type Key, useEffect, useMemo, useState } from 'react';
 import { useCoramApp } from '../../app/CoramAppContext';
 import { EditorialCard, EditorialHeading, EditorialHero, ExperienceCanvas, FilterChip, MetricTile, SearchField, SectionHeading, StatePanel } from '../../components/experience-v2/ExperienceV2';
 import type { Resource } from '../../types';
+import { SponsoredPlacement } from '../../features/sponsors/SponsoredPlacement';
 
 export function RecursosPage() {
   const { state, isFavorite, toggleFavorite, recordRecentActivity } = useCoramApp();
@@ -33,6 +34,7 @@ export function RecursosPage() {
   return <ExperienceCanvas>
     <EditorialHeading eyebrow="Biblioteca descargable" title="Recursos" body="Partituras, guías, audios y materiales publicados para preparar cada servicio con orden." icon={FolderOpen} />
     <EditorialHero badge="Material ministerial" title="Todo lo que necesitas, listo para usar" body="Busca, guarda y abre los recursos reales publicados desde el panel administrador." icon={Sparkles} imageUrl="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1500&q=82" />
+    <SponsoredPlacement placement="recursos" />
     <section className="grid gap-3 sm:grid-cols-3"><MetricTile label="Recursos" value={state.resources.length} detail="Publicados" icon={FolderOpen} /><MetricTile label="Con archivo" value={downloadable} detail="Listos para abrir" icon={Download} tone="gold" /><MetricTile label="Favoritos" value={favorites} detail="Guardados" icon={Heart} tone="lilac" /></section>
     <section className="space-y-4"><SectionHeading eyebrow="Explorar" title="Encuentra tu material" /><SearchField value={query} onChange={setQuery} placeholder="Buscar recursos..." /><div className="flex gap-2 overflow-x-auto pb-1">{categories.map((item) => <FilterChip key={item} active={category === item} label={item} onClick={() => setCategory(item)} />)}<FilterChip active={onlyFavorites} label="Favoritos" icon={Heart} onClick={() => setOnlyFavorites((current) => !current)} /></div></section>
     <section className="space-y-4"><SectionHeading eyebrow="Contenido publicado" title="Biblioteca CorAM" />{state.resources.length === 0 ? <StatePanel icon={FolderOpen} title="Aún no hay recursos" body="Los materiales aparecerán cuando sean publicados desde Supabase." /> : filtered.length === 0 ? <StatePanel icon={Search} title="No hay coincidencias" body="Prueba con otra búsqueda o categoría." /> : <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filtered.map((resource) => <ResourceTile key={resource.id} resource={resource} favorite={isFavorite('resource', resource.id)} onOpen={() => openResource(resource)} onFavorite={() => void toggleFavorite('resource', resource.id)} />)}</div>}</section>

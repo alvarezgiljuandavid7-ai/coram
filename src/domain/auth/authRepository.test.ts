@@ -80,13 +80,19 @@ describe('authRepository', () => {
     expect(mocks.assign).toHaveBeenCalledWith('https://appleid.apple.com/auth/authorize?client_id=coram');
   });
 
-  it('keeps auth redirects on the current origin in Preview and local environments', async () => {
+  it('uses the stable configured origin for Preview OAuth callbacks', async () => {
     const { buildAuthRedirectUrl } = await import('./authRepository');
 
-    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe('http://localhost:3000/login');
+    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'https://coram-two.vercel.app/')).toBe('https://coram-two.vercel.app/login');
     expect(
       buildAuthRedirectUrl('/login', 'https://coram-co1nryl1h-alvarezgiljuandavid7-ais-projects.vercel.app', 'https://coram-two.vercel.app/'),
-    ).toBe('https://coram-co1nryl1h-alvarezgiljuandavid7-ais-projects.vercel.app/login');
+    ).toBe('https://coram-two.vercel.app/login');
+  });
+
+  it('falls back to the current origin when the configured redirect origin is invalid', async () => {
+    const { buildAuthRedirectUrl } = await import('./authRepository');
+
+    expect(buildAuthRedirectUrl('/login', 'http://localhost:3000', 'http://invalid.example.com')).toBe('http://localhost:3000/login');
   });
 
   it('trims email before password sign in', async () => {

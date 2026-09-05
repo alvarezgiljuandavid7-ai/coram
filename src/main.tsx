@@ -4,6 +4,12 @@ import App from './App.tsx';
 import { reportError } from './domain/observability/observabilityRepository.ts';
 import './index.css';
 
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js');
+  }, { once: true });
+}
+
 window.addEventListener('error', (event) => {
   console.error(JSON.stringify({ level: 'error', message: event.message, stack: event.error?.stack, route: window.location.pathname }));
   void reportError({

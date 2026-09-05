@@ -76,9 +76,12 @@ Set these in Vercel Project Settings > Environment Variables for Production and 
 ```text
 VITE_SUPABASE_URL=https://qbjcqnhgijsotmdzccmi.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<publishable-key>
+VITE_CORAM_AUTH_REDIRECT_ORIGIN=<stable-https-web-domain>
 ```
 
 Do not add any Supabase `service_role` or secret key to Vercel for the browser app.
+Use the same stable HTTPS domain for `VITE_CORAM_AUTH_REDIRECT_ORIGIN` in Preview
+and Production so OAuth callbacks do not return to an ephemeral Preview URL.
 
 ## Supabase Auth URL settings
 

@@ -28,9 +28,10 @@ describe('AppShellV2 navigation', () => {
     expect(corarios && isNavigationItemActive(corarios, '/app/corarios-extra')).toBe(false);
   });
 
-  it('bypasses the shared shell for rehearsal routes only', () => {
+  it('bypasses the shared shell for immersive routes', () => {
     expect(getAppShellMode('/app/ensayo/corario/123')).toBe('immersive');
     expect(getAppShellMode('/app/ensayo/himno/456')).toBe('immersive');
+    expect(getAppShellMode('/app/feed')).toBe('immersive');
     expect(getAppShellMode('/app/corarios')).toBe('standard');
   });
 
@@ -40,7 +41,7 @@ describe('AppShellV2 navigation', () => {
   });
 
   it('gives every V2 user experience the edge-to-edge canvas', () => {
-    for (const path of ['/app/corarios', '/app/himnario', '/app/herramientas', '/app/herramientas/afinador', '/app/academia', '/app/recursos', '/app/colecciones', '/app/favoritos', '/app/perfil']) {
+    for (const path of ['/app/corarios', '/app/himnario', '/app/herramientas', '/app/herramientas/afinador', '/app/academia', '/app/recursos', '/app/colecciones', '/app/favoritos', '/app/repertorio', '/app/ministerio', '/app/perfil']) {
       expect(getPageContainerMode(path)).toBe('edge-to-edge');
     }
   });
@@ -49,6 +50,7 @@ describe('AppShellV2 navigation', () => {
     expect(appNavigationItems.map((item) => item.to)).toEqual([
       '/app',
       '/app/inicio',
+      '/app/feed',
       '/app/corarios',
       '/app/himnario',
       '/app/herramientas',
@@ -56,6 +58,8 @@ describe('AppShellV2 navigation', () => {
       '/app/recursos',
       '/app/colecciones',
       '/app/favoritos',
+      '/app/repertorio',
+      '/app/ministerio',
       '/app/perfil',
     ]);
   });
